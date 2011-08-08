@@ -117,7 +117,7 @@
 				<!--<jvmarg value="-server" />-->
 				<arg value="ducks.driver.Main"/>
 				<arg value="-f"/>
-				<arg value="resources/workflow-study.properties" />
+				<arg value="resources/cian-workflow-study.properties" />
 				<arg value="-d"/>
 				<arg value="resources/log4j.properties"/>
 				<classpath refid="project.classpath"/>
@@ -133,7 +133,7 @@
         	<jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5432" />	
         		-->
 			<arg value="-s"/>
-        	<arg value="resources/study.properties"/>
+        	<arg value="resources/cian-workflow-study.properties"/>
 			<!--<arg value="-n" />-->
 			<arg value="-d"/>
 			<arg value="resources/log4j.properties"/>
