@@ -1,0 +1,3 @@
+[submodule "CiAN"]
+	path = CiAN
+	url = https://jalliot@github.com/jalliot/CiAN.git
