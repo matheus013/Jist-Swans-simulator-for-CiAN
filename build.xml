@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="build" name="vanet-simu">
+	
+	<property name="classes.dir" value="classes" />
+	<property name="src.dir" value="src" />
+	<property name="libs.dir" value="libs" />
+	<property name="cian.src.dir" value="src/java" />
+	<property name="cian.libs.dir" value="lib" />
+
+	
+	<!-- Available modules -->
+	<property name="jist.dir" value="jist-swans-1.0.6" />
+	<property name="js-ext.dir" value="js-ext"/>
+	<property name="ducks.dir" value="ducks" />
+	<property name="vans.dir" value="vans" />
+	<property name="cian.dir" value="CiAN" />
+
+	<path id="project.classpath">
+    	<dirset dir="${basedir}">
+    		<include name="*/${classes.dir}"/>
+    	</dirset>
+    	<fileset dir="${basedir}">
+    		<include name="*/${libs.dir}/*.jar"/>
+    		<include name="${cian.dir}/${cian.libs.dir}/*.jar"/>
+    	</fileset>
+    </path>
+	
+	<target name="build.cian">
+		<mkdir dir="${cian.dir}/${classes.dir}"/>
+		<javac destdir="${cian.dir}/${classes.dir}" source="1.5">
+			<src path="${cian.dir}/${cian.src.dir}" />
+		   	<classpath refid="project.classpath"/>
+		</javac>
+	</target>
+	
+	<!-- Compilation targets ......................................... -->
+    <target name="build.init" depends="build.cian">
+    	
+    </target>
+	
+    <target name="clean.classes">
+    	<delete includeemptydirs="true">
+    	    <fileset dir="${basedir}" includes="*/${classes.dir}/**/*"/>
+    		<fileset dir="${basedir}" includes="*/${classes.dir}"/>
+		</delete>
+    </target>
+	
+	<target name="build.jist" depends="build.init" >
+		<mkdir dir="${jist.dir}/${classes.dir}"/>
+		<javac destdir="${jist.dir}/${classes.dir}" source="1.5">
+			<src path="${jist.dir}/${src.dir}" />
+			<src path="${js-ext.dir}/${src.dir}" />
+			<src path="${vans.dir}/${src.dir}"/>
+			<src path="${ducks.dir}/${src.dir}"/>
+		   	<classpath refid="project.classpath"/>
+		</javac>
+		<copy todir="${jist.dir}/${classes.dir}">
+			<fileset dir="${jist.dir}/${src.dir}">
+				<filename name="**/*.properties" />
+			</fileset>
+		</copy>
+	</target>
+	
+	<target name="build.jsext" depends="build.jist">
+		<mkdir dir="${js-ext.dir}/${classes.dir}"/>
+		<javac destdir="${js-ext.dir}/${classes.dir}" source="1.5">
+			<src path="${js-ext.dir}/${src.dir}" />
+			<classpath refid="project.classpath"/>
+		</javac>
+	</target>
+	
+	<target name="build.vans" depends="build.jist">
+		<mkdir dir="${vans.dir}/${classes.dir}"/>
+		<javac destdir="${vans.dir}/${classes.dir}" source="1.5">
+			<src path="${vans.dir}/${src.dir}"/>
+			<classpath refid="project.classpath"/>
+		</javac>
+	</target>
+	
+	<target name="build.ducks" depends="build.jist,build.jsext,build.vans">
+		<mkdir dir="${ducks.dir}/${classes.dir}"/>
+		<javac destdir="${ducks.dir}/${classes.dir}" source="1.5">
+			<!-- This command line argument to the compiler works around a problem that apparently BCEL has with
+		     Java 1.5. The problem is a ClassFormatException around LVT entries when running the code.
+		     Some users say that it only happens when using for-loops with iterators which were introduced with Java 1.5
+		     Another one says, he sees this behaviour only if there's a local variable using generics in a method, 
+		     that get's it's bytecode changed, e.g. only if you use a generic local variable AND 
+		     access a rewritten field directly. This might happen in JiST/SWANS, if a rewritten module uses
+		     generics.
+		     The option "-g:lines,source" compiles the code without variable debug information and resolves
+		     the problem 
+		     -->
+			<compilerarg value="-g:lines,source" />
+			<src path="${ducks.dir}/${src.dir}"/>
+		    <classpath refid="project.classpath"/>
+		</javac>
+	</target>
+	
+	<target name="build" depends="build.jist,build.jsext,build.vans,build.ducks">
+		<echo message="Compiling ${ant.project.name}: ${ant.file}"/>
+	</target>
+	
+	<!-- Running targets ......................................... -->
+	<target name="clean.cache" description="Cleans the JiST Rewriter cache which can accidentally lead to strange effects">
+		<delete>
+			<fileset dir="${java.io.tmpdir}" includes="jistRewriterCache-*" />
+		</delete>
+	</target>
+	
+	<target name="run.ducks.driver" depends="clean.cache">
+			<java classname="jist.runtime.Main" dir="${basedir}/${ducks.dir}" failonerror="true" fork="yes">
+				<jvmarg value="-Xmx1G" />
+				<!-- enable for debugging			
+				<jvmarg value="-Xdebug" />
+				<jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5432" />
+				 --> 									
+				<!--<jvmarg value="-server" />-->
+				<arg value="ducks.driver.Main"/>
+				<arg value="-f"/>
+				<arg value="resources/workflow-study.properties" />
+				<arg value="-d"/>
+				<arg value="resources/log4j.properties"/>
+				<classpath refid="project.classpath"/>
+			</java>
+	</target>
+
+	<target name="run.ducks.controller">
+        	<java classname="ducks.controller.DucksController" dir="${basedir}/${ducks.dir}" failonerror="true" fork="yes">
+			<jvmarg value="-server" />
+			<jvmarg value="-Xmx1G" />     
+        	<!-- enable for debugging 		
+        	<jvmarg value="-Xdebug" />
+        	<jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5432" />	
+        		-->
+			<arg value="-s"/>
+        	<arg value="resources/study.properties"/>
+			<!--<arg value="-n" />-->
+			<arg value="-d"/>
+			<arg value="resources/log4j.properties"/>
+			<arg value="-l" />
+			<arg value="WARN" />
+			<classpath refid="project.classpath"/>
+		</java>
+	</target>
+	
+	<target name="run.jist.server" depends="clean.cache">
+		<delete>
+			<fileset dir="${java.io.tmpdir}" includes="jistRewriterCache-*"/>
+  		</delete>
+		<java classname="jist.runtime.Main" dir="${jist.dir}/bin" failonerror="true" fork="yes">
+			<jvmarg value="-server"/>
+			<jvmarg value="-Xmx1G" />
+			<arg value="-S"/>	
+			<arg value="-p"/>	
+			<arg value="5550"/>
+			<classpath refid="project.classpath"/>
+		</java>
+	</target>
+
+
+	
+    <target name="run.jist.aodvsim" depends="clean.cache">
+		<java classname="jist.runtime.Main" dir="${jist.dir}/bin" failonerror="true" fork="yes">
+			<jvmarg value="-server"/>
+			<arg value="jist.swans.Main"/>
+			<arg value="ext.driver.aodvsim"/>
+			<arg value="-n"/>
+			<arg value="100"/>
+			<arg value="-f"/>
+			<arg value="500x500"/>
+			<arg value="-t"/>
+			<arg value="10,120,20"/>
+			<arg value="-m"/>
+			<arg value="waypoint:0,100,1,5"/>
+			<arg value="-a"/>
+			<arg value="random"/>
+			<arg value="-l"/>
+			<arg value="none"/>
+			<arg value="-s"/>
+			<arg value="1.0"/>
+			<classpath refid="project.classpath"/>
+		</java>
+    </target>
+	
+	<target name="run.driver.udp" depends="clean.cache">
+		<java classname="jist.runtime.Main" dir="${jist.dir}/bin" failonerror="true" fork="yes">
+			<jvmarg value="-server"/>
+			<arg value="jist.swans.Main"/>
+			<arg value="driver.udp"/>
+			<classpath refid="project.classpath"/>
+		</java>
+	</target>
+		
+</project>

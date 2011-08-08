@@ -1,0 +1,3765 @@
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/bin/jist jist-swans-1.0.6/bin/jist
+--- jist-swans-1.0.6-orig/bin/jist	2004-01-20 20:25:19.000000000 +0100
++++ jist-swans-1.0.6/bin/jist	2007-11-08 15:01:53.000000000 +0100
+@@ -2,15 +2,16 @@
+ 
+ # java executable
+ JAVA=java
+-JAVA_OPT=-server
++JAVA_OPT="-server"
+ #JAVA=/opt/IBMJava2-141/bin/java
+ #JAVA_OPT=
+ # -enableassertions
+ 
+ # jist directories
+-JIST_DIR=`dirname $0`/../
++JIST_DIR=`dirname $0`/..
+ JIST_SRC=${JIST_DIR}/src
+ JIST_LIBS=${JIST_DIR}/libs/bcel.jar:${JIST_DIR}/libs/bsh.jar:${JIST_DIR}/libs/jargs.jar:${JIST_DIR}/libs/log4j.jar:${JIST_DIR}/libs/jython.jar
++#JAVA_OPT="${JAVA_OPT} -Dlog4j.debug"
+ 
+ # .so path
+ LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${JIST_SRC}/jist/swans/misc
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/bin/jist-server.bat jist-swans-1.0.6/bin/jist-server.bat
+--- jist-swans-1.0.6-orig/bin/jist-server.bat	1970-01-01 01:00:00.000000000 +0100
++++ jist-swans-1.0.6/bin/jist-server.bat	2007-11-08 15:01:53.000000000 +0100
+@@ -0,0 +1,7 @@
++@set JAVA="java"
++
++@set JAVA_OPT=-server
++
++@%JAVA% -version
++@set CP=..\libs\bcel.jar;..\libs\bsh.jar;..\libs\jargs.jar;..\libs\log4j.jar;..\libs\jython.jar;..\classes;%CLASSPATH%
++@%JAVA% %JAVA_OPT% -Xmx250000000 -classpath %CP% jist.runtime.Main -S -p 555
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/bin/jist.bat jist-swans-1.0.6/bin/jist.bat
+--- jist-swans-1.0.6-orig/bin/jist.bat	2003-11-09 03:57:24.000000000 +0100
++++ jist-swans-1.0.6/bin/jist.bat	2007-11-08 15:01:53.000000000 +0100
+@@ -1,7 +1,7 @@
+-@set JAVA=java
++@set JAVA="C:\Programme\JDK\jdk142\bin\java"
++
+ @set JAVA_OPT=-server
+-@rem set JAVA="c:\program files\ibm\java13\bin\java"
+-@rem set JAVA_OPT=
+ 
+-@set CP=..\libs\bcel.jar;..\libs\bsh.jar;..\libs\jargs.jar;..\libs\log4j.jar;..\libs\jython.jar;..\src;%CLASSPATH%
+-@%JAVA% %JAVA_OPT% -Xmx250000000 -classpath %CP% jist.runtime.Main %1 %2 %3 %4 %5 %6 %7 %8 %9
++@%JAVA% -version
++@set CP=..\libs\bcel.jar;..\libs\bsh.jar;..\libs\jargs.jar;..\libs\log4j.jar;..\libs\jython.jar;..\classes;%CLASSPATH%
++@%JAVA% %JAVA_OPT% -Xmx250000000 -classpath %CP% jist.runtime.Main %*
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/bin/proxy jist-swans-1.0.6/bin/proxy
+--- jist-swans-1.0.6-orig/bin/proxy	2005-07-25 14:52:56.000000000 +0200
++++ jist-swans-1.0.6/bin/proxy	1970-01-01 01:00:00.000000000 +0100
+@@ -1,3 +0,0 @@
+-#!/bin/bash
+-JIST_SRC=`dirname $0`/../src
+-exec java -cp ${JIST_SRC}:${CLASSPATH} jist.runtime.ProxyPoint $*
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/bin/swans.bat jist-swans-1.0.6/bin/swans.bat
+--- jist-swans-1.0.6-orig/bin/swans.bat	2003-10-24 17:05:07.000000000 +0200
++++ jist-swans-1.0.6/bin/swans.bat	2007-11-08 15:01:53.000000000 +0100
+@@ -1,3 +1,3 @@
+ @set CP=..\libs\bcel.jar;..\libs\bsh.jar;..\libs\jargs.jar;..\libs\log4j.jar;..\libs\jython.jar;..\src
+-@jist.bat jist.swans.Main %1 %2 %3 %4 %5 %6 %7 %8 %9
++@jist.bat jist.swans.Main %*
+ 
+Files jist-swans-1.0.6-orig/libs/bcel.jar and jist-swans-1.0.6/libs/bcel.jar differ
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/driver/aodvsim.java jist-swans-1.0.6/src/driver/aodvsim.java
+--- jist-swans-1.0.6-orig/src/driver/aodvsim.java	2004-04-06 18:07:41.000000000 +0200
++++ jist-swans-1.0.6/src/driver/aodvsim.java	2007-11-08 15:01:48.000000000 +0100
+@@ -447,8 +447,8 @@
+     JistAPI.sleep(opts.startTime*Constants.SECOND);
+     //System.out.println("clear stats at t="+JistAPI.getTimeString());
+     stats.clear();
+-    int numTotalMessages = (int)Math.floor(((double)opts.sendRate/60) * opts.nodes * opts.duration);
+-    long delayInterval = (long)Math.ceil((double)opts.duration * (double)Constants.SECOND / (double)numTotalMessages);
++    int numTotalMessages = (int)StrictMath.floor(((double)opts.sendRate/60) * opts.nodes * opts.duration);
++    long delayInterval = (long)StrictMath.ceil((double)opts.duration * (double)Constants.SECOND / (double)numTotalMessages);
+     for(int i=0; i<numTotalMessages; i++)
+     {
+       //pick random send node
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/driver/heartbeat.java jist-swans-1.0.6/src/driver/heartbeat.java
+--- jist-swans-1.0.6-orig/src/driver/heartbeat.java	2004-11-22 17:51:05.000000000 +0100
++++ jist-swans-1.0.6/src/driver/heartbeat.java	2007-11-08 15:01:48.000000000 +0100
+@@ -9,6 +9,8 @@
+ 
+ package driver;
+ 
++import java.util.ArrayList;
++
+ import jist.swans.Constants;
+ import jist.swans.misc.Util;
+ import jist.swans.misc.Mapper;
+@@ -27,6 +29,7 @@
+ import jist.swans.net.NetIp;
+ import jist.swans.net.PacketLoss;
+ import jist.swans.app.AppHeartbeat;
++import jist.swans.app.AppHeartbeat.HeartbeatStats;
+ 
+ import jist.runtime.JistAPI;
+ 
+@@ -49,6 +52,10 @@
+   /** random waypoint maximum speed. */
+   public static final int MAX_SPEED = 10;
+ 
++  // Elmar Schoch added >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
++  private static ArrayList<AppHeartbeat> appList = new ArrayList<AppHeartbeat>();
++  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
++
+   /**
+    * Initialize simulation node.
+    *
+@@ -72,6 +79,10 @@
+     NetIp net = new NetIp(new NetAddress(i), protMap, plIn, plOut);
+     AppHeartbeat app = new AppHeartbeat(i, true);
+ 
++    // Elmar Schoch added >>>>>>>>>>>>>>>>>>>>>>>>>>>
++    heartbeat.appList.add(app);
++    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
++    
+     // hookup entities
+     field.addRadio(radio.getRadioInfo(), radio.getProxy(), placement.getNextLocation());
+     field.startMobility(radio.getRadioInfo().getUnique().getID());
+@@ -150,6 +161,35 @@
+     System.out.println("Average sensing = "+f.computeAvgConnectivity(true));
+     System.out.println("Average receive = "+f.computeAvgConnectivity(false));
+     JistAPI.endAt(time*Constants.SECOND);
++    
++    // Elmar Schoch added >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
++    JistAPI.runAt(new Runnable()
++    {
++      public void run()
++      {
++        System.out.println("Evaluation");
++        int i = 0;
++        float avgMinSum = 0;
++        float avgMaxSum = 0;
++        float avgSum = 0;
++        for(AppHeartbeat app : appList) {
++        	float[] stats = app.hbs.getNeighborCountStats(5*Constants.SECOND, 60*Constants.SECOND, 500*Constants.MILLI_SECOND);
++        	float[] statTime = app.hbs.getNeighborTimeStats(60*Constants.SECOND);
++        	avgMinSum += stats[0];
++        	avgMaxSum += stats[1];
++        	avgSum += stats[2];
++        	System.out.println("Node "+i+":");
++        	System.out.println(" - Neighbor Count:  Min: "+stats[0]+"  Max: "+stats[1]+"  Avg: "+stats[2]);
++        	System.out.println(" - Neighbor Time:   Min: "+statTime[0]+"  Max: "+statTime[1]+"  Avg: "+statTime[2]);
++        	//app.hbs.displayNeighborTrace();
++        	i++;
++        }
++        System.out.println("Min average: "+(avgMinSum / (float) appList.size()));
++        System.out.println("Max average: "+(avgMaxSum / (float) appList.size()));
++        System.out.println("Total average: "+(avgSum / (float) appList.size()));
++      }
++    }, JistAPI.END);
++    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+   }
+ 
+ }
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/driver/ndp.java jist-swans-1.0.6/src/driver/ndp.java
+--- jist-swans-1.0.6-orig/src/driver/ndp.java	2004-04-06 18:07:42.000000000 +0200
++++ jist-swans-1.0.6/src/driver/ndp.java	2007-11-08 15:01:48.000000000 +0100
+@@ -406,7 +406,7 @@
+               System.out.println("Average node/bin = "+options.num/(double)(options.spatial_div*options.spatial_div));
+               break;
+             case MODE_SPATIAL_HIER:
+-              System.out.println("Average node/bin = "+options.num/Math.pow(4, options.spatial_div));
++              System.out.println("Average node/bin = "+options.num/StrictMath.pow(4, options.spatial_div));
+               break;
+             default:
+               throw new RuntimeException("invalid binning type");
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/driver/spatial.java jist-swans-1.0.6/src/driver/spatial.java
+--- jist-swans-1.0.6-orig/src/driver/spatial.java	2005-07-11 18:23:27.000000000 +0200
++++ jist-swans-1.0.6/src/driver/spatial.java	2007-11-08 15:01:48.000000000 +0100
+@@ -271,7 +271,7 @@
+           bins = options.spatial_div*options.spatial_div;
+           break;
+         case MODE_SPATIAL_HIER:
+-          bins = (long)Math.pow(4, options.spatial_div);
++          bins = (long)StrictMath.pow(4, options.spatial_div);
+           break;
+         default:
+           throw new RuntimeException("invalid spatial binning mode");
+@@ -296,7 +296,7 @@
+       // results
+       System.out.println("seconds: "+((endTime-startTime)/1000.0)
+           +" bins="+numbins
+-          +" work="+(numbins*Math.max(nodebin,1)));
++          +" work="+(numbins*StrictMath.max(nodebin,1)));
+       */
+     }
+     catch(CmdLineParser.OptionException e)
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/runtime/Controller.java jist-swans-1.0.6/src/jist/runtime/Controller.java
+--- jist-swans-1.0.6-orig/src/jist/runtime/Controller.java	2005-03-13 17:11:54.000000000 +0100
++++ jist-swans-1.0.6/src/jist/runtime/Controller.java	2007-11-08 15:01:16.000000000 +0100
+@@ -15,6 +15,10 @@
+ import java.rmi.server.*;
+ import org.apache.log4j.*;
+ 
++// @author Elmar Schoch
++// import necessary only for advanced schedulers from ext.jist.runtime.SchedulingQueue
++// import ext.jist.runtime.SchedulingQueue;
++
+ import jist.runtime.guilog.GuiLog;
+ 
+ /** 
+@@ -176,8 +180,12 @@
+   /**
+    * Queue of simulation events.
+    */
+-  private final Scheduler.Heap events = new Scheduler.Heap();
+-  //private final Scheduler.Calendar events = new Scheduler.Calendar(1000000000, 1000);
++  private final Scheduler events = new Scheduler.Heap();
++  //private final Scheduler events = new Scheduler.Calendar(1000000000, 1000);
++  //private final Scheduler events = new SchedulingQueue.PQScheduler();
++  //private final Scheduler events = new SchedulingQueue.PBScheduler();
++  //private final Scheduler events = new SchedulingQueue.TMScheduler();
++  //private final Scheduler events = new SchedulingQueue.STScheduler();
+ 
+ 
+   /**
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/runtime/Event.java jist-swans-1.0.6/src/jist/runtime/Event.java
+--- jist-swans-1.0.6-orig/src/jist/runtime/Event.java	2004-07-27 17:46:47.000000000 +0200
++++ jist-swans-1.0.6/src/jist/runtime/Event.java	2007-11-08 15:01:16.000000000 +0100
+@@ -7,6 +7,9 @@
+ // All rights reserved.
+ // Refer to LICENSE for terms and conditions of use.
+ 
++// Includes extensions by Ulm University
++// - Make an event comparable
++
+ package jist.runtime;
+ 
+ import java.util.Comparator;
+@@ -23,7 +26,7 @@
+  * @version $Id: Event.java,v 1.34 2004-07-27 15:46:47 barr Exp $
+  * @since JIST1.0
+  */
+-public class Event 
++public class Event implements Comparable
+ {
+   //////////////////////////////////////////////////
+   // locals
+@@ -329,6 +332,20 @@
+     return hash;
+   }
+ 
++  
++  /**
++   * Implement the Comparable Interface in order to allow Collections
++   * to sort Events by a natural ordering. The comparison works the
++   * same way as the EventComparator provided by JiST. By refusing to
++   * return 0 for concurrent events we get a well defined order in the
++   * spirit of "first come, first serve". This is not a total order!!
++   *
++   * @author Michael Feiri &lt;michael.feiri@uni-ulm.de&gt;
++   */
++  public int compareTo(Object o) {
++	  return (((Event)o).time < this.time) ? 1 : -1;
++  }
++  
+   //////////////////////////////////////////////////
+   // Event comparison
+   //
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/runtime/Main.java jist-swans-1.0.6/src/jist/runtime/Main.java
+--- jist-swans-1.0.6-orig/src/jist/runtime/Main.java	2004-06-09 20:54:17.000000000 +0200
++++ jist-swans-1.0.6/src/jist/runtime/Main.java	2007-11-08 15:01:16.000000000 +0100
+@@ -7,6 +7,9 @@
+ // All rights reserved.
+ // Refer to LICENSE for terms and conditions of use.
+ 
++// Includes extensions by Ulm Univserity
++// - Do not close RMI streams stdout und stderr automatically 
++
+ package jist.runtime;
+ 
+ import java.io.*;
+@@ -437,8 +440,17 @@
+       {
+         System.setOut(lout); System.setErr(lerr);
+       }
++      // @author Elmar Schoch >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
++      // Commented out, since rerr and rout are always != null and thus System.out and System.err
++      // are closed (normally setting rerr and rout to null is done by the calling method (jobPump)
++      // in currentJob.client.done();
++      
++      /* 
+       if(rerr!=null) rerr.close(); 
+       if(rout!=null) rout.close();
++      */
++      
++      // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+     }
+     catch(Exception e) 
+     { 
+@@ -775,7 +787,7 @@
+           // reconnect with backoff for job queue server failures
+           System.out.println("Connection to queue server failed! Will try to reconnect in "+(pause/1000)+" seconds.");
+           Thread.sleep(pause);
+-          pause = Math.min(maxpause, pause*2);
++          pause = StrictMath.min(maxpause, pause*2);
+         }
+       }
+     }
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/runtime/ProxyEntity.java jist-swans-1.0.6/src/jist/runtime/ProxyEntity.java
+--- jist-swans-1.0.6-orig/src/jist/runtime/ProxyEntity.java	2004-04-06 18:07:43.000000000 +0200
++++ jist-swans-1.0.6/src/jist/runtime/ProxyEntity.java	2007-11-08 15:01:16.000000000 +0100
+@@ -89,7 +89,7 @@
+   //
+ 
+   /**
+-   * Check recursively whether a given class implements a given interface.
++   * Check whether a given class implements a given interface.
+    *
+    * @param c class to check
+    * @param ci interface to check for
+@@ -97,10 +97,49 @@
+    */
+   public static boolean doesImplement(Class c, Class ci)
+   {
+-   return ci.isInterface() && ci.isAssignableFrom(c);
++    while(c!=null)
++    {
++        // modified by Christian Spann
++        // the parent interfaces of the returned interfaces may also be
++        // the interface we search for
++//         if(Util.contains(c.getInterfaces(), ci)){
++//            return true;
++//         }
++         Class[] ifaces = c.getInterfaces();
++         //search the interfaces and their parents
++         if(searchInterface(ifaces, ci)){
++        return true;
++         }
++      //check superclasses  
++      c = c.getSuperclass();
++    }
++    return false;
+   }
+ 
+   /**
++   * Searches the list of interfaces and all their parent interfaces for the given Interface
++   * recursively.
++   * @param ifaces the list of interfaces
++   * @param ci the interface to search for
++   * @return true if found - false if not
++   */
++  private static boolean searchInterface(Class[] ifaces, Class ci){
++      for (Class iface : ifaces) {
++          //check the interface itself
++          if(iface.equals(ci)){
++              return true;
++          }
++          //check parent interfaces
++          if(iface.getInterfaces().length > 0){
++              if(searchInterface(iface.getInterfaces(), ci)){
++                  return true;
++              }
++          }
++      }
++      return false;
++  }
++
++  /**
+    * Verifies the given proxy target and proxy interfaces are valid. Checks
+    * performed include: verify that target implements the interface, the
+    * interface does not expose non-final or non-static fields, the interface
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/runtime/RemoteJist.java jist-swans-1.0.6/src/jist/runtime/RemoteJist.java
+--- jist-swans-1.0.6-orig/src/jist/runtime/RemoteJist.java	2004-04-06 18:07:43.000000000 +0200
++++ jist-swans-1.0.6/src/jist/runtime/RemoteJist.java	2007-11-08 15:01:16.000000000 +0100
+@@ -7,6 +7,10 @@
+ // All rights reserved.
+ // Refer to LICENSE for terms and conditions of use.
+ 
++// Includes extensions by Ulm University
++// - Allow specific stdout and stderr streams
++// - Bugfixes in classloading mechanisms
++
+ package jist.runtime;
+ 
+ import java.io.*;
+@@ -16,6 +20,7 @@
+ import java.rmi.server.*;
+ import java.rmi.registry.*;
+ import org.apache.bcel.classfile.*;
++import org.apache.bcel.util.ClassPath;
+ 
+ /** 
+  * All the JiST client-server related remote classes.
+@@ -386,9 +391,9 @@
+     private ResourceFinderRemote resources;
+ 
+     /**
+-     * Hashmap of loaded classes.
++     * Map of loaded classes.
+      */
+-    private HashMap loaded;
++    private Map loaded;
+ 
+     /**
+      * Create new remote classloader backed by 
+@@ -449,9 +454,9 @@
+     private ResourceFinderRemote resources;
+ 
+     /**
+-     * Hashmap of loaded classes.
++     * Map of loaded classes.
+      */
+-    private HashMap cache;
++    private Map cache;
+ 
+     /**
+      * Local server output stream.
+@@ -540,6 +545,28 @@
+       cache = new HashMap();
+     }
+ 
++    /**
++     * Get the ClassPath associated with this Repository
++	 * @author Michael Feiri
++     */
++    public ClassPath getClassPath()
++    {
++        // we are not backed by a filesystem, so we cannot offer a ClassPath
++        // object with a custom path! subclassing ClassPath could be an option,
++        // but simply returning null looks like a viable solution. this approach
++        // is also used in org.apache.bcel.util.ClassLoaderRepository, which
++        // might have served as a template for RemoteRepository.
++ 
++ 		// Elmar Schoch: Another (untested) possibility might be to return
++ 		// the Java temp dir, where JiST caches rewritten classes
++ 		// but this is probably not reliable (since one might choose to
++ 		// disable caching of rewritten classes)
++ 		
++    	// return new ClassPath(System.getProperty("java.io.tmpdir"));
++    	
++        return null;
++    }
++
+   } // class: RemoteRepository
+ 
+ 
+@@ -604,6 +631,22 @@
+       rerr = new RemoteIO.RemoteOutputStreamReceiver(System.err);
+     }
+ 
++    // @author Elmar Schoch >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
++    /**
++     * New constructor for JistClient to be able to assign user-defined
++     * output streams to the remote server instead of simply using
++     * System.out and System.err (which is still possible, of course)
++     * @author Elmar Schoch
++     * @param outStream Stream for output (like System.out)
++     * @param errStream Stream for errors (like System.err)
++     * @throws RemoteException
++     */
++    public JistClient(OutputStream outStream, OutputStream errStream) throws RemoteException {
++    	rout = new RemoteIO.RemoteOutputStreamReceiver(outStream);
++    	rerr = new RemoteIO.RemoteOutputStreamReceiver(errStream);
++    }
++    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
++
+     //////////////////////////////////////////////////
+     // JistClient interface
+     //
+@@ -623,11 +666,20 @@
+     /** {@inheritDoc} */
+     public synchronized void done() throws RemoteException
+     {
++    	// @author Elmar Schoch >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
++    	// Modified to assure that the "notify" command is executed 
++    	// (since the remote client waits for release)
++    	try {
+       UnicastRemoteObject.unexportObject(this, true);
++    	} finally {
+       rout = null;
+       rerr = null;
++    		
+       notify();
+     }
++    	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
++    	
++    }
+ 
+     //////////////////////////////////////////////////
+     // ResourceFinderRemote interface
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/runtime/Rewriter.java jist-swans-1.0.6/src/jist/runtime/Rewriter.java
+--- jist-swans-1.0.6-orig/src/jist/runtime/Rewriter.java	2005-10-04 13:52:47.000000000 +0200
++++ jist-swans-1.0.6/src/jist/runtime/Rewriter.java	2007-11-08 15:01:13.000000000 +0100
+@@ -11,6 +11,7 @@
+ 
+ import org.apache.bcel.*;
+ import org.apache.bcel.classfile.*;
++import org.apache.bcel.util.ClassPath;
+ import org.apache.bcel.generic.*;
+ import org.apache.bcel.verifier.structurals.*;
+ import org.apache.log4j.*;
+@@ -199,6 +200,9 @@
+     "jargs.gnu.",
+     "bsh.",
+     "org.python.",
++    "apple.",
++    "org.xml.",
++    "com.mysql.",
+   };
+ 
+   /**
+@@ -311,7 +315,21 @@
+     }
+     this.lookupCache = new HashMap();
+     this.calledBy = new HashMap();
+-    this.rewriterTime = Repository.lookupClassFile(Rewriter.class.getName()).getTime();
++
++    // @author Elmar Schoch >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
++    // Splitted up classfile lookup and call of "getTime()", since this sometime led to
++    // NullPointerExceptions
++    
++    // this.rewriterTime = Repository.lookupClassFile(Rewriter.class.getName()).getTime();
++    
++    ClassPath.ClassFile cf = Repository.lookupClassFile(Rewriter.class.getName());
++    if ( cf != null) {
++        this.rewriterTime = cf.getTime();
++    } else {
++        this.rewriterTime = 0;
++    }    
++    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
++    
+     this.rewritten = new HashMap();
+     this.rewriters = new Vector();
+     this.continuable = new HashSet();
+@@ -485,8 +503,23 @@
+     // put in cache
+     // note: must come before call graph processing to ensure termination
+     lookupCache.put(name.intern(), jcl);
++    
++    // @author Elmar Schoch >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
++    
+     // process super
+-    JavaClass sup = jcl.getSuperClass();
++    // JavaClass sup = jcl.getSuperClass();
++    
++    // modified to catch a ClassNotFoundException
++    // TODO needs conformance testing!!!
++    JavaClass sup = null;
++    try {
++    	sup = jcl.getSuperClass();
++    } catch (ClassNotFoundException cnfe) {
++    	System.out.println("Rewriter:507 ClassNotFoundException ignored (didn't find superclass of "+jcl+")");
++    }
++    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
++   
++    
+     if(sup!=null) lookupJavaClass(sup.getClassName());
+     // process callgraph
+     if(!isIgnored(name))
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/runtime/RewriterVerify.java jist-swans-1.0.6/src/jist/runtime/RewriterVerify.java
+--- jist-swans-1.0.6-orig/src/jist/runtime/RewriterVerify.java	2004-04-06 18:07:44.000000000 +0200
++++ jist-swans-1.0.6/src/jist/runtime/RewriterVerify.java	2007-11-08 15:01:16.000000000 +0100
+@@ -30,7 +30,7 @@
+    *
+    * @param name class name
+    */
+-  public static void checkme(String name)
++  public static void checkme(String name) throws java.lang.ClassNotFoundException
+   {
+     System.out.println("Now verifying: "+name+"\n");
+ 
+@@ -81,7 +81,7 @@
+         checkme(jcl.getClassName());
+       }
+     }
+-    catch(IOException e)
++    catch(Exception e)
+     {
+     }
+   }
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/runtime/Scheduler.java jist-swans-1.0.6/src/jist/runtime/Scheduler.java
+--- jist-swans-1.0.6-orig/src/jist/runtime/Scheduler.java	2005-03-13 17:11:54.000000000 +0100
++++ jist-swans-1.0.6/src/jist/runtime/Scheduler.java	2007-11-08 15:01:16.000000000 +0100
+@@ -17,7 +17,7 @@
+  * @since JIST1.0
+  */
+ 
+-abstract class Scheduler
++public abstract class Scheduler
+ {
+ 
+   /**
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/runtime/Util.java jist-swans-1.0.6/src/jist/runtime/Util.java
+--- jist-swans-1.0.6-orig/src/jist/runtime/Util.java	2004-05-22 21:04:53.000000000 +0200
++++ jist-swans-1.0.6/src/jist/runtime/Util.java	2007-11-08 15:01:16.000000000 +0100
+@@ -309,8 +309,8 @@
+    */
+   public static double round(double num, int decimal)
+   {
+-    double factor = Math.pow(10, decimal);
+-    return Math.rint(num*factor)/factor;
++    double factor = StrictMath.pow(10, decimal);
++    return StrictMath.rint(num*factor)/factor;
+   }
+ 
+   /**
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/Constants.java jist-swans-1.0.6/src/jist/swans/Constants.java
+--- jist-swans-1.0.6-orig/src/jist/swans/Constants.java	2005-02-10 00:32:20.000000000 +0100
++++ jist-swans-1.0.6/src/jist/swans/Constants.java	2007-11-08 15:01:42.000000000 +0100
+@@ -60,7 +60,7 @@
+   /** Speed of light in a vacuum (units: meter/second). */
+   public static final double SPEED_OF_LIGHT = 2.9979e8;
+   /** Pre-computed natural logarithm of 10. */
+-  public static final double log10 = Math.log(10);
++  public static final double log10 = StrictMath.log(10);
+ 
+   //////////////////////////////////////////////////
+   // Field-related constants
+@@ -78,7 +78,7 @@
+   /** node placement choice constant. */
+   public static final int PLACEMENT_GRID    = 2;
+   /** node placement choice constant. */
+-  public static final int PLACEMENT_MAX     = 2;
++  public static final int PLACEMENT_STREET_RANDOM    = 3;
+   /** node placement choice constant. */
+   public static final int PLACEMENT_DEFAULT = PLACEMENT_RANDOM;
+ 
+@@ -93,8 +93,17 @@
+   /** node mobility choice constant. */
+   public static final int MOBILITY_WALK     = 4;
+   /** node mobility choice constant. */
++  public static final int MOBILITY_STRAW_SIMPLE = 5;
++  /** node mobility choice constant. */
++  public static final int MOBILITY_STRAW_OD   = 6;
++  /** node mobility choice constant. */
+   public static final int MOBILITY_DEFAULT  = MOBILITY_STATIC;
+ 
++  /** street mobility configuration constant. */
++  public static final int MOBILITY_STREET_RANDOM = 1;
++  /** street mobility configuration constant. */
++  public static final int MOBILITY_STREET_FLOW = 2;
++
+   /** spatial data structure choice constant. */
+   public static final int SPATIAL_INVALID = -1;
+   /** spatial data structure choice constant. */
+@@ -216,6 +225,11 @@
+   /** default time-to-live. */
+   public static final byte TTL_DEFAULT = 64;
+ 
++
++  // These numbers do not seem to have a very strict relationship to the
++  // official http://www.iana.org/assignments/protocol-numbers assignments.
++  // Probably simply copied from GloMoSim.
++  
+   /** network level (IP) protocol number. */
+   public static final short NET_PROTOCOL_INVALID        = -1;
+   /** network level (IP) protocol number. */
+@@ -233,6 +247,8 @@
+   /** network level (IP) protocol number. */
+   public static final short NET_PROTOCOL_DSR            = 135;
+   /** network level (IP) protocol number. */
++  public static final short NET_PROTOCOL_CGGC           = 136;
++  /** network level (IP) protocol number. */
+   public static final short NET_PROTOCOL_ODMRP          = 145;
+   /** network level (IP) protocol number. */
+   public static final short NET_PROTOCOL_LAR1           = 110;
+@@ -258,6 +274,13 @@
+   /** network level (IP) protocol number. */
+   public static final short NET_PROTOCOL_MAX            = 999;
+ 
++
++  /** IP option number. */
++  public static final Byte IP_OPTION_ZRP = new Byte((byte)137);
++  /** IP option number. */
++  public static final Byte IP_OPTION_HOPLOC = new Byte((byte)138);
++  
++  
+   //////////////////////////////////////////////////
+   // Routing-related constants
+   //
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/Main.java jist-swans-1.0.6/src/jist/swans/Main.java
+--- jist-swans-1.0.6-orig/src/jist/swans/Main.java	2004-04-06 18:07:46.000000000 +0200
++++ jist-swans-1.0.6/src/jist/swans/Main.java	2007-11-08 15:01:34.000000000 +0100
+@@ -196,6 +196,7 @@
+       }
+       catch(IOException e) 
+       { 
++    	  System.out.println("Logging config file for SWANS ("+options.properties+") was not found");
+       }
+       // set up logging
+       if(config!=null)
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/app/AppHeartbeat.java jist-swans-1.0.6/src/jist/swans/app/AppHeartbeat.java
+--- jist-swans-1.0.6-orig/src/jist/swans/app/AppHeartbeat.java	2004-04-06 18:07:46.000000000 +0200
++++ jist-swans-1.0.6/src/jist/swans/app/AppHeartbeat.java	2007-11-08 18:41:35.000000000 +0100
+@@ -18,8 +18,11 @@
+ 
+ import jist.runtime.JistAPI;
+ 
++import java.util.ArrayList;
+ import java.util.HashMap;
+ import java.util.Iterator;
++import java.util.List;
++
+ 
+ /**
+  * Heartbeat application.
+@@ -145,7 +148,185 @@
+     return (AppInterface)self;
+   }
+ 
+-  //////////////////////////////////////////////////
++  
++  
++  // Elmar Schoch >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
++  // Statistics collection
++  
++  public static class HeartbeatStats {
++	  
++	  public static class NeighborEvent {
++		  public int event;  // 1 = discovered, 0=lost
++		  long time;
++	  }
++	  
++	  private HashMap<MacAddress, List<NeighborEvent>> nbEvents = new HashMap<MacAddress, List<NeighborEvent>>();
++	  
++	  public void neighborDiscovered(MacAddress mac) {
++		  List<NeighborEvent> evList = nbEvents.get(mac);
++		  if (evList == null) {
++			  evList = new ArrayList<NeighborEvent>();
++			  nbEvents.put(mac, evList);
++		  }
++		  NeighborEvent ne = new NeighborEvent();
++		  ne.event = 1;
++		  ne.time = JistAPI.getTime();
++		  evList.add(ne);
++	  }
++	  
++	  public void neighborLost(MacAddress mac) {
++		  List<NeighborEvent> evList = nbEvents.get(mac);
++		  if (evList == null) {
++			  System.out.println("Event List started with Neighbor loss. Should not happen like this.");
++			  evList = new ArrayList<NeighborEvent>();
++			  nbEvents.put(mac, evList);
++		  }
++		  NeighborEvent ne = new NeighborEvent();
++		  ne.event = 0;
++		  ne.time = JistAPI.getTime();
++		  evList.add(ne);
++	  }
++	  
++	  private boolean isNeighbor(MacAddress mac, long time) {
++		  List<NeighborEvent> evList = nbEvents.get(mac);
++		  if (evList.get(0).time < time ) {
++			  for(NeighborEvent ne: evList) {
++				  if (ne.time <= time) {
++					  if (ne.event == 1) {
++						  return true;
++					  } else {
++						  return false;
++					  }
++				  }
++			  }
++		  }
++		  // if no time entry smaller than the current time is found
++		  return false;
++	  }
++	  
++	  /**
++	   * Return a list of statistical values on number of neighbors, counted
++	   * between 'start' and 'end', with a granularity of 'step'
++	   * @param start
++	   * @param end
++	   * @param step
++	   * @return array of floats. Currently [0] = min, [1] = max, [2] = average (more imaginable)
++	   */
++	  public float[] getNeighborCountStats(long start, long end, long step) {
++		  
++		  int minNeighbors = Integer.MAX_VALUE;
++		  int maxNeighbors = Integer.MIN_VALUE;
++		  ArrayList<Integer> counts = new ArrayList<Integer>();
++		  long time = start;
++		  while (time < end) {
++			  int cnt = 0;
++			  for(MacAddress mac: nbEvents.keySet()) {
++				  if ( isNeighbor(mac, time) ) cnt++;
++			  }
++			  if (cnt > maxNeighbors) maxNeighbors = cnt;
++			  if (cnt < minNeighbors) minNeighbors = cnt;
++			  counts.add(new Integer(cnt));
++			  
++			  time += step;
++		  }
++		  
++		  float[] result = new float[3];
++		  result[0] = minNeighbors;
++		  result[1] = maxNeighbors;
++		  int sum = 0;
++		  for(Integer cnt : counts) {
++			  sum += cnt;
++		  }
++		  if (counts.size() > 0) {
++			  result[2] = (float) sum / counts.size();
++		  } else {
++			  result[2] = 0;
++		  }
++		  
++		  return result;
++	  }
++
++	  public void displayNeighborTrace() {
++		  for(MacAddress mac: nbEvents.keySet()) {
++			  System.out.print("Node "+mac+" ");
++			  for (NeighborEvent ne : nbEvents.get(mac)) {
++				  if (ne.event == 1) {
++					  System.out.print("discovered at "+ne.time+", ");
++				  } else {
++					  System.out.print("lost at "+ne.time+", ");
++				  }
++			  }
++			  System.out.println("");
++		  }
++	  }
++	  
++	  /**
++	   * Return statistics about the time that nodes stay in mutual visibility.
++	   *
++	   * @param end [0] min visibility of a neighbor (seconds) [1] max. [2] avg. [3] total number of reincounters 
++	   * @return
++	   */
++	  public float[] getNeighborTimeStats(long end) {
++		  int reincounters = 0;
++		  long start;
++		  boolean reincounterFlag;
++		  
++		  ArrayList<Long> periods = new ArrayList<Long>();
++		  
++		  for (MacAddress mac : nbEvents.keySet()) {
++			  reincounterFlag = false;
++			  start = -1;
++			  for(NeighborEvent ne : nbEvents.get(mac)) {
++				  if (ne.event == 1) {
++					  start = ne.time;
++					  if (reincounterFlag) reincounters++;
++				  } else {
++					  if (start == -1) {
++						  // a neighbor lost event following no neighbor discovered event
++						  // --> Something is wrong. Don't count.
++						  System.out.println("Something wrong.");
++					  } else {
++						  periods.add(new Long(ne.time - start));
++						  start = -1;
++						  reincounterFlag = true;
++					  }
++				  }
++			  }
++			  if (start != -1) {
++				  // Neighbor was still there at the end
++				  periods.add(new Long(end - start));
++			  }
++		  }
++		  
++		  long minPeriod = Long.MAX_VALUE;
++		  long maxPeriod = Long.MIN_VALUE;
++		  long avgPeriodSum = 0;
++		  for(Long period : periods) {
++			  if (period.longValue() < minPeriod) minPeriod = period.longValue();
++			  if (period.longValue() > maxPeriod) maxPeriod = period.longValue();
++			  avgPeriodSum += period.longValue();
++		  }
++		  
++		  float[] result = new float[4];
++		  result[0] = minPeriod / (float) Constants.SECOND;
++		  result[1] = maxPeriod / (float) Constants.SECOND;
++		  if (periods.size() > 0) {
++			  result[2] = (avgPeriodSum / (float) Constants.SECOND)  / (float) periods.size();
++		  } else {
++			  result[2] = 0;
++		  }
++		  result[3] = reincounters;
++		  
++		  return result;
++	  }
++  }
++  
++  public HeartbeatStats hbs = new HeartbeatStats();
++  
++  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
++  
++  
++//////////////////////////////////////////////////
+   // neighbour events
+   //
+ 
+@@ -156,6 +337,9 @@
+    */
+   private void neighbourLost(MacAddress mac)
+   {
++	 // Elmar Schoch added >>>>>>>>>>>>>>>>>>>>>
++	 hbs.neighborLost(mac);
++	 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+     if(display)
+     {
+       System.out.println("("+nodenum+") lost neighbour:  "+mac+", t="+Util.timeSeconds());
+@@ -169,12 +353,18 @@
+    */
+   private void neighbourDiscovered(MacAddress mac)
+   {
++	  // Elmar Schoch added >>>>>>>>>>>>>>>>>>>>>
++	  hbs.neighborDiscovered(mac);
++	  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+     if(display)
+     {
+       System.out.println("("+nodenum+") found neighbour: "+mac+", t="+Util.timeSeconds());
+     }
+   }
+ 
++  
++  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
++
+   //////////////////////////////////////////////////
+   // NetHandler methods
+   //
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/app/io/BufferedReader.java jist-swans-1.0.6/src/jist/swans/app/io/BufferedReader.java
+--- jist-swans-1.0.6-orig/src/jist/swans/app/io/BufferedReader.java	2004-04-06 18:07:46.000000000 +0200
++++ jist-swans-1.0.6/src/jist/swans/app/io/BufferedReader.java	2007-11-08 15:01:27.000000000 +0100
+@@ -182,7 +182,7 @@
+           return -1;
+       }
+     }
+-    int n = Math.min(len, nChars - nextChar);
++    int n = StrictMath.min(len, nChars - nextChar);
+     System.arraycopy(cb, nextChar, cbuf, off, n);
+     nextChar += n;
+     return n;
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/app/io/InputStream.java jist-swans-1.0.6/src/jist/swans/app/io/InputStream.java
+--- jist-swans-1.0.6-orig/src/jist/swans/app/io/InputStream.java	2004-04-06 18:07:46.000000000 +0200
++++ jist-swans-1.0.6/src/jist/swans/app/io/InputStream.java	2007-11-08 15:01:27.000000000 +0100
+@@ -101,7 +101,7 @@
+     while (remaining > 0) 
+     {
+       nr = read(localSkipBuffer, 0,
+-          (int) Math.min(SKIP_BUFFER_SIZE, remaining));
++          (int) StrictMath.min(SKIP_BUFFER_SIZE, remaining));
+       if (nr < 0) 
+       {
+         break;
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/app/io/Reader.java jist-swans-1.0.6/src/jist/swans/app/io/Reader.java
+--- jist-swans-1.0.6-orig/src/jist/swans/app/io/Reader.java	2004-04-06 18:07:46.000000000 +0200
++++ jist-swans-1.0.6/src/jist/swans/app/io/Reader.java	2007-11-08 15:01:27.000000000 +0100
+@@ -70,7 +70,7 @@
+   {
+     if (n < 0L) 
+       throw new IllegalArgumentException("skip value is negative");
+-    int nn = (int) Math.min(n, maxSkipBufferSize);
++    int nn = (int) StrictMath.min(n, maxSkipBufferSize);
+     synchronized (lock) 
+     {
+       if ((skipBuffer == null) || (skipBuffer.length < nn))
+@@ -78,7 +78,7 @@
+       long r = n;
+       while (r > 0) 
+       {
+-        int nc = read(skipBuffer, 0, (int)Math.min(r, nn));
++        int nc = read(skipBuffer, 0, (int)StrictMath.min(r, nn));
+         if (nc == -1)
+           break;
+         r -= nc;
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/field/Fading.java jist-swans-1.0.6/src/jist/swans/field/Fading.java
+--- jist-swans-1.0.6-orig/src/jist/swans/field/Fading.java	2004-06-23 19:15:54.000000000 +0200
++++ jist-swans-1.0.6/src/jist/swans/field/Fading.java	2007-11-08 15:01:32.000000000 +0100
+@@ -68,7 +68,7 @@
+     public double compute()
+     {
+       // compute fading_dB; positive values are signal gains
+-      return 5.0 * Math.log(-2.0 * VARIANCE * Math.log(Constants.random.nextDouble())) / Constants.log10;
++      return 5.0 * StrictMath.log(-2.0 * VARIANCE * StrictMath.log(Constants.random.nextDouble())) / Constants.log10;
+     }
+   }
+ 
+@@ -102,7 +102,7 @@
+      */
+     private static double Besseli0(double x) 
+     {
+-      double ax = Math.abs(x);
++      double ax = StrictMath.abs(x);
+       if (ax < 3.75) 
+       {
+         double y = x/3.75;
+@@ -113,7 +113,7 @@
+       else
+       {
+         double y = 3.75/ax;
+-        return (Math.exp(ax)/Math.sqrt(ax)) * (0.39894228 + y*(0.1328592e-1 + 
++        return (StrictMath.exp(ax)/StrictMath.sqrt(ax)) * (0.39894228 + y*(0.1328592e-1 + 
+           y*(0.225319e-2 + y*(-0.157565e-2 + y*(0.916281e-2 + y*(-0.2057706e-1 + 
+           y*(0.2635537e-1 + y*(-0.1647633e-1 + y*0.392377e-2))))))));
+       }
+@@ -127,7 +127,7 @@
+      */
+     private static double Besseli1(double x) 
+     {
+-      double ax = Math.abs(x);
++      double ax = StrictMath.abs(x);
+       if (ax < 3.75)
+       {
+         double y = x/3.75;
+@@ -138,7 +138,7 @@
+       else
+       {
+         double y = 3.75/ax;
+-        return Math.abs((Math.exp(ax)/Math.sqrt(ax)) * (0.39894228 + y*(-0.3988024e-1 + 
++        return StrictMath.abs((StrictMath.exp(ax)/StrictMath.sqrt(ax)) * (0.39894228 + y*(-0.3988024e-1 + 
+           y*(-0.362018e-2 + y*(0.163801e-2 + y*(-0.1031555e-1 + y*(0.2282967e-1 + 
+           y*(-0.2895312e-1 + y*(0.1787654e-1 - y*0.420059e-2)))))))));
+       }
+@@ -152,7 +152,7 @@
+      */
+     private static double computeStandardDeviation(double kFactor)
+     {
+-      return 1.0/(Math.sqrt(Math.PI/2.0) * Math.exp(-kFactor/2.0) * 
++      return 1.0/(StrictMath.sqrt(StrictMath.PI/2.0) * StrictMath.exp(-kFactor/2.0) * 
+         ((1+kFactor)*Besseli0(kFactor/2.0) + kFactor*Besseli1(kFactor/2.0)));
+     }
+ 
+@@ -161,7 +161,7 @@
+     public double compute()
+     {
+       // compute fading_dB; positive values are signal gains
+-      double a = Math.sqrt(2.0 * kFactor * stddev * stddev), r, v1, v2;
++      double a = StrictMath.sqrt(2.0 * kFactor * stddev * stddev), r, v1, v2;
+       do 
+       {
+         v1 = -1.0 + 2.0 * Constants.random.nextDouble();
+@@ -169,10 +169,10 @@
+         r = v1 * v1 + v2 * v2;
+       }
+       while (r > 1.0);
+-      r = Math.sqrt(-2.0 * Math.log(r) / r);
++      r = StrictMath.sqrt(-2.0 * StrictMath.log(r) / r);
+       v1 = a + stddev * v1 * r;
+       v2 = stddev * v2 * r;
+-      return 5.0 * Math.log(v1*v1 + v2*v2) / Constants.log10;
++      return 5.0 * StrictMath.log(v1*v1 + v2*v2) / Constants.log10;
+     }
+   }
+ 
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/field/Field.java jist-swans-1.0.6/src/jist/swans/field/Field.java
+--- jist-swans-1.0.6-orig/src/jist/swans/field/Field.java	2004-04-06 18:07:47.000000000 +0200
++++ jist-swans-1.0.6/src/jist/swans/field/Field.java	2007-11-08 15:01:32.000000000 +0100
+@@ -7,8 +7,13 @@
+ // All rights reserved.
+ // Refer to LICENSE for terms and conditions of use.
+ 
++// Includes extensions by Ulm University
++// - allow for movement listeners
++
+ package jist.swans.field;
+ 
++import java.util.Vector;
++
+ import jist.swans.radio.RadioInterface;
+ import jist.swans.radio.RadioInfo;
+ import jist.swans.misc.Message;
+@@ -74,6 +81,15 @@
+    */
+   protected RadioData[] radios;
+ 
++  // @author Elmar Schoch >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
++  /**
++   * Vector holding listeners that want to be notified on
++   * node movements
++   * @author Elmar Schoch
++   */
++  protected Vector moveRadioListeners = new Vector();
++  
++  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+ 
+   //////////////////////////////////////////////////
+   // initialize
+@@ -231,6 +247,11 @@
+      */
+     protected RadioData prev, next;
+ 
++    /** nodes must be able to read their position in order to enable georouting */
++    public Location getLoc() {
++        return loc;
++    }
++
+   } // class: RadioData
+ 
+ 
+@@ -306,6 +327,14 @@
+     {
+       logField.info("move radio id="+id+" to="+loc);
+     }
++    
++    // @author Elmar Schoch >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 
++    // Call listeners that want to be notified about movements
++    for (int i=0; i < moveRadioListeners.size(); i++) {
++    		((MovementListenerInterface) moveRadioListeners.get(i)).move(JistAPI.getTime(), loc, id.intValue());
++    }    
++    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
++        
+     // update spatial data structure
+     RadioData rd = getRadioData(id);
+     spatial.moveInside(rd, loc);
+@@ -319,9 +348,7 @@
+   /** {@inheritDoc} */
+   public void moveRadioOff(Integer id, Location delta)
+   {
+-    Location newLoc = getRadioData(id).loc.getClone();
+-    newLoc.add(delta);
+-    moveRadio(id, newLoc);
++    moveRadio(id, getRadioData(id).loc.add(delta));
+   }
+ 
+   /**
+@@ -453,5 +480,31 @@
+     return connectivityVisitor.getAvgLinks();
+   }
+ 
+-} // class: Field
++  // @author Elmar Schoch >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+ 
++  /**
++   * Retrieve mobility associated with Field
++   */
++  public Mobility getMobility() {
++	  return mobility;
++  }
++
++  /**
++   * Add listener that wants to be notified about node movements
++   * @param listener
++   */
++  public void addMovementListener(MovementListenerInterface listener) {
++	  moveRadioListeners.add(listener);
++  }
++  
++  /**
++   * Remove node movement listener
++   * @param listener
++   */
++  public void removeMovementListener(MovementListenerInterface listener) {
++	  moveRadioListeners.remove(listener);
++  }
++  
++  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
++  
++} // class: Field
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/field/Mobility.java jist-swans-1.0.6/src/jist/swans/field/Mobility.java
+--- jist-swans-1.0.6-orig/src/jist/swans/field/Mobility.java	2005-03-13 17:11:54.000000000 +0100
++++ jist-swans-1.0.6/src/jist/swans/field/Mobility.java	2007-11-08 15:01:32.000000000 +0100
+@@ -7,6 +7,9 @@
+ // All rights reserved.
+ // Refer to LICENSE for terms and conditions of use.
+ 
++// Includes extensions by Ulm University
++// - implemented missing constructor of Mobility.RandomWaypoint
++
+ package jist.swans.field;
+ 
+ import jist.swans.misc.Location;
+@@ -171,7 +174,15 @@
+      */
+     public RandomWaypoint(Location.Location2D bounds, String config)
+     {
+-      throw new RuntimeException("not implemented");
++	// @author Elmar Schoch >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
++	// Implemented functionality
++	// throw new RuntimeException("not implemented");
++        // parse config string of the form
++        // <pause-time>,<precicion>,<minspeed>,<maxspeed>
++    	String[] data = config.split(",");
++    	init(bounds,Integer.parseInt(data[0]) * Constants.SECOND ,Float.parseFloat(data[1]),
++                   Float.parseFloat(data[2]), Float.parseFloat(data[3]));
++	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+     }
+     
+     /**
+@@ -220,7 +232,7 @@
+           if(Main.ASSERT) Util.assertion(rwi.waypoint.inside(bounds));
+           float speed = minspeed + (maxspeed-minspeed) * Constants.random.nextFloat();
+           float dist = loc.distance(rwi.waypoint);
+-          rwi.steps = (int)Math.max(Math.floor(dist / precision),1);
++          rwi.steps = (int)StrictMath.max(StrictMath.floor(dist / precision),1);
+           if(Main.ASSERT) Util.assertion(rwi.steps>0);
+           float time = dist / speed;
+           rwi.stepTime = (long)(time*Constants.SECOND/rwi.steps);
+@@ -379,9 +391,9 @@
+     public void next(FieldInterface f, Integer id, Location loc, MobilityInfo info)
+     {
+       // compute new random position with fixedRadius+randomRadius() distance
+-      double randomAngle = 2*Math.PI*Constants.random.nextDouble();
++      double randomAngle = 2*StrictMath.PI*Constants.random.nextDouble();
+       double r = fixedRadius + Constants.random.nextDouble()*randomRadius;
+-      double x = r * Math.cos(randomAngle), y = r * Math.sin(randomAngle);
++      double x = r * StrictMath.cos(randomAngle), y = r * StrictMath.sin(randomAngle);
+       double lx = loc.getX()+x, ly = loc.getY()+y;
+       // bounds check and reflect
+       if(lx<0) lx=-lx;
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/field/MovementListenerInterface.java jist-swans-1.0.6/src/jist/swans/field/MovementListenerInterface.java
+--- jist-swans-1.0.6-orig/src/jist/swans/field/MovementListenerInterface.java	1970-01-01 01:00:00.000000000 +0100
++++ jist-swans-1.0.6/src/jist/swans/field/MovementListenerInterface.java	2007-11-08 15:01:32.000000000 +0100
+@@ -0,0 +1,8 @@
++package jist.swans.field;
++
++import jist.swans.misc.Location;
++
++public interface MovementListenerInterface {
++
++	public void move(long time, Location loc, int node);
++}
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/field/PathLoss.java jist-swans-1.0.6/src/jist/swans/field/PathLoss.java
+--- jist-swans-1.0.6-orig/src/jist/swans/field/PathLoss.java	2004-06-23 19:15:54.000000000 +0200
++++ jist-swans-1.0.6/src/jist/swans/field/PathLoss.java	2007-11-08 15:01:32.000000000 +0100
+@@ -62,7 +62,7 @@
+     {
+       double dist = srcLocation.distance(dstLocation);
+       double pathloss = - srcRadio.getShared().getGain() - dstRadio.getShared().getGain();
+-      double valueForLog = 4.0 * Math.PI * dist / srcRadio.getShared().getWaveLength();
++      double valueForLog = 4.0 * StrictMath.PI * dist / srcRadio.getShared().getWaveLength();
+       if (valueForLog > 1.0)
+       {
+         pathloss += Util.log((float)valueForLog) / Constants.log10 * 20.0;
+@@ -89,19 +89,19 @@
+       double pathloss = - srcRadio.getShared().getGain() - dstRadio.getShared().getGain();
+       double planeEarthLoss = (dist * dist) / 
+         (srcLocation.getHeight() * dstLocation.getHeight());
+-      double freeSpaceLoss = 4.0 * Math.PI * dist / srcRadio.getShared().getWaveLength();
++      double freeSpaceLoss = 4.0 * StrictMath.PI * dist / srcRadio.getShared().getWaveLength();
+       if (planeEarthLoss > freeSpaceLoss)
+       {
+         if (planeEarthLoss > 1.0)
+         {
+-          pathloss += 20.0 * Math.log(planeEarthLoss) / Constants.log10;
++          pathloss += 20.0 * StrictMath.log(planeEarthLoss) / Constants.log10;
+         }
+       }
+       else
+       {
+         if (freeSpaceLoss > 1.0)
+         {
+-          pathloss += 20.0 * Math.log(freeSpaceLoss) / Constants.log10;
++          pathloss += 20.0 * StrictMath.log(freeSpaceLoss) / Constants.log10;
+         }
+       }
+       return pathloss;
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/field/Spatial.java jist-swans-1.0.6/src/jist/swans/field/Spatial.java
+--- jist-swans-1.0.6-orig/src/jist/swans/field/Spatial.java	2004-04-06 18:07:47.000000000 +0200
++++ jist-swans-1.0.6/src/jist/swans/field/Spatial.java	2007-11-08 15:01:32.000000000 +0100
+@@ -923,8 +923,7 @@
+       int count = 0;
+       for(int i=0; i<offsets.length; i++)
+       {
+-        Location l = srcLoc.getClone();
+-        l.add(offsets[i]);
++        Location l = srcLoc.add(offsets[i]);
+         count += tile.visitTransmit(visitor, srcInfo, l, msg, durationObj, limit);
+       }
+       return count;
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/mac/Mac802_11.java jist-swans-1.0.6/src/jist/swans/mac/Mac802_11.java
+--- jist-swans-1.0.6-orig/src/jist/swans/mac/Mac802_11.java	2005-02-10 17:52:28.000000000 +0100
++++ jist-swans-1.0.6/src/jist/swans/mac/Mac802_11.java	2007-11-08 15:01:31.000000000 +0100
+@@ -7,6 +7,10 @@
+ // All rights reserved.
+ // Refer to LICENSE for terms and conditions of use.
+ 
++// Includes extensions by Ulm University
++// - implemented packet drop notification throught MAC layer
++// - broacast reception flag
++
+ package jist.swans.mac;
+ 
+ import jist.swans.radio.RadioInfo;
+@@ -554,7 +558,7 @@
+    */
+   private void incCW()
+   {
+-    cw = (short)Math.min(2*cw+1, CW_MAX);
++    cw = (short)StrictMath.min(2*cw+1, CW_MAX);
+   }
+ 
+   /**
+@@ -922,8 +926,10 @@
+ 
+   private void retryNo()
+   {
+-    // todo:
+-    // NetworkIpNotifyOfPacketDrop(packet, packetNextHop);
++    // @author Michael Feiri >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
++    // Implemented network layer notification (a todo in the original code)
++    netEntity.dropNotify(packet, packetNextHop);
++    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+     decCW();
+     cfDone(true, true);
+   }
+@@ -1033,7 +1039,7 @@
+     {
+       if(MacAddress.ANY.equals(msg.getDst()))
+       {
+-        netEntity.receive(msg.getBody(), msg.getSrc(), netId, false);
++        netEntity.receive(msg.getBody(), msg.getSrc(), netId, false, true);
+         cfDone(false, false);
+       }
+       else
+@@ -1044,7 +1050,7 @@
+         if(!(msg.getRetry() && getSeqEntry(msg.getSrc())==msg.getSeq()))
+         {
+           updateSeqEntry(msg.getSrc(), msg.getSeq());
+-          netEntity.receive(msg.getBody(), msg.getSrc(), netId, false);
++          netEntity.receive(msg.getBody(), msg.getSrc(), netId, false, false);
+         }
+       }
+     }
+@@ -1083,7 +1089,7 @@
+     if (promisc && msg.getType()==MacMessage.TYPE_DATA)
+     {
+       MacMessage.Data macDataMsg = (MacMessage.Data)msg;
+-      netEntity.receive(macDataMsg.getBody(), macDataMsg.getSrc(), netId, true);
++      netEntity.receive(macDataMsg.getBody(), macDataMsg.getSrc(), netId, true, false);
+     }
+   }
+ 
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/mac/MacDumb.java jist-swans-1.0.6/src/jist/swans/mac/MacDumb.java
+--- jist-swans-1.0.6-orig/src/jist/swans/mac/MacDumb.java	2005-03-13 17:11:55.000000000 +0100
++++ jist-swans-1.0.6/src/jist/swans/mac/MacDumb.java	2007-11-08 15:01:31.000000000 +0100
+@@ -254,15 +254,15 @@
+     JistAPI.sleep(Constants.LINK_DELAY);
+     if(MacAddress.ANY.equals(mdm.getDst()))
+     {
+-      if(netEntity!=null) netEntity.receive(mdm.getPayload(), mdm.getSrc(), netId, false);
++      if(netEntity!=null) netEntity.receive(mdm.getPayload(), mdm.getSrc(), netId, false, true);
+     }
+     else if(localAddr.equals(mdm.getDst()))
+     {
+-      if(netEntity!=null) netEntity.receive(mdm.getPayload(), mdm.getSrc(), netId, false);
++      if(netEntity!=null) netEntity.receive(mdm.getPayload(), mdm.getSrc(), netId, false, false);
+     }
+     else if(promisc)
+     {
+-      if(netEntity!=null) netEntity.receive(mdm.getPayload(), mdm.getSrc(), netId, true);
++      if(netEntity!=null) netEntity.receive(mdm.getPayload(), mdm.getSrc(), netId, true, false);
+     }
+   }
+ 
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/mac/MacLoop.java jist-swans-1.0.6/src/jist/swans/mac/MacLoop.java
+--- jist-swans-1.0.6-orig/src/jist/swans/mac/MacLoop.java	2004-04-06 18:07:48.000000000 +0200
++++ jist-swans-1.0.6/src/jist/swans/mac/MacLoop.java	2007-11-08 15:01:31.000000000 +0100
+@@ -92,7 +92,7 @@
+   public void send(Message msg, MacAddress nextHop)
+   {
+     JistAPI.sleep(Constants.LINK_DELAY);
+-    netEntity.receive(msg, MacAddress.LOOP, (byte)Constants.NET_INTERFACE_LOOPBACK, false);
++    netEntity.receive(msg, MacAddress.LOOP, (byte)Constants.NET_INTERFACE_LOOPBACK, false, false);
+     JistAPI.sleep(Constants.EPSILON_DELAY);
+     netEntity.pump(netId);
+   }
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/misc/Location.java jist-swans-1.0.6/src/jist/swans/misc/Location.java
+--- jist-swans-1.0.6-orig/src/jist/swans/misc/Location.java	2004-04-06 18:07:48.000000000 +0200
++++ jist-swans-1.0.6/src/jist/swans/misc/Location.java	2007-11-08 15:01:38.000000000 +0100
+@@ -7,6 +7,10 @@
+ // All rights reserved.
+ // Refer to LICENSE for terms and conditions of use.
+ 
++// Includes extensions by Ulm University
++// - includes size estimation
++// - make objects hashable and comparable
++
+ package jist.swans.misc;
+ 
+ import jist.swans.Constants;
+@@ -15,7 +19,7 @@
+ import jist.runtime.JistAPI;
+ 
+ /** 
+- * Location (of a node).
++ * Immutable Location (of a node).
+  *
+  * @author Rimon Barr &lt;barr+jist@cs.cornell.edu&gt;
+  * @version $Id: Location.java,v 1.12 2004-04-06 16:07:48 barr Exp $
+@@ -89,12 +93,19 @@
+   public abstract boolean inside(Location min, Location max);
+ 
+   /**
+-   * Vector addition of locations... Be careful! This method mutates
+-   * the current object.
++   * Vector addition of locations. Returns a Location object whose value
++   * is (this + l).
+    *
+    * @param l second location / displacement
+    */
+-  public abstract void add(Location l);
++  public abstract Location add(Location l);
++
++  /**
++   * The size of the dataset in bytes.
++   * 
++   * @return the size of the dataset in bytes
++   */
++  public abstract int size();
+ 
+   /**
+    * Return clone of location object.
+@@ -133,6 +144,42 @@
+     else throw new IllegalArgumentException("invalid format, expected x,y[,h]");
+   }
+ 
++  private volatile int hashCode = 0;
++
++  /**
++   * Compute hash code
++   *
++   * @return hash code
++   */
++  public int hashCode() { 
++    if (hashCode == 0) { 
++      int result = 17; 
++      result = result * 31 + Float.floatToIntBits(getX());
++      result = result * 31 + Float.floatToIntBits(getY());
++      result = result * 31 + Float.floatToIntBits(getHeight());
++      hashCode = result; 
++    }
++    return hashCode; 
++  }
++
++  /**
++   * Return whether this is equal to another object.
++   *
++   * @param o object to test equality against
++   * @return whether object provided is equal
++   */
++  public boolean equals(Object o) {
++    if (o == this) return true; 
++    if (!(o instanceof Location)) return false; 
++    Location pn = (Location)o; 
++    return (pn.getX() == this.getX()) &&
++            (pn.getY() == this.getY()) &&
++            (pn.getHeight() == this.getHeight()); 
++  } 
++
++
++
++
+   //////////////////////////////////////////////////
+   // 2d
+   //
+@@ -147,7 +194,9 @@
+   public static final class Location2D extends Location
+   {
+     /** co-ordinates. */
+-    private float x, y, height;
++    private final float x, y, height;
++    private final int SIZE;
++    
+ 
+     /**
+      * Create two-dimensional coordinate at default height.
+@@ -172,6 +221,7 @@
+       this.x = x;
+       this.y = y;
+       this.height = height;
++      this.SIZE = 4*2; //two floats
+     }
+ 
+     /** {@inheritDoc} */
+@@ -185,7 +235,7 @@
+     /** {@inheritDoc} */
+     public float distance(Location l)
+     {
+-      return (float)Math.sqrt(distanceSqr(l));
++      return (float)StrictMath.sqrt(distanceSqr(l));
+     }
+ 
+     /** {@inheritDoc} */
+@@ -229,10 +279,16 @@
+     }
+ 
+     /** {@inheritDoc} */
+-    public void add(Location l)
++    public Location add(Location l)
+     {
+       Location2D l2d = (Location2D)l;
+-      x+=l2d.x; y+=l2d.y;
++      return new Location2D(l2d.x+x,l2d.y+y);
++    }
++
++    /** {@inheritDoc} */
++    public int size()
++    {
++      return SIZE;
+     }
+ 
+     /** {@inheritDoc} */
+@@ -241,6 +297,17 @@
+       return "("+x+","+y+")";
+     }
+ 
++    /* (non-Javadoc)
++    * @see jist.swans.misc.Location#bearing(jist.swans.misc.Location)
++    */
++    public Location bearing(Location nextPoint) {
++        Location2D l2d = (Location2D)nextPoint;
++        float dx=l2d.x - x;
++        float dy=l2d.y - y;
++        float dist = this.distance(nextPoint);
++        return new Location.Location2D(dx/dist, dy/dist);
++    }
++
+   } // class: Location2D
+ 
+   //////////////////////////////////////////////////
+@@ -257,7 +324,8 @@
+   public static final class Location3D extends Location
+   {
+     /** co-ordinates. */
+-    private float x, y, z;
++    private final float x, y, z;
++    private final int SIZE;
+ 
+     /**
+      * Create three-dimensional coordinate.
+@@ -271,6 +339,7 @@
+       this.x = x;
+       this.y = y;
+       this.z = z;
++      this.SIZE = 4*3; // three floats
+     }
+ 
+     /** {@inheritDoc} */
+@@ -284,7 +353,7 @@
+     /** {@inheritDoc} */
+     public float distance(Location l)
+     {
+-      return (float)Math.sqrt(distanceSqr(l));
++      return (float)StrictMath.sqrt(distanceSqr(l));
+     }
+ 
+     /** {@inheritDoc} */
+@@ -329,10 +398,16 @@
+     }
+ 
+     /** {@inheritDoc} */
+-    public void add(Location l)
++    public Location add(Location l)
+     {
+       Location3D l3d = (Location3D)l;
+-      x+=l3d.x; y+=l3d.y; z+=l3d.z;
++      return new Location3D(l3d.x+x, l3d.y+y, l3d.z+z);
++    }
++    
++    /** {@inheritDoc} */
++    public int size()
++    {
++      return SIZE;
+     }
+ 
+     /** {@inheritDoc} */
+@@ -341,7 +416,26 @@
+       return "("+x+","+y+","+z+")";
+     }
+ 
++    /* (non-Javadoc)
++     * @see jist.swans.misc.Location#bearing(jist.swans.misc.Location)
++     */
++    public Location bearing(Location nextPoint) {
++            Location3D l3d = (Location3D)nextPoint;
++            float dx=l3d.x - x;
++            float dy=l3d.y - y;
++            float dz = l3d.z - z;
++            float dist = this.distance(nextPoint);
++            return new Location.Location3D(dx/dist, dy/dist, z/dist);
++    }
++
+   } // class Location3D
+ 
++  /**
++   * Returns the normalized direction from the current point to the next point.
++   * @param nextPoint the destination location
++   * @return the normalized bearing for this segment
++   */
++public abstract Location bearing(Location nextPoint);
++    
+ } // interface Location
+ 
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/misc/Mapper.java jist-swans-1.0.6/src/jist/swans/misc/Mapper.java
+--- jist-swans-1.0.6-orig/src/jist/swans/misc/Mapper.java	2004-04-06 18:07:48.000000000 +0200
++++ jist-swans-1.0.6/src/jist/swans/misc/Mapper.java	2007-11-08 15:01:38.000000000 +0100
+@@ -67,7 +67,7 @@
+     int max = values[0];
+     for(int i=1; i<values.length; i++)
+     {
+-      max = Math.max(max, values[i]);
++      max = StrictMath.max(max, values[i]);
+     }
+     init(max);
+     for(int i=0; i<values.length; i++)
+@@ -115,7 +115,7 @@
+     if(sealed) throw new RuntimeException("mapping sealed");
+     mapTo[i] = j;
+     mapFrom[j] = i;
+-    limit = Math.max(limit, j);
++    limit = StrictMath.max(limit, j);
+     limit++;
+     return j;
+   }
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/misc/Pickle.java jist-swans-1.0.6/src/jist/swans/misc/Pickle.java
+--- jist-swans-1.0.6-orig/src/jist/swans/misc/Pickle.java	2004-04-06 18:07:49.000000000 +0200
++++ jist-swans-1.0.6/src/jist/swans/misc/Pickle.java	2007-11-08 15:01:38.000000000 +0100
+@@ -227,7 +227,7 @@
+   public static int getLength(byte[] b, int offset)
+   {
+     int len = arrayToInteger(b, offset);
+-    return Math.max(0, len)+4;
++    return StrictMath.max(0, len)+4;
+   }
+ 
+   public static byte[] stringToArray(String s)
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/misc/Util.java jist-swans-1.0.6/src/jist/swans/misc/Util.java
+--- jist-swans-1.0.6-orig/src/jist/swans/misc/Util.java	2004-04-06 18:07:49.000000000 +0200
++++ jist-swans-1.0.6/src/jist/swans/misc/Util.java	2007-11-08 15:01:38.000000000 +0100
+@@ -75,7 +75,7 @@
+    */
+   public static double toDB(double x)
+   {
+-    return 10.0 * Math.log(x) / Constants.log10;
++    return 10.0 * StrictMath.log(x) / Constants.log10;
+   }
+ 
+   /**
+@@ -86,7 +86,7 @@
+    */
+   public static double fromDB(double x)
+   {
+-    return Math.pow(10.0, x / 10.0);
++    return StrictMath.pow(10.0, x / 10.0);
+   }
+ 
+   /**
+@@ -190,7 +190,7 @@
+   private static native float fast_log(float n);
+ 
+   /**
+-   * Native logarithm function wrapper. Will use the regular Java Math.log
++   * Native logarithm function wrapper. Will use the regular Java StrictMath.log
+    * if the native function is not available.
+    *
+    * @param n number to log
+@@ -198,7 +198,7 @@
+    */
+   public static float log(float n)
+   {
+-    return nativeLogExists ? fast_log(n) : (float)Math.log(n);
++    return nativeLogExists ? fast_log(n) : (float)StrictMath.log(n);
+   }
+ 
+   /**
+Files jist-swans-1.0.6-orig/src/jist/swans/misc/libswansutil.so and jist-swans-1.0.6/src/jist/swans/misc/libswansutil.so differ
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/misc/native.h jist-swans-1.0.6/src/jist/swans/misc/native.h
+--- jist-swans-1.0.6-orig/src/jist/swans/misc/native.h	1970-01-01 01:00:00.000000000 +0100
++++ jist-swans-1.0.6/src/jist/swans/misc/native.h	2007-11-08 15:01:38.000000000 +0100
+@@ -0,0 +1,21 @@
++/* DO NOT EDIT THIS FILE - it is machine generated */
++#include <jni.h>
++/* Header for class jist_swans_misc_Util */
++
++#ifndef _Included_jist_swans_misc_Util
++#define _Included_jist_swans_misc_Util
++#ifdef __cplusplus
++extern "C" {
++#endif
++/*
++ * Class:     jist_swans_misc_Util
++ * Method:    fast_log
++ * Signature: (F)F
++ */
++JNIEXPORT jfloat JNICALL Java_jist_swans_misc_Util_fast_1log
++  (JNIEnv *, jclass, jfloat);
++
++#ifdef __cplusplus
++}
++#endif
++#endif
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/net/MessageQueue.java jist-swans-1.0.6/src/jist/swans/net/MessageQueue.java
+--- jist-swans-1.0.6-orig/src/jist/swans/net/MessageQueue.java	2004-04-06 18:07:49.000000000 +0200
++++ jist-swans-1.0.6/src/jist/swans/net/MessageQueue.java	2007-11-08 15:01:34.000000000 +0100
+@@ -114,27 +114,27 @@
+     /**
+      * Heads of message queues for different priorities.
+      */
+-    private QueuedMessage[] heads; 
++    protected QueuedMessage[] heads; 
+ 
+     /**
+      * Tails of message queues for different priorities.
+      */
+-    private QueuedMessage[] tails;
++    protected QueuedMessage[] tails;
+ 
+     /**
+      * Index of highest priority.
+      */
+-    private byte topPri;
++    protected byte topPri;
+ 
+     /**
+      * Length of list.
+      */
+-    private byte size;
++    protected byte size;
+ 
+     /**
+      * List size limit.
+      */
+-    private byte capacity;
++    protected byte capacity;
+ 
+     /**
+      * Initialize prioritized message queue.
+@@ -194,7 +194,7 @@
+         throw new IndexOutOfBoundsException("list maximum exceeded");
+       }
+       size++;
+-      topPri = (byte)Math.min(pri, topPri);
++      topPri = (byte)StrictMath.min(pri, topPri);
+       QueuedMessage tail = tails[pri];
+       if(tail==null)
+       {
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/net/NetAddress.java jist-swans-1.0.6/src/jist/swans/net/NetAddress.java
+--- jist-swans-1.0.6-orig/src/jist/swans/net/NetAddress.java	2004-04-06 18:07:49.000000000 +0200
++++ jist-swans-1.0.6/src/jist/swans/net/NetAddress.java	2007-11-08 15:01:34.000000000 +0100
+@@ -159,5 +159,14 @@
+     }
+   }
+ 
++  /**
++   * Return size in bytes (round up if necessary)
++   *
++   * @return size in bytes
++   */
++  public int getSize() {
++	  return 4;
++  }
++  
+ } // class NetAddress
+ 
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/net/NetInterface.java jist-swans-1.0.6/src/jist/swans/net/NetInterface.java
+--- jist-swans-1.0.6-orig/src/jist/swans/net/NetInterface.java	2004-04-06 18:07:49.000000000 +0200
++++ jist-swans-1.0.6/src/jist/swans/net/NetInterface.java	2007-11-08 15:01:34.000000000 +0100
+@@ -7,6 +7,10 @@
+ // All rights reserved.
+ // Refer to LICENSE for terms and conditions of use.
+ 
++// Includes extensions by Ulm University
++// - implemented packet drop notification throught MAC layer
++// - broacast reception flag
++
+ package jist.swans.net;
+ 
+ import jist.swans.mac.MacAddress;
+@@ -39,9 +43,18 @@
+    * @param msg incoming network packet
+    * @param lastHop link-level source of incoming packet
+    * @param macId incoming interface
+-   * @param promiscuous whether network interface is in promisc. mode
++   * @param promiscuous whether packet was received in promiscuos mode
++   * @param bcast whether packet was received in brodcast mode
++   */
++  void receive(Message msg, MacAddress lastHop, byte macId, boolean promiscuos, boolean bcast);
++
++  /**
++   * Receive a notification from the link layer.
++   *
++   * @param packet dropped network packet
++   * @param packetNextHop link-level destination of droped packet
+    */
+-  void receive(Message msg, MacAddress lastHop, byte macId, boolean promiscuous);
++  void dropNotify(Message packet, MacAddress packetNextHop);
+ 
+   /**
+    * Route, if necessary, and send a message (from TRANSPORT).
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/net/NetIp.java jist-swans-1.0.6/src/jist/swans/net/NetIp.java
+--- jist-swans-1.0.6-orig/src/jist/swans/net/NetIp.java	2004-11-04 00:53:22.000000000 +0100
++++ jist-swans-1.0.6/src/jist/swans/net/NetIp.java	2007-11-08 15:01:34.000000000 +0100
+@@ -1,386 +1,27 @@
+-//////////////////////////////////////////////////
+-// JIST (Java In Simulation Time) Project
+-// Timestamp: <NetIp.java Tue 2004/04/20 10:12:52 barr pompom.cs.cornell.edu>
++/////////////////////////////////////////////////////////////////
++// JiST/SWANS extensions by UULM
++//
++// Note: This "new" NetIp class replaces the original NetIp class from JiST/SWANS,
++// which was renamed to "NetIpBase" and made abstract to be able to derive
++// new types of network layers from this base class.
++//
++// 
++// Copyright (C) 2006 by Michael Feiri
+ //
+-
+-// Copyright (C) 2004 by Cornell University
+-// All rights reserved.
+-// Refer to LICENSE for terms and conditions of use.
+ 
+ package jist.swans.net;
+ 
+-import jist.swans.mac.MacAddress;
+-import jist.swans.mac.MacInterface;
+-import jist.swans.mac.MacLoop;
+-
+-import jist.swans.route.RouteInterface;
+-
+-import jist.swans.misc.Message;
+ import jist.swans.misc.Mapper;
+-import jist.swans.misc.Util;
+-
+-import jist.swans.Constants;
+-import jist.swans.Main;
+-
+-import jist.runtime.JistAPI;
+-
+-import org.apache.log4j.*;
+ 
+ /**
+- * IPv4 implementation based on RFC 791. Performs protocol
+- * multiplexing, and prioritized packet queuing, but no
+- * RED or packet fragmentation.
+- *
+- * @author Rimon Barr &lt;barr+jist@cs.cornell.edu&gt;
+- * @version $Id: NetIp.java,v 1.45 2004-11-03 23:53:22 barr Exp $
+- * @since SWANS1.0
+- */
+-
+-public class NetIp implements NetInterface
+-{
+-  /**
+-   * IP logger.
+-   */
+-  public static final Logger log = Logger.getLogger(NetIp.class.getName());
+-
+-  /**
+-   * Information about each network interface.
+-   */
+-  public static class NicInfo
+-  {
+-    /** mac entity. */
+-    public MacInterface mac;
+-    /** outgoing packet queue. */
+-    public MessageQueue q;
+-    /** whether link layer is busy. */
+-    public boolean busy;
+-  }
+-
+-  //////////////////////////////////////////////////
+-  // constants
+-  //
+-
+-  /**
+-   * Packet fragmentation threshold.
+-   */
+-  public static final int THRESHOLD_FRAGMENT = 2048;
+-
+-  /**
+-   * Maximum packet queue length.
+-   */
+-  public static final byte MAX_QUEUE_LENGTH = 50;
+-
+-  //////////////////////////////////////////////////
+-  // locals
+-  //
+-
+-  // entity hookup
+-  /** self-referencing proxy entity. */
+-  protected NetInterface self;
+-
+-  /** local network address. */
+-  protected NetAddress localAddr;
+-
+-  /** routing protocol. */
+-  protected RouteInterface routing;
+-
+-  /** protocol number mapping. */
+-  protected Mapper protocolMap;
+-
+-  /** protocol handlers. */
+-  protected NetHandler[] protocolHandlers;
+-
+-  /** network interfaces. */
+-  protected NicInfo[] nics;
+-
+-  /** packet loss models. */
+-  protected PacketLoss incomingLoss, outgoingLoss;
+-
+-  //////////////////////////////////////////////////
+-  // initialization 
+-  //
+-
+-  /**
+-   * Initialize IP implementation with given address and protocol mapping.
++ * Concrete implementation of plain NetIP with Proxiable marker (through NetInterface)
+    *
+-   * @param addr local network address
+-   * @param protocolMap protocol number mapping
+-   * @param in incoming packet loss model
+-   * @param out outgoing packet loss model
++ * @author Michael Feiri &lt;michael.feiri@uni-ulm.de&gt;
+    */
+-  public NetIp(NetAddress addr, Mapper protocolMap, PacketLoss in, PacketLoss out)
+-  {
+-    // proxy entity
+-    this.self = (NetInterface)JistAPI.proxy(this, NetInterface.class);
+-    // local address
+-    setAddress(addr);
+-    // protocol number mapping
+-    this.protocolMap = protocolMap;
+-    // protocol handlers
+-    this.protocolHandlers = new NetHandler[protocolMap.getLimit()];
+-    // network interfaces
+-    this.nics = new NicInfo[0];
+-    // packet loss
+-    this.incomingLoss = in;
+-    this.outgoingLoss = out;
+-    // add loopback mac:
+-    //   therefore, loopback = 0, Constants.NET_INTERFACE_LOOPBACK
+-    //              next     = 1, Constants.NET_INTERFACE_DEFAULT
+-    MacLoop loopback = new MacLoop();
+-    byte netid = addInterface(loopback.getProxy());
+-    if(Main.ASSERT) Util.assertion(netid==Constants.NET_INTERFACE_LOOPBACK);
+-    loopback.setNetEntity(getProxy(), netid);
+-  }
+ 
+-  //////////////////////////////////////////////////
+-  // entity hookup
+-  //
+-
+-  /**
+-   * Return self-referencing proxy entity.
+-   *
+-   * @return self-referencing proxy entity
+-   */
+-  public NetInterface getProxy()
+-  {
+-    return this.self;
++public class NetIp extends NetIpBase implements NetInterface {
++  public NetIp(NetAddress addr, Mapper protocolMap, PacketLoss in, PacketLoss out) {
++    super(addr, protocolMap, in, out);
+   }
+-
+-  //////////////////////////////////////////////////
+-  // address
+-  //
+-
+-  /**
+-   * Set local network address.
+-   *
+-   * @param addr local network address
+-   */
+-  public void setAddress(NetAddress addr)
+-  {
+-    if(Main.ASSERT) Util.assertion(addr!=null);
+-    this.localAddr = addr;
+-  }
+-
+-  /**
+-   * Whether packet is for local consumption.
+-   *
+-   * @param msg packet to inspect
+-   * @return whether packet is for local consumption
+-   */
+-  private boolean isForMe(NetMessage.Ip msg)
+-  {
+-    NetAddress addr = msg.getDst();
+-    return NetAddress.ANY.equals(addr)
+-      || NetAddress.LOCAL.equals(addr)
+-      || localAddr.equals(addr);
+-  }
+-
+-  //////////////////////////////////////////////////
+-  // routing, protocols, interfaces
+-  //
+-
+-  /**
+-   * Set routing implementation.
+-   *
+-   * @param routingEntity routing entity
+-   */
+-  public void setRouting(RouteInterface routingEntity)
+-  {
+-    if(!JistAPI.isEntity(routingEntity)) throw new IllegalArgumentException("expected entity");
+-    this.routing = routingEntity;
+-  }
+-
+-  /**
+-   * Add network interface with default queue.
+-   *
+-   * @param macEntity link layer entity
+-   * @return network interface identifier
+-   */
+-  public byte addInterface(MacInterface macEntity)
+-  {
+-    return addInterface(macEntity, 
+-        new MessageQueue.NoDropMessageQueue(
+-          Constants.NET_PRIORITY_NUM, MAX_QUEUE_LENGTH));
+-  }
+-
+-  /**
+-   * Add network interface.
+-   *
+-   * @param macEntity link layer entity
+-   * @return network interface identifier
+-   */
+-  public byte addInterface(MacInterface macEntity, MessageQueue q)
+-  {
+-    if(!JistAPI.isEntity(macEntity)) throw new IllegalArgumentException("expected entity");
+-    // create new nicinfo
+-    NicInfo ni = new NicInfo();
+-    ni.mac = macEntity;
+-    ni.q = q;
+-    ni.busy = false;
+-    // store
+-    NicInfo[] nics2 = new NicInfo[nics.length+1];
+-    System.arraycopy(nics, 0, nics2, 0, nics.length);
+-    nics2[nics.length] = ni;
+-    nics = nics2;
+-    // return interface id
+-    return (byte)(nics.length-1);
+-  }
+-
+-  /**
+-   * Set network protocol handler.
+-   *
+-   * @param protocolId protocol identifier
+-   * @param handler protocol handler
+-   */
+-  public void setProtocolHandler(int protocolId, NetHandler handler)
+-  {
+-    protocolHandlers[protocolMap.getMap(protocolId)] = handler;
+-  }
+-
+-  /**
+-   * Return network protocol handler.
+-   *
+-   * @param protocolId protocol identifier
+-   * @return procotol handler
+-   */
+-  private NetHandler getProtocolHandler(int protocolId)
+-  {
+-    return protocolHandlers[protocolMap.getMap(protocolId)];
+-  }
+-
+-  //////////////////////////////////////////////////
+-  // NetInterface implementation
+-  //
+-
+-  /** {@inheritDoc} */
+-  public NetAddress getAddress() throws JistAPI.Continuation
+-  {
+-    return localAddr;
+-  }
+-
+-  /** {@inheritDoc} */
+-  public void receive(Message msg, MacAddress lastHop, byte macId, boolean promisc)
+-  {
+-    if(msg==null) throw new NullPointerException();
+-    NetMessage.Ip ipmsg = (NetMessage.Ip)msg;
+-    if(incomingLoss.shouldDrop(ipmsg)) return;
+-    if(log.isInfoEnabled())
+-    {
+-      log.info("receive t="+JistAPI.getTime()+" from="+lastHop+" on="+macId+" data="+msg);
+-    }
+-    if(routing!=null) routing.peek(ipmsg, lastHop);
+-    if(isForMe(ipmsg))
+-    {
+-      JistAPI.sleep(Constants.NET_DELAY);
+-      getProtocolHandler(ipmsg.getProtocol()).receive(ipmsg.getPayload(), 
+-          ipmsg.getSrc(), lastHop, macId, ipmsg.getDst(), 
+-          ipmsg.getPriority(), ipmsg.getTTL());
+-    }
+-    else
+-    {
+-      if(ipmsg.getTTL()>0)
+-      {
+-        if(ipmsg.isFrozen()) ipmsg = ipmsg.copy();
+-        ipmsg.decTTL();
+-        sendIp(ipmsg);
+-      }
+-    }
+-  }
+-
+-  /** {@inheritDoc} */
+-  public void send(Message msg, NetAddress dst, 
+-      short protocol, byte priority, byte ttl) 
+-  {
+-    if(msg==null) throw new NullPointerException();
+-    sendIp(new NetMessage.Ip(msg, localAddr, dst, 
+-          protocol, priority, ttl));
+-  }
+-
+-  /** {@inheritDoc} */
+-  public void send(NetMessage.Ip msg, int interfaceId, MacAddress nextHop) 
+-  {
+-    if(msg==null) throw new NullPointerException();
+-    if(outgoingLoss.shouldDrop(msg)) return;
+-    /*
+-    if(msg.getSize()>THRESHOLD_FRAGMENT)
+-    {
+-      throw new RuntimeException("ip fragmentation not implemented");
+-    }
+-    */
+-    if(log.isDebugEnabled())
+-    {
+-      log.debug("queue t="+JistAPI.getTime()+" to="+nextHop+" on="+interfaceId+" data="+msg);
+-    }
+-    NicInfo ni = nics[interfaceId];
+-    ni.q.insert(new QueuedMessage(msg, nextHop), msg.getPriority());
+-    if(!ni.busy) pump(interfaceId);
+-  }
+-
+-  //////////////////////////////////////////////////
+-  // send/receive
+-  //
+-
+-  /**
+-   * Send an IP packet. Knows how to broadcast, to deal
+-   * with loopback. Will call routing for all other destinations.
+-   *
+-   * @param msg ip packet
+-   */
+-  private void sendIp(NetMessage.Ip msg) 
+-  {
+-    if (NetAddress.ANY.equals(msg.getDst()))
+-    {
+-      // broadcast
+-      send(msg, Constants.NET_INTERFACE_DEFAULT, MacAddress.ANY);
+-    }
+-    else if(NetAddress.LOCAL.equals(msg.getDst()) || localAddr.equals(msg.getDst()))
+-    {
+-      // loopback
+-      send(msg, Constants.NET_INTERFACE_LOOPBACK, MacAddress.LOOP);
+-    }
+-    else
+-    {
+-      // route and send
+-      routing.send(msg);
+-    }
+-  }
+-
+-  //////////////////////////////////////////////////
+-  // send pump
+-  //
+-
+-  /** {@inheritDoc} */
+-  public void pump(int interfaceId)
+-  {
+-    NicInfo ni = nics[interfaceId];
+-    if(ni.q.isEmpty())
+-    {
+-      ni.busy = false;
+-    }
+-    else
+-    {
+-      ni.busy = true;
+-      QueuedMessage qmsg = ni.q.remove();
+-      NetMessage.Ip ip = (NetMessage.Ip)qmsg.getPayload();
+-      ip = ip.freeze(); // immutable once packet leaves node
+-      if(log.isInfoEnabled())
+-      {
+-        log.info("send t="+JistAPI.getTime()+" to="+qmsg.getNextHop()+" data="+ip);
+-      }
+-      JistAPI.sleep(Constants.NET_DELAY);
+-      ni.mac.send(ip, qmsg.getNextHop());
+-    }
+-  }
+-
+-  //////////////////////////////////////////////////
+-  // display
+-  //
+-
+-  /** {@inheritDoc} */
+-  public String toString()
+-  {
+-    return "ip:"+localAddr;
+-  }
+-
+ }
+ 
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/net/NetIpBase.java jist-swans-1.0.6/src/jist/swans/net/NetIpBase.java
+--- jist-swans-1.0.6-orig/src/jist/swans/net/NetIpBase.java	1970-01-01 01:00:00.000000000 +0100
++++ jist-swans-1.0.6/src/jist/swans/net/NetIpBase.java	2007-11-08 15:01:34.000000000 +0100
+@@ -0,0 +1,432 @@
++//////////////////////////////////////////////////
++// JIST (Java In Simulation Time) Project
++// Timestamp: <NetIpBase.java Tue 2004/04/20 10:12:52 barr pompom.cs.cornell.edu>
++//
++
++// Copyright (C) 2004 by Cornell University
++// All rights reserved.
++// Refer to LICENSE for terms and conditions of use.
++
++// Includes extensions by Ulm University (Michael Feiri, Elmar Schoch)
++// - Notification of packets dropped on MAC layer
++// - More flexible protocol handler
++// - Broadcast reception flag
++
++package jist.swans.net;
++
++import jist.swans.mac.MacAddress;
++import jist.swans.mac.MacInterface;
++import jist.swans.mac.MacLoop;
++
++import jist.swans.route.RouteInterface;
++
++import jist.swans.misc.Message;
++import jist.swans.misc.Mapper;
++import jist.swans.misc.Util;
++import jist.swans.net.NetInterface.NetHandler;
++
++import jist.swans.Constants;
++import jist.swans.Main;
++
++import jist.runtime.JistAPI;
++
++import org.apache.log4j.*;
++
++/**
++ * IPv4 implementation based on RFC 791. Performs protocol
++ * multiplexing, and prioritized packet queuing, but no
++ * RED or packet fragmentation.
++ *
++ * @author Rimon Barr &lt;barr+jist@cs.cornell.edu&gt;
++ * @version $Id: NetIpBase.java,v 1.45 2004/11/03 23:53:22 barr Exp $
++ * @since SWANS1.0
++ */
++
++//public class NetIpBase implements NetInterface
++public abstract class NetIpBase
++{
++  /**
++   * IP logger.
++   */
++  public static final Logger log = Logger.getLogger(NetIpBase.class.getName());
++
++  /**
++   * Information about each network interface.
++   */
++  public static class NicInfo
++  {
++    /** mac entity. */
++    public MacInterface mac;
++    /** outgoing packet queue. */
++    public MessageQueue q;
++    /** whether link layer is busy. */
++    public boolean busy;
++  }
++
++  //////////////////////////////////////////////////
++  // constants
++  //
++
++  /**
++   * Packet fragmentation threshold.
++   */
++  public static final int THRESHOLD_FRAGMENT = 2048;
++
++  /**
++   * Maximum packet queue length.
++   */
++  public static final byte MAX_QUEUE_LENGTH = 50;
++
++  //////////////////////////////////////////////////
++  // locals
++  //
++
++  // entity hookup
++  /** self-referencing proxy entity. */
++  protected NetInterface self;
++
++  /** local network address. */
++  protected NetAddress localAddr;
++
++  /** routing protocol. */
++  protected RouteInterface routing;
++
++  /** protocol number mapping. */
++  protected Mapper protocolMap;
++
++  /** protocol handlers. */
++  protected NetHandler[] protocolHandlers;
++
++  /** network interfaces. */
++  protected NicInfo[] nics;
++
++  /** packet loss models. */
++  protected PacketLoss incomingLoss, outgoingLoss;
++
++  //////////////////////////////////////////////////
++  // initialization 
++  //
++
++  /**
++   * Initialize IP implementation with given address and protocol mapping.
++   *
++   * @param addr local network address
++   * @param protocolMap protocol number mapping
++   * @param in incoming packet loss model
++   * @param out outgoing packet loss model
++   */
++  public NetIpBase(NetAddress addr, Mapper protocolMap, PacketLoss in, PacketLoss out)
++  {
++    // proxy entity
++    this.self = (NetInterface)JistAPI.proxy(this, NetInterface.class);
++    // local address
++    setAddress(addr);
++    // protocol number mapping
++    this.protocolMap = protocolMap;
++    // protocol handlers
++    // @author Elmar Schoch >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
++    // Remark: since protocolMap.getLimit() always returns the CURRENT
++    //         maximum index in the map, later assignment of net handlers
++    //         than the NetIP constructor is not possible. This side effect
++    //         makes development rather tricky and thus should be avoided
++    //         I left this in here and decided to implement a sustainable
++    //         solution - now, the array grows dynamically when new handlers
++    //         are set (see setNetHandler method)
++    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
++    this.protocolHandlers = new NetHandler[protocolMap.getLimit()];
++    // network interfaces
++    this.nics = new NicInfo[0];
++    // packet loss
++    this.incomingLoss = in;
++    this.outgoingLoss = out;
++    // add loopback mac:
++    //   therefore, loopback = 0, Constants.NET_INTERFACE_LOOPBACK
++    //              next     = 1, Constants.NET_INTERFACE_DEFAULT
++    MacLoop loopback = new MacLoop();
++    byte netid = addInterface(loopback.getProxy());
++    if(Main.ASSERT) Util.assertion(netid==Constants.NET_INTERFACE_LOOPBACK);
++    loopback.setNetEntity(getProxy(), netid);
++  }
++
++  //////////////////////////////////////////////////
++  // entity hookup
++  //
++
++  /**
++   * Return self-referencing proxy entity.
++   *
++   * @return self-referencing proxy entity
++   */
++  public NetInterface getProxy()
++  {
++    return this.self;
++  }
++
++  //////////////////////////////////////////////////
++  // address
++  //
++
++  /**
++   * Set local network address.
++   *
++   * @param addr local network address
++   */
++  public void setAddress(NetAddress addr)
++  {
++    if(Main.ASSERT) Util.assertion(addr!=null);
++    this.localAddr = addr;
++  }
++
++  /**
++   * Whether packet is for local consumption.
++   *
++   * @param msg packet to inspect
++   * @return whether packet is for local consumption
++   */
++  protected boolean isForMe(NetMessage.Ip msg)
++  {
++    NetAddress addr = msg.getDst();
++    return NetAddress.ANY.equals(addr)
++      || NetAddress.LOCAL.equals(addr)
++      || localAddr.equals(addr);
++  }
++
++  protected boolean isDup(NetMessage.Ip msg) {
++	  return false;
++  }
++  
++  
++  //////////////////////////////////////////////////
++  // routing, protocols, interfaces
++  //
++
++  /**
++   * Set routing implementation.
++   *
++   * @param routingEntity routing entity
++   */
++  public void setRouting(RouteInterface routingEntity)
++  {
++    if(!JistAPI.isEntity(routingEntity)) throw new IllegalArgumentException("expected entity");
++    this.routing = routingEntity;
++  }
++
++  /**
++   * Add network interface with default queue.
++   *
++   * @param macEntity link layer entity
++   * @return network interface identifier
++   */
++  public byte addInterface(MacInterface macEntity)
++  {
++    return addInterface(macEntity, 
++        new MessageQueue.NoDropMessageQueue(
++          Constants.NET_PRIORITY_NUM, MAX_QUEUE_LENGTH));
++  }
++
++  /**
++   * Add network interface.
++   *
++   * @param macEntity link layer entity
++   * @return network interface identifier
++   */
++  public byte addInterface(MacInterface macEntity, MessageQueue q)
++  {
++    if(!JistAPI.isEntity(macEntity)) throw new IllegalArgumentException("expected entity");
++    // create new nicinfo
++    NicInfo ni = new NicInfo();
++    ni.mac = macEntity;
++    ni.q = q;
++    ni.busy = false;
++    // store
++    NicInfo[] nics2 = new NicInfo[nics.length+1];
++    System.arraycopy(nics, 0, nics2, 0, nics.length);
++    nics2[nics.length] = ni;
++    nics = nics2;
++    // return interface id
++    return (byte)(nics.length-1);
++  }
++
++  /**
++   * Set network protocol handler.
++   *
++   * @param protocolId protocol identifier
++   * @param handler protocol handler
++   */
++  public void setProtocolHandler(int protocolId, NetHandler handler)
++  {
++
++	  // @author Elmar Schoch >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
++	  // grow protocol handler array, if necessary
++	  if (protocolMap.getLimit() > protocolHandlers.length) {
++		  log.info("Growing protocol handler array at "+this.localAddr+" from "+protocolHandlers.length+" to "+protocolMap.getLimit());	
++		  NetHandler[] protocolHandlersNew = new NetHandler[protocolMap.getLimit()];
++		  for (int i=0; i < protocolHandlers.length; i++) {
++			  protocolHandlersNew[i] = protocolHandlers[i];
++		  }
++		  protocolHandlers = protocolHandlersNew;
++	  }
++	  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
++	  
++    protocolHandlers[protocolMap.getMap(protocolId)] = handler;
++  }
++
++  /**
++   * Return network protocol handler.
++   *
++   * @param protocolId protocol identifier
++   * @return procotol handler
++   */
++  private NetHandler getProtocolHandler(int protocolId)
++  {
++    return protocolHandlers[protocolMap.getMap(protocolId)];
++  }
++
++  //////////////////////////////////////////////////
++  // NetInterface implementation
++  //
++
++  /** {@inheritDoc} */
++  public NetAddress getAddress() throws JistAPI.Continuation
++  {
++    return localAddr;
++  }
++
++  /** {@inheritDoc} */
++  public void receive(Message msg, MacAddress lastHop, byte macId, boolean promisc, boolean bcast)
++  {
++    if(msg==null) throw new NullPointerException();
++    NetMessage.Ip ipmsg = (NetMessage.Ip)msg;
++    if(incomingLoss.shouldDrop(ipmsg)) return;
++    if(log.isInfoEnabled())
++    {
++      log.info("receive t="+JistAPI.getTime()+" from="+lastHop+" on="+macId+" data="+msg);
++    }
++    if(routing!=null) routing.peek(ipmsg, macId, lastHop);
++    if(promisc) return;
++    if(bcast) if(isDup(ipmsg)) return;
++    
++    
++    if(isForMe(ipmsg) || (macId == Constants.NET_INTERFACE_LOOPBACK)) {
++      JistAPI.sleep(Constants.NET_DELAY);
++      getProtocolHandler(ipmsg.getProtocol()).receive(ipmsg.getPayload(), 
++          ipmsg.getSrc(), lastHop, macId, ipmsg.getDst(), 
++          ipmsg.getPriority(), ipmsg.getTTL());
++    }
++    else
++    {
++      if(ipmsg.getTTL()>0)
++      {
++        if(ipmsg.isFrozen()) ipmsg = ipmsg.copy(); else log.info("NOT FRIZZLED!");
++        ipmsg.decTTL();
++        sendIp(ipmsg, bcast);
++      } else {
++    	  
++    	  log.info("in node "+ localAddr + " a packets ttl expired " + ipmsg);
++    	  return;
++      }
++    }
++  }
++
++
++  public void dropNotify(Message packet, MacAddress packetNextHop){
++		routing.dropNotify(packet, packetNextHop);
++  }
++  
++  /** {@inheritDoc} */
++  public void send(Message msg, NetAddress dst, 
++      short protocol, byte priority, byte ttl) 
++  {
++    if(msg==null) throw new NullPointerException();
++	sendIp(new NetMessage.Ip(msg, localAddr, dst, protocol, priority, ttl), false);
++  }
++
++  /** {@inheritDoc} */
++  public void send(NetMessage.Ip msg, int interfaceId, MacAddress nextHop) 
++  {
++    if(msg==null) throw new NullPointerException();
++    if(outgoingLoss.shouldDrop(msg)) return;
++    /*
++    if(msg.getSize()>THRESHOLD_FRAGMENT)
++    {
++      throw new RuntimeException("ip fragmentation not implemented");
++    }
++    */
++    if(log.isDebugEnabled())
++    {
++      log.debug("queue t="+JistAPI.getTime()+" to="+nextHop+" on="+interfaceId+" data="+msg);
++    }
++    NicInfo ni = nics[interfaceId];
++    ni.q.insert(new QueuedMessage(msg, nextHop), msg.getPriority());
++    if(!ni.busy) pump(interfaceId);
++  }
++
++  //////////////////////////////////////////////////
++  // send/receive
++  //
++
++  /**
++   * Send an IP packet. Knows how to broadcast, to deal
++   * with loopback. Will call routing for all other destinations.
++   *
++   * @param msg ip packet
++   * @param bast whether the packet was received as a broadcast
++   */
++  protected void sendIp(NetMessage.Ip msg, boolean bcast)
++  {
++    if (NetAddress.ANY.equals(msg.getDst()))
++    {
++      // broadcast
++      send(msg, Constants.NET_INTERFACE_DEFAULT, MacAddress.ANY);
++    }
++    else if(NetAddress.LOCAL.equals(msg.getDst()) || localAddr.equals(msg.getDst()))
++    {
++      // loopback
++      send(msg, Constants.NET_INTERFACE_LOOPBACK, MacAddress.LOOP);
++    }
++    else
++    {
++      // route and send
++      routing.send(msg);
++    }
++  }
++
++  //////////////////////////////////////////////////
++  // send pump
++  //
++
++  /** {@inheritDoc} */
++  public void pump(int interfaceId)
++  {
++    NicInfo ni = nics[interfaceId];
++    if(ni.q.isEmpty())
++    {
++      ni.busy = false;
++    }
++    else
++    {
++      ni.busy = true;
++      QueuedMessage qmsg = ni.q.remove();
++      NetMessage.Ip ip = (NetMessage.Ip)qmsg.getPayload();
++      ip = ip.freeze(); // immutable once packet leaves node
++      if(log.isInfoEnabled())
++      {
++        log.info("send t="+JistAPI.getTime()+" to="+qmsg.getNextHop()+" data="+ip);
++      }
++      JistAPI.sleep(Constants.NET_DELAY);
++      ni.mac.send(ip, qmsg.getNextHop());
++    }
++  }
++
++  //////////////////////////////////////////////////
++  // display
++  //
++
++  /** {@inheritDoc} */
++  public String toString()
++  {
++    return "ip:"+localAddr;
++  }
++
++}
++
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/net/NetMessage.java jist-swans-1.0.6/src/jist/swans/net/NetMessage.java
+--- jist-swans-1.0.6-orig/src/jist/swans/net/NetMessage.java	2005-03-13 17:11:55.000000000 +0100
++++ jist-swans-1.0.6/src/jist/swans/net/NetMessage.java	2007-11-08 15:01:34.000000000 +0100
+@@ -7,8 +7,20 @@
+ // All rights reserved.
+ // Refer to LICENSE for terms and conditions of use.
+ 
++// Includes extensions by Ulm University (Michael Feiri, Elmar Schoch)
++// - More flexible handling of option headers
++
++
+ package jist.swans.net;
+ 
++import java.util.ArrayList;
++import java.util.Collections;
++import java.util.HashMap;
++import java.util.Iterator;
++import java.util.List;
++import java.util.Map;
++
++import jist.swans.misc.Location;
+ import jist.swans.misc.Message;
+ import jist.swans.misc.Util;
+ 
+@@ -45,7 +57,7 @@
+   //   protocol               size: 1
+   //   header chksum          size: 2
+   //   src                    size: 4
+-  //   dst                    size: 4
++  //   dst                    size: variable
+   //   options:               size: 4 * number
+   //   packet payload:        size: variable
+   //
+@@ -57,7 +69,7 @@
+   {
+ 
+     /** Fixed IP packet size. */
+-    public static final int BASE_SIZE = 20;
++    public static final int BASE_SIZE = 16;
+ 
+     //////////////////////////////////////////////////
+     // message contents
+@@ -83,8 +95,9 @@
+     private short fragOffset;
+ 
+     // options
+-    /** source route. */
+-    private IpOptionSourceRoute srcRoute;
++    //private IpOption[] option;
++    //private ArrayList options; // List alone doesnt provide the Cloneable Interface
++    private HashMap options; // Map alone doesnt provide the Cloneable Interface
+ 
+     /** Next identification number to use. */
+     private static short nextId = 0;
+@@ -114,6 +127,8 @@
+       this.ttl = ttl;
+       this.id = id;
+       this.fragOffset = fragOffset;
++      //options = new ArrayList();
++      options = new HashMap();
+     }
+ 
+     /**
+@@ -156,14 +171,15 @@
+     }
+ 
+     /**
+-     * Make copy of packet, usually in order to modify it.
++     * Make a semi shallow copy of packet, usually in order to modify it.
+      *
+      * @return mutable copy of packet.
+      */
+     public Ip copy()
+     {
+-      NetMessage.Ip ip2 = new Ip(payload, src, dst, protocol, priority, ttl);
+-      ip2.srcRoute = this.srcRoute;
++      NetMessage.Ip ip2 = new Ip(payload, src, dst, protocol, priority, ttl, id, fragOffset);
++      ip2.options = (HashMap)this.options.clone();
++      //ip2.options = (ArrayList)this.options.clone();		
+       return ip2;
+     }
+ 
+@@ -265,54 +281,26 @@
+     }
+ 
+     //////////////////////////////////////////////////
+-    // source route
++    // IpOption
+     //
+ 
+     /**
+-     * Returns whether packet contains source route.
+-     *
+-     * @return whether packet contains source route
+-     */
+-    public boolean hasSourceRoute()
+-    {
+-      return srcRoute!=null;
+-    }
+-
+-    /**
+-     * Return source route. (do not modify)
+-     *
+-     * @return source route (do not modify)
+-     */
+-    public NetAddress[] getSourceRoute()
+-    {
+-      return srcRoute.getRoute();
+-    }
+-
+-    /**
+-     * Return source route pointer.
+-     *
+-     * @return source route pointer
+-     */
+-    public int getSourceRoutePointer()
+-    {
+-      return srcRoute.getPtr();
+-    }
+-
+-    /**
+-     * Set source route.
+-     *
+-     * @param srcRoute source route
+-     */
+-    public void setSourceRoute(IpOptionSourceRoute srcRoute)
+-    {
+-      if(frozen) throw new IllegalStateException();
+-      this.srcRoute = srcRoute;
++	 * Return the optional (thus can be null) IpOption object. Note that
++	 * IpOption objects must be immutable to avoid conflicts with the possibly
++	 * frozen state of the packet
++	 * 
++	 * @return IpOption (can be null)
++	 */
++	public Map getOptions() {
++		//return isFrozen() ? Collections.unmodifiableList(options) : options;
++		return isFrozen() ? Collections.unmodifiableMap(options) : options;
+     }
+ 
+     /** {@inheritDoc} */
+-    public String toString()
+-    {
+-      return "ip(src="+src+" dst="+dst+" size="+getSize()+" prot="+protocol+" ttl="+ttl+" route="+srcRoute+" data="+payload+")";
++		public String toString() {
++			return "ip(src=" + src + " dst=" + dst + " size=" + getSize()
++					+ " prot=" + protocol + " ttl=" + ttl + " id=" + id
++					+ " option=" + options + " data=" + payload + ")";
+     }
+ 
+     //////////////////////////////////////////////////
+@@ -320,15 +308,16 @@
+     //
+ 
+     /** {@inheritDoc} */
+-    public int getSize()
+-    {
++		public int getSize() {
+       int size = payload.getSize();
+-      if(size==Constants.ZERO_WIRE_SIZE)
+-      {
++			if (size == Constants.ZERO_WIRE_SIZE) {
+         return Constants.ZERO_WIRE_SIZE;
+       }
+-      // todo: options
+-      return BASE_SIZE + size;
++			Iterator it = options.values().iterator();
++			while (it.hasNext()) {
++				size += ((IpOption)it.next()).getSize();
++			}
++			return BASE_SIZE + size + dst.getSize();
+     }
+ 
+     /** {@inheritDoc} */
+@@ -444,6 +433,83 @@
+   } // class: IpOptionSourceRoute
+ 
+ 
++	/**
++	 * The geographic location of an IP packets most recent hop.
++	 */
++	public static class IpOptionHopLoc extends IpOption {
++
++		private static final byte TYPE = (byte) 138;
++		private Location lastHop;
++
++		public IpOptionHopLoc(Location lastLoc) {
++			lastHop = lastLoc;
++		}
++
++		public Location getLoc() {
++			return lastHop;
++		}
++
++		/** {@inheritDoc} */
++		public byte getType() {
++			return TYPE;
++		}
++
++		/** {@inheritDoc} */
++		public int getSize() {
++			/** TODO vans: give Location objects a getSize method */
++			// return lastHop.getSize();
++			return 2;
++		}
++
++		/** {@inheritDoc} */
++		public void getBytes(byte[] msg, int offset) {
++			throw new RuntimeException("not implemented");
++		}
++
++		/** {@inheritDoc} */
++		public String toString() {
++			return "hopLoc:" + lastHop.toString();
++		}
++		
++	} // class: hopLoc
++
++
++	public static class IpOptionRecordRoute extends IpOption {
++
++		private static final byte TYPE = (byte) 7;
++		private List recordedRoute = new ArrayList();
++
++		public IpOptionRecordRoute() {
++		}
++		
++		public void addHop(NetAddress na) {
++			recordedRoute.add(na);
++		}
++		
++		/** {@inheritDoc} */
++		public byte getType() {
++			return TYPE;
++		}
++
++		/** {@inheritDoc} */
++		public int getSize() {
++			return recordedRoute.size()*4;
++		}
++
++		/** {@inheritDoc} */
++		public void getBytes(byte[] msg, int offset) {
++			throw new RuntimeException("not implemented");
++		}
++
++		/** {@inheritDoc} */
++		public String toString() {
++			return "IpOptionRecordRoute:" + recordedRoute.toString();
++		}
++		
++	} // class: IpOptionBeacon
++
++
++	
+ } // class: NetMessage
+ 
+ /*
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/radio/BERTable.java jist-swans-1.0.6/src/jist/swans/radio/BERTable.java
+--- jist-swans-1.0.6-orig/src/jist/swans/radio/BERTable.java	2005-03-13 17:11:55.000000000 +0100
++++ jist-swans-1.0.6/src/jist/swans/radio/BERTable.java	2007-11-08 15:01:42.000000000 +0100
+@@ -114,7 +114,7 @@
+     double ber = calc(snrVal);
+     if(Main.ASSERT) Util.assertion(ber>=0.0 && ber<=1.0);
+     if(ber<=0) return false;
+-    double error = 1.0 - Math.pow((1.0-ber), bits);
++    double error = 1.0 - StrictMath.pow((1.0-ber), bits);
+     if(Main.ASSERT) Util.assertion(error>=0.0 && error<=1.0);
+     return error>Constants.random.nextDouble();
+   }
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/radio/RadioInfo.java jist-swans-1.0.6/src/jist/swans/radio/RadioInfo.java
+--- jist-swans-1.0.6-orig/src/jist/swans/radio/RadioInfo.java	2004-04-06 18:07:50.000000000 +0200
++++ jist-swans-1.0.6/src/jist/swans/radio/RadioInfo.java	2007-11-08 15:01:42.000000000 +0100
+@@ -113,6 +113,13 @@
+     protected double background_mW;
+ 
+     /**
++     * Receive upcoming stronger packets while receiving another packet.
++     * This is possible due to the capture effect but <b>NOT</b> accordant IEEE 802.11
++     * @author Manuel Schoch &lt;manuel.schoch@uni-ulm.de&gt;
++     */
++    protected boolean captureStrongerLast;
++
++    /**
+      * Return radio wavelength.
+      *
+      * @return wavelength (units: meter)
+@@ -182,6 +189,16 @@
+       return background_mW;
+     }
+ 
++    /**
++     * Return whether to capture stronger last packets.
++     * 
++     * @return <code>true</code> if upcoming stronger packets shall be captured, <code>false</code> otherwise.
++     * @author Manuel Schoch &lt;manuel.schoch@uni-ulm.de&gt;
++     */
++    public boolean getCaptureStrongerLast() {
++    	return this.captureStrongerLast;
++    }
++
+     /** {@inheritDoc} */
+     public String toString()
+     {
+@@ -251,6 +268,42 @@
+       double transmit, double gain, double sensitivity_mW, double threshold_mW, 
+       double temperature, double thermalFactor, double ambientNoise_mW)
+   {
++	return createShared(frequency,
++						bandwidth,
++						transmit,
++						gain,
++						sensitivity_mW,
++						threshold_mW,
++						temperature,
++						thermalFactor,
++						ambientNoise_mW,
++						true // to emulate the old behavior set true by default
++					);
++  }
++  
++  /**
++   * Create shared radio parameters.
++   *
++   * @param frequency radio frequency (units: Hertz)
++   * @param bandwidth bandwidth (units: bits/second)
++   *
++   * @param transmit transmission power (units: dBm)
++   * @param gain antenna gain (units: dB)
++   *
++   * @param sensitivity_mW receive sensivity (units: mW)
++   * @param threshold_mW receive threshold (units: mW)
++   *
++   * @param temperature field temperature (units: degrees Kelvin)
++   * @param thermalFactor thermal noise
++   * @param ambientNoise_mW ambient noise (units: mW)
++   * 
++   * @param strongerlast capture strong upcoming packets 
++   *
++   * @return shared radio information object
++   */
++  public static RadioInfoShared createShared(double frequency, int bandwidth, 
++	      double transmit, double gain, double sensitivity_mW, double threshold_mW, 
++	      double temperature, double thermalFactor, double ambientNoise_mW, boolean strongerlast) {
+     RadioInfoShared shared = new RadioInfoShared();
+     // wavelength
+     shared.wavelength = Constants.SPEED_OF_LIGHT / frequency;
+@@ -265,6 +318,9 @@
+     // noise
+     double thermalNoise_mW = Constants.BOLTZMANN * temperature * thermalFactor * 1000.0;
+     shared.background_mW = (ambientNoise_mW + thermalNoise_mW) * bandwidth;
++	  
++	  shared.captureStrongerLast = strongerlast;
++	    
+     return shared;
+   }
+ 
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/radio/RadioNoiseAdditive.java jist-swans-1.0.6/src/jist/swans/radio/RadioNoiseAdditive.java
+--- jist-swans-1.0.6-orig/src/jist/swans/radio/RadioNoiseAdditive.java	2004-11-19 16:55:34.000000000 +0100
++++ jist-swans-1.0.6/src/jist/swans/radio/RadioNoiseAdditive.java	2007-11-08 15:01:42.000000000 +0100
+@@ -7,6 +7,9 @@
+ // All rights reserved.
+ // Refer to LICENSE for terms and conditions of use.
+ 
++// Includes extensions by Ulm University
++// - Bugfix: mode was set to "receive" in endTransmit, if a signal was pending
++
+ package jist.swans.radio;
+ 
+ import jist.swans.misc.Message;
+@@ -51,7 +54,8 @@
+   protected byte type;
+ 
+   /**
+-   * threshold signal-to-noise ratio.
++   * threshold signal-to-noise ratio (mW)
++   * <code>SNR = signal power / noise power</code>
+    */
+   protected float thresholdSNR;
+ 
+@@ -144,12 +148,15 @@
+     switch(mode)
+     {
+       case Constants.RADIO_MODE_IDLE:
++    	// if power greater than general reception threshold and signal noise gap is big enough
++    	// try to recevie the packet ( SNR = Signalpower / Noisepower )
+         if(power_mW >= radioInfo.shared.threshold_mW
+             &&  power_mW >= totalPower_mW*thresholdSNR)
+         {
+           lockSignal(msg, power_mW, duration);
+           setMode(Constants.RADIO_MODE_RECEIVING);
+         }
++    	// otherwise if new noise level is bigger than sensing threshold set channel busy
+         else if(totalPower_mW+power_mW > radioInfo.shared.sensitivity_mW)
+         {
+           setMode(Constants.RADIO_MODE_SENSING);
+@@ -164,17 +171,25 @@
+         }
+         break;
+       case Constants.RADIO_MODE_RECEIVING:
+-        if(power_mW > signalPower_mW  &&  power_mW >= totalPower_mW*thresholdSNR)
+-        {
++    	// if the new signal is strong enough to be received ...
++    	if(power_mW > signalPower_mW  &&  power_mW >= totalPower_mW*thresholdSNR) {
++    	  // ... check if we should recognize the signal as a packet ...
++    	  if(radioInfo.shared.captureStrongerLast) { // ... yes -> receive it
+           lockSignal(msg, power_mW, duration);
+           setMode(Constants.RADIO_MODE_RECEIVING);
++    	  } else { // ... no -> through away both
++		unlockSignal();
++		setMode(Constants.RADIO_MODE_SENSING);
+         }
+-        else if(type == SNR  
+-            &&  signalPower_mW < (totalPower_mW-signalPower_mW+power_mW)*thresholdSNR)
+-        {
++    	} else {
++          // probably "type == SNR &&" should be removed here because if a collision occures a correct
++          // packet reception is impossible in any case - Manuel Schoch
++          // TODO Manuel Schoch: check if we should use a capture threshold instead of SNR here
++          if(type == SNR && signalPower_mW < (totalPower_mW-signalPower_mW+power_mW)*thresholdSNR) {
+           unlockSignal();
+           setMode(Constants.RADIO_MODE_SENSING);
+         }
++        }
+         break;
+       case Constants.RADIO_MODE_TRANSMITTING:
+         break;
+@@ -211,7 +226,8 @@
+           dropped |= type == BER  && totalPower_mW>0 &&
+               ber.shouldDrop(signalPower_mW/totalPower_mW, 
+                   8*signalBuffer.getSize());
+-          if(!dropped)
++
++          if(!dropped && signalBuffer!=null)
+           {
+             this.macEntity.receive(signalBuffer);
+           }
+@@ -235,5 +251,27 @@
+     }
+   } // function: endReceive
+ 
++  
++  // Elmar Schoch >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
++  // overwrite inherited method, since there seems to be an error in the original implementation:
++  // When the radio has signals after transmitting, it should not go into receiving mode, but
++  // into sensing mode.
++  //
++  // RadioInterface interface
++  /** {@inheritDoc} */
++  public void endTransmit()
++  {
++    // radio in sleep mode
++    if(mode==Constants.RADIO_MODE_SLEEP) return;
++    // check that we are currently transmitting
++    if(mode!=Constants.RADIO_MODE_TRANSMITTING) throw new RuntimeException("radio is not transmitting");
++    // set mode
++    setMode(totalPower_mW >= radioInfo.shared.sensitivity_mW 
++    		? Constants.RADIO_MODE_SENSING 
++    		: Constants.RADIO_MODE_IDLE);
++  }
++
++  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
++  
+ } // class: RadioNoiseAdditive
+ 
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/radio/RadioNoiseIndep.java jist-swans-1.0.6/src/jist/swans/radio/RadioNoiseIndep.java
+--- jist-swans-1.0.6-orig/src/jist/swans/radio/RadioNoiseIndep.java	2004-11-05 04:38:34.000000000 +0100
++++ jist-swans-1.0.6/src/jist/swans/radio/RadioNoiseIndep.java	2007-11-08 15:01:42.000000000 +0100
+@@ -101,7 +101,8 @@
+         break;
+       case Constants.RADIO_MODE_RECEIVING:
+         if(Main.ASSERT) Util.assertion(signals>0);
+-        if(power_mW >= radioInfo.shared.threshold_mW
++        if(radioInfo.shared.captureStrongerLast 
++            && power_mW >= radioInfo.shared.threshold_mW
+             &&  power_mW > signalPower_mW*thresholdSNR)
+         {
+           lockSignal(msg, power_mW, duration);
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/route/RouteAodv.java jist-swans-1.0.6/src/jist/swans/route/RouteAodv.java
+--- jist-swans-1.0.6-orig/src/jist/swans/route/RouteAodv.java	2004-04-06 18:07:50.000000000 +0200
++++ jist-swans-1.0.6/src/jist/swans/route/RouteAodv.java	2007-11-08 15:01:44.000000000 +0100
+@@ -33,6 +33,8 @@
+  * @author Rimon Barr &lt;barr+jist@cs.cornell.edu&gt;
+  * @version $Id: RouteAodv.java,v 1.48 2006-05-14 18:48:40 barr Exp $
+  * @since SWANS1.0
++ *
++ * Bugfix by Ulm University: "Self-Entry" in routing table must not be removed
+  */
+ public class RouteAodv implements RouteInterface.Aodv
+ {
+@@ -638,7 +640,7 @@
+      */
+     public void incTtl()
+     {
+-      ttl = (byte)Math.min(ttl+TTL_INCREMENT, TTL_THRESHOLD);
++      ttl = (byte)StrictMath.min(ttl+TTL_INCREMENT, TTL_THRESHOLD);
+     }
+     
+     /**
+@@ -1568,6 +1561,14 @@
+       Map.Entry mapEntry = (Map.Entry)itr.next();
+       MacAddress macAddr = (MacAddress)mapEntry.getKey();
+       OutgoingInfo outInfo = (OutgoingInfo)mapEntry.getValue();
++      
++      // @author Elmar Schoch >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
++      // The routing table contains a "self entry", that must not be
++      // removed. Leads to NullPointerException in
++      // RouteRequest.broadcast(..) otherwise
++      if (macAddr == MacAddress.NULL) continue;
++      // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
++      
+       if (outInfo.getHelloWaitCount() > HELLO_ALLOWED_LOSS)
+       {
+         //remove all affected routes in routing table
+@@ -1641,7 +1642,7 @@
+    * @param msg incoming packet
+    * @param lastHop last link-level hop of incoming packet
+    */
+-  public void peek(NetMessage msg, MacAddress lastHop)
++  public void peek(NetMessage msg, byte interfaceId, MacAddress lastHop)
+   {
+     //If receive a message from an outgoing link, reset hello_wait_count
+     OutgoingInfo lastHopInfo = outgoingSet.getInfo(lastHop);
+@@ -2320,4 +2321,9 @@
+     System.out.println();
+   }
+ 
++
++  public void dropNotify(Message packet, MacAddress packetNextHop) {
++	  // unused
++  }
++
+ }
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/route/RouteDsr.java jist-swans-1.0.6/src/jist/swans/route/RouteDsr.java
+--- jist-swans-1.0.6-orig/src/jist/swans/route/RouteDsr.java	2004-11-25 18:52:17.000000000 +0100
++++ jist-swans-1.0.6/src/jist/swans/route/RouteDsr.java	2007-11-08 15:01:44.000000000 +0100
+@@ -7,6 +7,9 @@
+ // All rights reserved.
+ // Refer to LICENSE for terms and conditions of use.
+ 
++// Includes extensions by Ulm University
++// - introduces statistics collection
++
+ package jist.swans.route;
+ 
+ import jist.swans.mac.MacAddress;
+@@ -35,6 +38,35 @@
+  */
+ public class RouteDsr implements RouteInterface.Dsr
+ {
++	
++	// @author Elmar Schoch >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
++	// statistics collection classes
++	public static class DsrStats {
++		public DsrPacketStats originated = new DsrPacketStats();
++		public DsrPacketStats forwarded = new DsrPacketStats();
++		public DsrPacketStats recv = new DsrPacketStats();
++		
++	}
++	
++	public static class DsrPacketStats {
++		public long rreqPackets;
++		public long rrepPackets;
++		public long rerrPackets;
++		public long dataPackets;
++		
++		public long totalDsrPackets() {
++			return rreqPackets + rrepPackets + rerrPackets;
++		}
++		
++		public void clear() {
++			rreqPackets = 0;
++			rrepPackets = 0;
++			rerrPackets = 0;
++		}
++	}
++	
++	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
++	
+   //////////////////////////////////////////////////
+   // constants
+   //
+@@ -294,6 +326,17 @@
+   /** The proxy interface for this object. */
+   private RouteInterface.Dsr self;
+ 
++  // @author Elmar Schoch >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
++  /** Statistics object for DSR */
++  private DsrStats stats;
++  
++  /** Set statistics object */
++  public void setStats(DsrStats stats) {
++	  this.stats = stats;
++  }
++  
++  
++  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+ 
+   //////////////////////////////////////////////////
+   // initialization
+@@ -378,6 +421,12 @@
+     RouteDsrMsg reply = new RouteDsrMsg(null);
+     reply.addOption(RouteDsrMsg.OptionRouteReply.create(routeToHere));
+     
++    // @author Elmar Schoch >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
++    if (stats != null) {
++    	stats.originated.rrepPackets++;
++    }
++    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
++    
+     if (routeFromHere.length > 0)
+     {
+       reply.addOption(RouteDsrMsg.OptionSourceRoute.create(0,
+@@ -388,7 +437,7 @@
+       src, Constants.NET_PROTOCOL_DSR, Constants.NET_PRIORITY_NORMAL,
+       Constants.TTL_DEFAULT);
+ 
+-    JistAPI.sleep((long)(Math.random() * BROADCAST_JITTER));
++    JistAPI.sleep((long)(Constants.random.nextDouble() * BROADCAST_JITTER));
+     Transmit(replyMsg);
+   }
+ 
+@@ -438,7 +487,13 @@
+     NetMessage.Ip newRequestIp = new NetMessage.Ip(newRequest, src, dst,
+       protocol, priority, (byte)(ttl - 1), id, fragOffset);
+ 
+-    JistAPI.sleep((long)(Math.random() * BROADCAST_JITTER));
++    JistAPI.sleep((long)(Constants.random.nextDouble() * BROADCAST_JITTER));
++    
++    // @author Elmar Schoch >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
++    if (stats != null) {
++    	stats.forwarded.rreqPackets++;
++    }
++    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+     netEntity.send(newRequestIp, Constants.NET_INTERFACE_DEFAULT, MacAddress.ANY);
+   }
+ 
+@@ -644,6 +699,33 @@
+       NetMessage.Ip ipMsg = new NetMessage.Ip(newMsg, src, dest, protocol,
+         priority, (byte)(ttl - 1), id, fragOffset);
+ 
++      // @author Elmar Schoch >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
++      // Check what type of packet we have here and record stats
++      
++      iter = newMsg.getOptions().iterator();
++      while (iter.hasNext() && stats != null){
++        byte[] optBuffer = (byte[])iter.next();
++        RouteDsrMsg.Option option = RouteDsrMsg.Option.create(optBuffer, 0);
++
++        if (option != null){
++
++        	switch (option.getType()) {
++        		case RouteDsrMsg.OPT_ROUTE_REQUEST:
++        			break; // Counted in separate method
++        		case RouteDsrMsg.OPT_ROUTE_REPLY:
++        			stats.forwarded.rrepPackets++;
++        			break;
++        		case RouteDsrMsg.OPT_SOURCE_ROUTE:
++        			stats.forwarded.dataPackets++;
++        			break;
++        		case RouteDsrMsg.OPT_ROUTE_ERROR:
++        			stats.forwarded.rerrPackets++;
++        			break;
++        	}
++        }
++      }
++      // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
++
+       Transmit(ipMsg);
+     }
+   }
+@@ -716,6 +798,12 @@
+ 
+     RouteDsrMsg dsrMsg = new RouteDsrMsg(null);
+ 
++    // @author Elmar Schoch >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
++    if (stats != null) {
++    	stats.originated.rrepPackets++;
++    }
++    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
++
+     try
+     {
+     dsrMsg.addOption(RouteDsrMsg.OptionRouteReply.create(routeFromSrc));
+@@ -858,16 +946,31 @@
+       switch (opt.getType())
+       {
+         case RouteDsrMsg.OPT_ROUTE_REQUEST:
++          // @author Elmar Schoch >>>>>>>>>>>>>>>>>>
++        	if (stats != null) {
++        		stats.recv.rreqPackets++;
++        	}
++          // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+           HandleRequest(msg, (RouteDsrMsg.OptionRouteRequest)opt, optBuf, src,
+             dst, protocol, priority, ttl, id, fragOffset);
+ 
+           break;
+ 
+         case RouteDsrMsg.OPT_ROUTE_REPLY:
++          // @author Elmar Schoch >>>>>>>>>>>>>>>>>>
++        	if (stats != null) {
++        		stats.recv.rrepPackets++;
++        	}
++          // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+           HandleReply(msg, (RouteDsrMsg.OptionRouteReply)opt);
+           break;
+ 
+         case RouteDsrMsg.OPT_SOURCE_ROUTE:
++          // @author Elmar Schoch >>>>>>>>>>>>>>>>>>
++        	if (stats != null) {
++        		stats.recv.dataPackets++;
++        	}
++          // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+           sourceRoute = (RouteDsrMsg.OptionSourceRoute)opt;
+ 
+           if (localAddr.equals(NextRecipient(sourceRoute, dst)))
+@@ -891,6 +994,11 @@
+           break;
+ 
+         case RouteDsrMsg.OPT_ROUTE_ERROR:
++          // @author Elmar Schoch >>>>>>>>>>>>>>>>>>
++        	if (stats != null) {
++        		stats.recv.rerrPackets++;
++        	}
++          // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+           HandleError((RouteDsrMsg.OptionRouteError)opt);
+           break;
+ 
+@@ -988,6 +1096,12 @@
+         NetAddress.ANY, Constants.NET_PROTOCOL_DSR, Constants.NET_PRIORITY_NORMAL,
+         Constants.TTL_DEFAULT);
+ 
++      // @author Elmar Schoch >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
++      if (stats != null) {
++    	  stats.originated.rreqPackets++;
++      }
++      // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
++      
+       netEntity.send(routeRequestMsg, Constants.NET_INTERFACE_DEFAULT, MacAddress.ANY);
+       entry.lastRequestTime = JistAPI.getTime();
+ 
+@@ -1348,6 +1462,12 @@
+           RouteDsrMsg.ERROR_NODE_UNREACHABLE, sourceRoute.getSalvageCount(),
+           localAddr, src, nextAddrBuf));
+ 
++        // @author Elmar Schoch >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
++        if (stats != null) {
++        	stats.originated.rerrPackets++;
++        }
++        // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
++
+         int curSegment =
+           sourceRoute.getNumAddresses() - sourceRoute.getNumSegmentsLeft();
+ 
+@@ -1507,7 +1627,7 @@
+     }
+ 
+     netEntity.send(msg, Constants.NET_INTERFACE_DEFAULT, MacAddress.ANY);
+-    JistAPI.sleep(PASSIVE_ACK_TIMEOUT + (long)(Math.random()*BROADCAST_JITTER));
++    JistAPI.sleep(PASSIVE_ACK_TIMEOUT + (long)(Constants.random.nextDouble()*BROADCAST_JITTER));
+ 
+     self.TransmitWithPassiveAck(msg, numRetransmits + 1);
+   }
+@@ -1593,7 +1713,7 @@
+     }
+ 
+     netEntity.send(msg, Constants.NET_INTERFACE_DEFAULT, MacAddress.ANY);
+-    JistAPI.sleep(timeout + (long)(Math.random() * BROADCAST_JITTER));
++    JistAPI.sleep(timeout + (long)(Constants.random.nextDouble() * BROADCAST_JITTER));
+     self.TransmitWithNetworkAck(msg, ackId, 2*timeout, numRetransmits + 1);
+   }
+ 
+@@ -1658,6 +1778,12 @@
+     NetMessage.Ip ipMsg = new NetMessage.Ip(dsrMsg, msg.getSrc(), msg.getDst(),
+       Constants.NET_PROTOCOL_DSR, msg.getPriority(), msg.getTTL());
+ 
++    // @author Elmar Schoch >>>>>>>>>>>>>>>>>>
++    if (stats != null) {
++    	stats.originated.dataPackets++;
++    }
++    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
++    
+     Transmit(ipMsg);
+   }
+ 
+@@ -1673,7 +1799,7 @@
+    * @param msg     the message to examine
+    * @param lastHop the MAC address of the node that sent this message
+    */
+-  public void peek(NetMessage msg, MacAddress lastHop)
++  public void peek(NetMessage msg, byte interfaceId, MacAddress lastHop)
+   {
+     if (msg instanceof NetMessage.Ip)
+     {
+@@ -1832,7 +1958,7 @@
+       NetMessage.Ip newIp = new NetMessage.Ip(dsrMsg.getContent(), src, dst,
+         dsrMsg.getNextHeaderType(), priority, ttl);        
+ 
+-      netEntity.receive(newIp, lastHop, macId, false);
++      netEntity.receive(newIp, lastHop, macId, false, false);
+ 
+       if (log.isInfoEnabled())
+       {
+@@ -1840,4 +1966,10 @@
+       }
+     }
+   }
++
++
++  public void dropNotify(Message packet, MacAddress packetNextHop) {
++	  // unused
++  }
++
+ }
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/route/RouteDsrMsg.java jist-swans-1.0.6/src/jist/swans/route/RouteDsrMsg.java
+--- jist-swans-1.0.6-orig/src/jist/swans/route/RouteDsrMsg.java	2004-04-06 18:07:50.000000000 +0200
++++ jist-swans-1.0.6/src/jist/swans/route/RouteDsrMsg.java	2007-11-08 15:01:44.000000000 +0100
+@@ -173,7 +173,7 @@
+     for (int i = 0; i < options.size(); i++)
+     {
+       byte[] option = (byte[])options.get(i);
+-      int bytesToCopy = Math.min(buf.length - offset, option.length);
++      int bytesToCopy = StrictMath.min(buf.length - offset, option.length);
+ 
+       System.arraycopy(buf, offset, option, 0, bytesToCopy);
+       offset += bytesToCopy;
+@@ -319,8 +319,8 @@
+      */
+     public int getBytes(byte[] buf, int offset)
+     {
+-      int numBytesToCopy = Math.min(getSize(), buf.length - offset);
+-      System.arraycopy(optBuf, optBufOffset, buf, offset, Math.min(getSize(), numBytesToCopy));
++      int numBytesToCopy = StrictMath.min(getSize(), buf.length - offset);
++      System.arraycopy(optBuf, optBufOffset, buf, offset, StrictMath.min(getSize(), numBytesToCopy));
+       return numBytesToCopy;
+     }
+ 
+@@ -676,8 +676,8 @@
+      */
+     public int getTypeSpecificInfoBytes(byte[] buf, int offset)
+     {
+-      int numBytesToCopy = Math.min(getTypeSpecificInfoSize(), buf.length - offset);
+-      System.arraycopy(optBuf, optBufOffset + 12, buf, offset, Math.min(getSize(), numBytesToCopy));
++      int numBytesToCopy = StrictMath.min(getTypeSpecificInfoSize(), buf.length - offset);
++      System.arraycopy(optBuf, optBufOffset + 12, buf, offset, StrictMath.min(getSize(), numBytesToCopy));
+       return numBytesToCopy;
+     }
+ 
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/route/RouteInterface.java jist-swans-1.0.6/src/jist/swans/route/RouteInterface.java
+--- jist-swans-1.0.6-orig/src/jist/swans/route/RouteInterface.java	2004-04-06 18:07:50.000000000 +0200
++++ jist-swans-1.0.6/src/jist/swans/route/RouteInterface.java	2007-11-08 15:01:44.000000000 +0100
+@@ -39,9 +39,10 @@
+    * purposes, but should not change their contents.
+    *
+    * @param msg incoming packet
++   * @param interfaceId the interface that received the msg
+    * @param lastHop last link-level hop of incoming packet
+    */
+-  void peek(NetMessage msg, MacAddress lastHop);
++  void peek(NetMessage msg, byte interfaceId, MacAddress lastHop);
+ 
+   /**
+    * Called by the network layer to request transmission of a packet that 
+@@ -54,6 +55,14 @@
+    */
+   void send(NetMessage msg);
+ 
++  /**
++   * Called by the network layer which forwards notifications of dropped packets
++   * from the link layer. Not all MAC implementations support this feature!
++   * 
++   * @param packet dropped network packet
++   * @param packetNextHop link-level destination of droped packet
++   */
++  void dropNotify(Message packet, MacAddress packetNextHop);
+ 
+   //////////////////////////////////////////////////
+   // ZRP
+@@ -489,5 +498,22 @@
+     
+   } // class: AODV
+ 
++
++  //////////////////////////////////////////////////
++  // CGGC
++  //
++
++  public static interface Cggc extends RouteInterface, Protocol {
++
++	/**
++	 * Timeout event, which gets called periodically. Primarily
++	 * responsible for beaconing.
++	 */
++	void timeout();
++
++  } // class: CGGC
++
++
++
+ } // class: RouteInterface
+ 
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/route/RouteZrp.java jist-swans-1.0.6/src/jist/swans/route/RouteZrp.java
+--- jist-swans-1.0.6-orig/src/jist/swans/route/RouteZrp.java	2005-03-13 17:11:55.000000000 +0100
++++ jist-swans-1.0.6/src/jist/swans/route/RouteZrp.java	2007-11-08 15:01:44.000000000 +0100
+@@ -7,6 +7,9 @@
+ // All rights reserved.
+ // Refer to LICENSE for terms and conditions of use.
+ 
++// Includes extensions by Ulm University
++// - modified to use IP option headers introduced in NetIp
++
+ package jist.swans.route;
+ 
+ import jist.swans.mac.MacAddress;
+@@ -27,6 +30,9 @@
+  * @author Rimon Barr &lt;barr+jist@cs.cornell.edu&gt;
+  * @version $Id: RouteZrp.java,v 1.41 2005-03-13 16:11:55 barr Exp $
+  * @since SWANS1.0
++ *
++ * Change by Ulm University (Michael Feiri): Use IP option headers
++ *
+  */
+ 
+ public class RouteZrp implements RouteInterface.Zrp
+@@ -424,7 +430,7 @@
+   //
+ 
+   /** {@inheritDoc} */
+-  public void peek(NetMessage msg, MacAddress lastHop)
++  public void peek(NetMessage msg, byte interfaceId, MacAddress lastHop)
+   {
+     if(logZRP.isDebugEnabled())
+     {
+@@ -443,22 +449,25 @@
+       logZRP.info("t="+JistAPI.getTime()+" at="+localAddr+" route "+ip);
+     }
+     NetAddress nextHop = null;
++    NetMessage.IpOption ipOpt = null;
++    ipOpt = (NetMessage.IpOption)ip.getOptions().get(Constants.IP_OPTION_ZRP);
+     // compute next hop
+     if(iarp.hasRoute(ip.getDst()))
+     {
+       // route found inside zone
+       nextHop = iarp.getRoute(ip.getDst())[0];
+     }
+-    else if(ip.hasSourceRoute())
++    else if(ipOpt!=null)
+     {
++      NetMessage.IpOptionSourceRoute ipOptSr = (NetMessage.IpOptionSourceRoute)ipOpt;
+       // packet source routed
+-      NetAddress[] route = ip.getSourceRoute();
++      NetAddress[] route = ipOptSr.getRoute();
+       // look within source route for first node inside zone
+       int i=route.length-1;
+-      for(i=route.length-1; i>=ip.getSourceRoutePointer() && !iarp.hasRoute(route[i]); i--)
++      for(i=route.length-1; i>=ipOptSr.getPtr() && !iarp.hasRoute(route[i]); i--)
+       {
+       }
+-      if(i<ip.getSourceRoutePointer())
++      if(i<ipOptSr.getPtr())
+       {
+         // todo: route failure
+         return;
+@@ -466,10 +475,10 @@
+       nextHop = iarp.getRoute(route[i])[0];
+       // adjust source route pointer
+       if(nextHop.equals(route[i])) i++;
+-      if(i!=ip.getSourceRoutePointer())
++      if(i!=ipOptSr.getPtr())
+       {
+         if(ip.isFrozen()) ip = ip.copy();
+-        ip.setSourceRoute(new NetMessage.IpOptionSourceRoute(ip.getSourceRoute(), i));
++		ip.getOptions().put(Constants.IP_OPTION_ZRP, new NetMessage.IpOptionSourceRoute(ipOptSr.getRoute(), i));		
+       }
+     }
+ 
+@@ -497,22 +506,22 @@
+       if(msg instanceof RouteInterface.Zrp.MessageNdp)
+       {
+         stats.send.ndpPackets++;
+-        stats.send.ndpBytes+=Math.max(msg.getSize(),0);
++        stats.send.ndpBytes+=StrictMath.max(msg.getSize(),0);
+       }
+       else if(msg instanceof RouteInterface.Zrp.MessageIarp)
+       {
+         stats.send.iarpPackets++;
+-        stats.send.iarpBytes+=Math.max(msg.getSize(),0);
++        stats.send.iarpBytes+=StrictMath.max(msg.getSize(),0);
+       }
+       else if(msg instanceof RouteInterface.Zrp.MessageBrp)
+       {
+         stats.send.brpPackets++;
+-        stats.send.brpBytes+=Math.max(msg.getSize(),0);
++        stats.send.brpBytes+=StrictMath.max(msg.getSize(),0);
+       }
+       else if(msg instanceof RouteInterface.Zrp.MessageIerp)
+       {
+         stats.send.ierpPackets++;
+-        stats.send.ierpBytes+=Math.max(msg.getSize(),0);
++        stats.send.ierpBytes+=StrictMath.max(msg.getSize(),0);
+       }
+       else
+       {
+@@ -547,7 +556,7 @@
+       if(stats!=null) 
+       {
+         stats.recv.ndpPackets++;
+-        stats.recv.ndpBytes+=Math.max(msg.getSize(),0);
++        stats.recv.ndpBytes+=StrictMath.max(msg.getSize(),0);
+       }
+       ndp.receive((RouteInterface.Zrp.MessageNdp)msg, src, lastHop, macId);
+     }
+@@ -556,7 +565,7 @@
+       if(stats!=null)
+       {
+         stats.recv.iarpPackets++;
+-        stats.recv.iarpBytes+=Math.max(msg.getSize(),0);
++        stats.recv.iarpBytes+=StrictMath.max(msg.getSize(),0);
+       }
+       iarp.receive((RouteInterface.Zrp.MessageIarp)msg, src);
+     }
+@@ -565,7 +574,7 @@
+       if(stats!=null)
+       {
+         stats.recv.brpPackets++;
+-        stats.recv.brpBytes+=Math.max(msg.getSize(),0);
++        stats.recv.brpBytes+=StrictMath.max(msg.getSize(),0);
+       }
+       brp.receive((RouteInterface.Zrp.MessageBrp)msg, src);
+     }
+@@ -574,7 +583,7 @@
+       if(stats!=null)
+       {
+         stats.recv.ierpPackets++;
+-        stats.recv.ierpBytes+=Math.max(msg.getSize(),0);
++        stats.recv.ierpBytes+=StrictMath.max(msg.getSize(),0);
+       }
+       ierp.receive((RouteInterface.Zrp.MessageIerp)msg);
+     }
+@@ -584,5 +593,9 @@
+     }
+   }
+ 
++  public void dropNotify(Message packet, MacAddress packetNextHop) {
++	  // unused
++  }
++  
+ } // class: RouteZrp
+ 
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/route/RouteZrpIerp.java jist-swans-1.0.6/src/jist/swans/route/RouteZrpIerp.java
+--- jist-swans-1.0.6-orig/src/jist/swans/route/RouteZrpIerp.java	2005-03-13 17:11:55.000000000 +0100
++++ jist-swans-1.0.6/src/jist/swans/route/RouteZrpIerp.java	2007-11-08 15:01:44.000000000 +0100
+@@ -11,6 +11,7 @@
+ 
+ import jist.swans.net.NetAddress;
+ import jist.swans.net.NetMessage;
++import jist.swans.net.NetMessage.IpOption;
+ import jist.swans.misc.Timer;
+ import jist.swans.misc.Util;
+ import jist.swans.Constants;
+@@ -142,7 +143,7 @@
+         {
+           // source route packet
+           if(ip.isFrozen()) ip = ip.copy();
+-          ip.setSourceRoute(new NetMessage.IpOptionSourceRoute(route));
++          ip.getOptions().put(Constants.IP_OPTION_ZRP, new NetMessage.IpOptionSourceRoute(route));
+           // send it off
+           if(logIERP.isInfoEnabled())
+           {
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/trans/TcpServerSocket.java jist-swans-1.0.6/src/jist/swans/trans/TcpServerSocket.java
+--- jist-swans-1.0.6-orig/src/jist/swans/trans/TcpServerSocket.java	2004-04-06 18:07:51.000000000 +0200
++++ jist-swans-1.0.6/src/jist/swans/trans/TcpServerSocket.java	2007-11-08 15:01:36.000000000 +0100
+@@ -396,7 +396,7 @@
+    */
+   public static int getRandomSequenceNumber ()
+   {
+-    return (Math.abs(Constants.random.nextInt()) % 1000000);
++    return (StrictMath.abs(Constants.random.nextInt()) % 1000000);
+   }
+   
+   
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/trans/TcpSocket.java jist-swans-1.0.6/src/jist/swans/trans/TcpSocket.java
+--- jist-swans-1.0.6-orig/src/jist/swans/trans/TcpSocket.java	2004-04-06 18:07:51.000000000 +0200
++++ jist-swans-1.0.6/src/jist/swans/trans/TcpSocket.java	2007-11-08 15:01:36.000000000 +0100
+@@ -509,7 +509,7 @@
+     // if lport = 0, find random local port
+     while (this.lport == 0)
+     {
+-      this.lport = Math.abs(Constants.random.nextInt()) % 5000;
++      this.lport = StrictMath.abs(Constants.random.nextInt()) % 5000;
+       TransInterface.TransTcpInterface tempEntity = (TransInterface.TransTcpInterface)tcpEntity;
+       if (tempEntity.checkSocketHandler (this.lport))
+       {
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/jist/swans/trans/TransTcp.java jist-swans-1.0.6/src/jist/swans/trans/TransTcp.java
+--- jist-swans-1.0.6-orig/src/jist/swans/trans/TransTcp.java	2004-04-06 18:07:51.000000000 +0200
++++ jist-swans-1.0.6/src/jist/swans/trans/TransTcp.java	2007-11-08 15:01:36.000000000 +0100
+@@ -764,7 +764,7 @@
+       int srcPort, byte priority)
+   {
+     // get a random number between 0 and 100
+-    int prob = Math.abs(Constants.random.nextInt()) % 101;
++    int prob = StrictMath.abs(Constants.random.nextInt()) % 101;
+     if (prob >= DROP_PROBABILITY)
+     {
+       JistAPI.sleep(Constants.TRANS_DELAY);
+Files jist-swans-1.0.6-orig/src/memprof/libmemprof.so and jist-swans-1.0.6/src/memprof/libmemprof.so differ
+diff -bBNru -X dist/exclude-from-patch jist-swans-1.0.6-orig/src/memprof/memprof.h jist-swans-1.0.6/src/memprof/memprof.h
+--- jist-swans-1.0.6-orig/src/memprof/memprof.h	1970-01-01 01:00:00.000000000 +0100
++++ jist-swans-1.0.6/src/memprof/memprof.h	2007-11-08 15:01:12.000000000 +0100
+@@ -0,0 +1,40 @@
++/* DO NOT EDIT THIS FILE - it is machine generated */
++#include <jni.h>
++/* Header for class memprof_memprof */
++
++#ifndef _Included_memprof_memprof
++#define _Included_memprof_memprof
++#ifdef __cplusplus
++extern "C" {
++#endif
++/*
++ * Class:     memprof_memprof
++ * Method:    _dumpHeap
++ * Signature: (Ljava/lang/String;)V
++ */
++JNIEXPORT void JNICALL Java_memprof_memprof__1dumpHeap
++  (JNIEnv *, jclass, jstring);
++
++/*
++ * Class:     memprof_memprof
++ * Method:    _dumpOnShutdown
++ * Signature: ()V
++ */
++JNIEXPORT void JNICALL Java_memprof_memprof__1dumpOnShutdown
++  (JNIEnv *, jclass);
++
++#ifdef __cplusplus
++}
++#endif
++#endif
++/* Header for class memprof_memprof_CommandLineOptions */
++
++#ifndef _Included_memprof_memprof_CommandLineOptions
++#define _Included_memprof_memprof_CommandLineOptions
++#ifdef __cplusplus
++extern "C" {
++#endif
++#ifdef __cplusplus
++}
++#endif
++#endif
