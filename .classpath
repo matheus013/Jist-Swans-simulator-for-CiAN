@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/CiAN"/>
+	<classpathentry kind="src" output="vans/classes" path="vans/src"/>
+	<classpathentry kind="src" path="CiAN/src/java"/>
+	<classpathentry kind="src" output="js-ext/classes" path="js-ext/src"/>
+	<classpathentry kind="src" output="jist-swans-1.0.6/classes" path="jist-swans-1.0.6/src"/>
+	<classpathentry kind="src" output="ducks/classes" path="ducks/src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="jist-swans-1.0.6/libs/bsh.jar"/>
+	<classpathentry kind="lib" path="jist-swans-1.0.6/libs/checkstyle-all.jar"/>
+	<classpathentry kind="lib" path="jist-swans-1.0.6/libs/jargs.jar"/>
+	<classpathentry kind="lib" path="jist-swans-1.0.6/libs/jython.jar"/>
+	<classpathentry kind="lib" path="ducks/libs/log4j-1.2.13.jar"/>
+	<classpathentry kind="lib" path="ducks/libs/mysql-connector-java-3.0.17-ga-bin.jar"/>
+	<classpathentry kind="lib" path="jist-swans-1.0.6/libs/bcel-5.2.jar"/>
+	<classpathentry kind="lib" path="CiAN/lib/jgraph.jar"/>
+	<classpathentry kind="lib" path="CiAN/lib/jgrapht-jdk1.5.jar"/>
+	<classpathentry kind="lib" path="CiAN/lib/ksoap2-j2se-full-2.1.2.jar"/>
+	<classpathentry kind="lib" path="CiAN/lib/sliver-j2se.jar"/>
+	<classpathentry kind="output" path="classes"/>
+</classpath>
