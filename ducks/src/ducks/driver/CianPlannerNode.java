@@ -27,13 +27,6 @@ public class CianPlannerNode extends GenericNode {
 		String appOpt = options.getStringProperty(SimParams.TRAFFIC_TYPE);
 
 		if (appOpt.equals(SimParams.TRAFFIC_TYPE_SERVICE)) {
-			int reqSize, reqRate, wTS, wTE, duration;
-			reqSize = options.getIntProperty(SimParams.COMPOSITION_LENGTH);
-			reqRate = options.getIntProperty(SimParams.TRAFFIC_SERV_RATE);
-			wTS = options.getIntProperty(SimParams.TRAFFIC_WAITSTART);
-			wTE = options.getIntProperty(SimParams.TRAFFIC_WAITEND);
-			duration = globalConfig.getIntProperty(SimParams.SIM_DURATION);
-
 			DucksCompositionStats compoStats = null;
 			try {
 				// get composition stats, and automatically create and register,
@@ -44,18 +37,15 @@ public class CianPlannerNode extends GenericNode {
 				e.printStackTrace();
 			}
 
-			AppCianBase ac = new AppCianPlanner(this.id, compoStats, reqSize,
-					reqRate, wTS, wTE, duration);
+			AppCianBase ac = new AppCianPlanner(this.id, compoStats);
 
-			// currently we do not use transport layer (UDP) instead we hand
-			// over from the network layer directly to application layer
 			protMap.testMapToNext(Constants.NET_PROTOCOL_UDP);
 			net.setProtocolHandler(Constants.NET_PROTOCOL_UDP,
-					(NetInterface.NetHandler) ac.getNetProxy());
+					ac.getUdpEntity());
 
-			protMap.testMapToNext(AppGreetingBase.NET_PROTOCOL_NUMBER);
-			net.setProtocolHandler(AppGreetingBase.NET_PROTOCOL_NUMBER,
-					(NetInterface.NetHandler) ac.getNetProxy());
+			protMap.testMapToNext(Constants.NET_PROTOCOL_TCP);
+			net.setProtocolHandler(Constants.NET_PROTOCOL_TCP,
+					ac.getTcpEntity());
 
 			this.app = ac;
 			this.appEntity = ac.getAppProxy();

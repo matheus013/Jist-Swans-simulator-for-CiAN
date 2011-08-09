@@ -64,11 +64,11 @@ public class CianHost3Node extends GenericNode {
 
 			protMap.testMapToNext(Constants.NET_PROTOCOL_UDP);
 			net.setProtocolHandler(Constants.NET_PROTOCOL_UDP,
-					(NetInterface.NetHandler) ac.getNetProxy());
+					ac.getUdpEntity());
 
-			protMap.testMapToNext(AppGreetingBase.NET_PROTOCOL_NUMBER);
-			net.setProtocolHandler(AppGreetingBase.NET_PROTOCOL_NUMBER,
-					(NetInterface.NetHandler) ac.getNetProxy());
+			protMap.testMapToNext(Constants.NET_PROTOCOL_TCP);
+			net.setProtocolHandler(Constants.NET_PROTOCOL_TCP,
+					ac.getTcpEntity());
 
 			this.app = ac;
 			this.appEntity = ac.getAppProxy();

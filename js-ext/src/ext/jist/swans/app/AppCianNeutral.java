@@ -18,10 +18,4 @@ public class AppCianNeutral extends AppCianBase {
 	public void run(String[] args) {
 	}
 
-	@Override
-	public void receive(Message msg, NetAddress src, MacAddress lastHop,
-			byte macId, NetAddress dst, byte priority, byte ttl) {
-
-	}
-
 }
