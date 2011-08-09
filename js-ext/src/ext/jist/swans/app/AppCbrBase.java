@@ -18,17 +18,15 @@
  */
 package ext.jist.swans.app;
 
-import ext.util.ExtendedProperties;
-import ext.util.stats.StatsCollector;
-
+import jist.runtime.JistAPI;
 import jist.swans.Constants;
-import jist.swans.net.NetInterface;
-import jist.swans.net.NetAddress;
 import jist.swans.app.AppInterface;
 import jist.swans.mac.MacAddress;
 import jist.swans.misc.Message;
-
-import jist.runtime.JistAPI;
+import jist.swans.net.NetAddress;
+import jist.swans.net.NetInterface;
+import ext.util.ExtendedProperties;
+import ext.util.stats.StatsCollector;
 
 /**
  * AppCbr sends series of packets from the current node to a randomly selected

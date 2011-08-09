@@ -4,14 +4,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
 
-import vans.net.Beaconing.BeaconMessage;
-import vans.net.Beaconing.BeaconReceiveListener;
-import vans.net.Beaconing.BeaconSendListener;
-
 import jist.runtime.JistAPI;
 import jist.swans.Constants;
 import jist.swans.mac.MacAddress;
 import jist.swans.net.NetAddress;
+import vans.net.Beaconing.BeaconMessage;
+import vans.net.Beaconing.BeaconReceiveListener;
+import vans.net.Beaconing.BeaconSendListener;
 
 public class NeighborTable implements BeaconReceiveListener, BeaconSendListener {
 

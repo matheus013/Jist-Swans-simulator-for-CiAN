@@ -1,26 +1,23 @@
 package vans.route;
 
-import jist.swans.field.Field.RadioData;
-import jist.swans.mac.MacAddress;
-import jist.swans.net.NetMessage;
-import jist.swans.net.NetAddress;
-import jist.swans.net.NetInterface;
-import jist.swans.misc.Message;
-import jist.swans.misc.Util;
-import jist.swans.Constants;
-
-import vans.net.NetAddressGeo;
-
 import java.util.Iterator;
 import java.util.Map;
 
-import jist.swans.misc.Location;
-import jist.swans.route.RouteInterface;
-
 import jist.runtime.JistAPI;
+import jist.swans.Constants;
+import jist.swans.field.Field.RadioData;
+import jist.swans.mac.MacAddress;
+import jist.swans.misc.Location;
+import jist.swans.misc.Message;
+import jist.swans.misc.Util;
+import jist.swans.net.NetAddress;
+import jist.swans.net.NetInterface;
+import jist.swans.net.NetMessage;
+import jist.swans.route.RouteInterface;
 
 import org.apache.log4j.Logger;
 
+import vans.net.NetAddressGeo;
 import ext.util.CacheMap;
 import ext.util.CacheSet;
 import ext.util.Region;

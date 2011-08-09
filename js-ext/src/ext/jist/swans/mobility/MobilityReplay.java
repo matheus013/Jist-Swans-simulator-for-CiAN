@@ -21,14 +21,14 @@ package ext.jist.swans.mobility;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
 import jist.runtime.JistAPI;
 import jist.swans.Constants;
 import jist.swans.field.FieldInterface;
 import jist.swans.field.Mobility;
 import jist.swans.misc.Location;
 import jist.swans.misc.Location.Location2D;
+
+import org.apache.log4j.Logger;
 
 public class MobilityReplay implements Mobility {
 

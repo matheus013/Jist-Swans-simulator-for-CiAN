@@ -14,23 +14,19 @@
 
 package jist.swans.net;
 
+import jist.runtime.JistAPI;
+import jist.swans.Constants;
+import jist.swans.Main;
 import jist.swans.mac.MacAddress;
 import jist.swans.mac.MacInterface;
 import jist.swans.mac.MacLoop;
-
-import jist.swans.route.RouteInterface;
-
-import jist.swans.misc.Message;
 import jist.swans.misc.Mapper;
+import jist.swans.misc.Message;
 import jist.swans.misc.Util;
 import jist.swans.net.NetInterface.NetHandler;
+import jist.swans.route.RouteInterface;
 
-import jist.swans.Constants;
-import jist.swans.Main;
-
-import jist.runtime.JistAPI;
-
-import org.apache.log4j.*;
+import org.apache.log4j.Logger;
 
 /**
  * IPv4 implementation based on RFC 791. Performs protocol multiplexing, and

@@ -19,11 +19,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import jist.swans.Constants;
 import jist.swans.misc.Location;
 import jist.swans.misc.Message;
 import jist.swans.misc.Util;
-
-import jist.swans.Constants;
 
 /**
  * Network packet.

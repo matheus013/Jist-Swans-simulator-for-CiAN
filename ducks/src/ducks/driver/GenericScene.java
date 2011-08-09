@@ -20,10 +20,6 @@ package ducks.driver;
 
 import java.util.Random;
 
-import org.apache.log4j.Logger;
-
-import vans.straw.StreetMobility;
-
 import jist.swans.Constants;
 import jist.swans.field.Fading;
 import jist.swans.field.Field;
@@ -31,6 +27,10 @@ import jist.swans.field.Mobility;
 import jist.swans.field.PathLoss;
 import jist.swans.field.Spatial;
 import jist.swans.misc.Location.Location2D;
+
+import org.apache.log4j.Logger;
+
+import vans.straw.StreetMobility;
 import ducks.misc.DucksException;
 import ext.util.ExtendedProperties;
 import ext.util.ReflectionUtils;

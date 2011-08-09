@@ -32,22 +32,32 @@
  */
 package vans.straw;
 
+import java.awt.Color;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.ByteOrder;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Random;
+import java.util.TreeMap;
+import java.util.Vector;
+
 import jist.runtime.JistAPI;
 import jist.swans.Constants;
 import jist.swans.field.FieldInterface;
 import jist.swans.field.Mobility;
 import jist.swans.misc.Location;
-import vans.straw.streets.*;
+import vans.straw.streets.Intersection;
+import vans.straw.streets.RoadSegment;
 import vans.straw.streets.Shape;
-import vans.straw.Visualizer;
-import vans.straw.VisualizerInterface;
-
-import java.awt.*;
-import java.io.*;
-import java.nio.ByteOrder;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
-import java.util.*;
+import vans.straw.streets.SpatialStreets;
+import vans.straw.streets.StreetName;
 
 /**
  * @author David Choffnes &lt;drchoffnes@cs.northwestern.edu&gt;

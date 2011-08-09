@@ -22,8 +22,8 @@ package vans.net;
 
 import java.net.InetAddress;
 
-import ext.util.Region;
 import jist.swans.net.NetAddress;
+import ext.util.Region;
 
 /**
  * A geographic network address.

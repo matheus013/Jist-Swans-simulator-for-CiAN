@@ -37,8 +37,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import vans.straw.StreetMobilityOD;
-
 /**
  * The AStarSearch class, along with the AStarNode class, implements a generic
  * A* search algorithm. The AStarNode class should be subclassed to provide

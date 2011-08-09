@@ -1,11 +1,11 @@
 package ext.jist.swans.app;
 
-import ext.util.ExtendedProperties;
 import jist.swans.Constants;
 import jist.swans.app.AppInterface;
 import jist.swans.mac.MacAddress;
 import jist.swans.misc.Message;
 import jist.swans.net.NetAddress;
+import ext.util.ExtendedProperties;
 
 public class AppGreetingProvider extends AppGreetingBase implements
 		AppInterface {

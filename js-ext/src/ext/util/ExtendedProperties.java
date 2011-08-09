@@ -31,9 +31,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
-
 import jist.runtime.JistAPI.DoNotRewrite;
+
+import org.apache.log4j.Logger;
 
 /**
  * Extended properties class, e.g. implementing some properties loading

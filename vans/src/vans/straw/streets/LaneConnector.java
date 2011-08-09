@@ -3,10 +3,9 @@ package vans.straw.streets;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import jist.swans.misc.Location;
 import vans.straw.StreetMobility;
 import vans.straw.StreetMobilityInfo;
-
-import jist.swans.misc.Location;
 
 public class LaneConnector {
 	/* resolution of curve rendering */

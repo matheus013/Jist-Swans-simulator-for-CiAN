@@ -25,22 +25,19 @@ import java.io.File;
 import java.util.Date;
 import java.util.Enumeration;
 
+import jist.runtime.JistAPI;
+import jist.swans.Constants;
+
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import ducks.driver.DucksDriverModule;
-import ducks.driver.SimParams;
 import ducks.eventlog.EventLog;
 import ducks.misc.DucksException;
-
 import ext.util.ExtendedProperties;
 import ext.util.MersenneTwister;
 import ext.util.StringUtils;
-
-import jist.runtime.JistAPI;
-import jist.swans.Constants;
 
 /**
  * This class represents the base for drivers in DUCKS. In the model, the driver

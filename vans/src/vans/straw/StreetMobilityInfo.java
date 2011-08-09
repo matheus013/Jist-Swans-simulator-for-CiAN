@@ -32,14 +32,14 @@
  */
 package vans.straw;
 
+import java.awt.Color;
+import java.util.LinkedList;
+
 import jist.swans.field.Mobility.MobilityInfo;
 import jist.swans.misc.Location;
 import vans.straw.streets.Intersection;
 import vans.straw.streets.LaneConnector;
 import vans.straw.streets.RoadSegment;
-
-import java.util.LinkedList;
-import java.awt.Color;
 
 /**
  * @author David Choffnes &lt;drchoffnes@cs.northwestern.edu&gt;

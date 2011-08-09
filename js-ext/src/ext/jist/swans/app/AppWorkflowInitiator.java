@@ -5,13 +5,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import ext.util.stats.DucksCompositionStats;
 import jist.runtime.JistAPI;
 import jist.swans.Constants;
 import jist.swans.app.AppInterface;
 import jist.swans.mac.MacAddress;
 import jist.swans.misc.Message;
 import jist.swans.net.NetAddress;
+import ext.util.stats.DucksCompositionStats;
 
 public class AppWorkflowInitiator extends AppWorkflowBase implements
 		AppInterface {

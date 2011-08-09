@@ -31,13 +31,13 @@
  */
 package vans.straw.streets;
 
-import jist.swans.misc.Location;
-import jist.swans.misc.Location.Location2D;
-import vans.straw.AStarNode;
-
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
+import jist.swans.misc.Location;
+import jist.swans.misc.Location.Location2D;
+import vans.straw.AStarNode;
 
 /**
  * @author David Choffnes &lt;drchoffnes@cs.northwestern.edu&gt;

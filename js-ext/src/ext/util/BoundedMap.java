@@ -18,8 +18,8 @@
  */
 package ext.util;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A CacheMap is a bounded map data structure that silently drops put() requests

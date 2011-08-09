@@ -26,17 +26,17 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.Properties;
 
+import jist.runtime.Main;
+import jist.runtime.Main.CommandLineOptions;
+import jist.runtime.Node;
+import jist.runtime.RemoteJist;
+import jist.swans.Constants;
+
 import org.apache.log4j.Logger;
 
 import ducks.controller.DucksController;
 import ducks.controller.simulation.SimulationInstance;
 import ducks.misc.DucksException;
-
-import jist.runtime.Main;
-import jist.runtime.RemoteJist;
-import jist.runtime.Node;
-import jist.runtime.Main.CommandLineOptions;
-import jist.swans.Constants;
 
 /**
  * This class represents a server for job scheduling.

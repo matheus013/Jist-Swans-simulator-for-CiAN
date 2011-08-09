@@ -33,13 +33,13 @@
  */
 package vans.straw.streets;
 
+import java.util.LinkedList;
+import java.util.ListIterator;
+
 import jist.swans.Main;
 import jist.swans.misc.Location;
 import jist.swans.misc.Util;
 import vans.straw.StreetMobility;
-
-import java.util.LinkedList;
-import java.util.ListIterator;
 
 /**
  * @author David Choffnes &lt;drchoffnes@cs.northwestern.edu&gt;

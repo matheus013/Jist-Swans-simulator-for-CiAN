@@ -9,13 +9,12 @@
 
 package jist.swans.mac;
 
-import jist.swans.radio.RadioInterface;
-import jist.swans.radio.RadioInfo;
-import jist.swans.net.NetInterface;
-import jist.swans.misc.Message;
-import jist.swans.Constants;
-
 import jist.runtime.JistAPI;
+import jist.swans.Constants;
+import jist.swans.misc.Message;
+import jist.swans.net.NetInterface;
+import jist.swans.radio.RadioInfo;
+import jist.swans.radio.RadioInterface;
 
 /**
  * A dumb, pass-through mac implementation.

@@ -10,10 +10,9 @@
 package jist.swans.mac;
 
 import jist.runtime.JistAPI;
-
-import jist.swans.net.NetInterface;
-import jist.swans.misc.Message;
 import jist.swans.Constants;
+import jist.swans.misc.Message;
+import jist.swans.net.NetInterface;
 
 /**
  * A loopback mac implementation.

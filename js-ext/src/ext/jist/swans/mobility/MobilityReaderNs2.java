@@ -19,19 +19,23 @@
  */
 package ext.jist.swans.mobility;
 
-import java.util.regex.*;
-import java.io.*;
-import java.nio.*;
-import java.nio.charset.*;
-import java.nio.channels.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-
-import org.apache.log4j.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import jist.swans.misc.Location.Location2D;
+
+import org.apache.log4j.Logger;
 
 /**
  * Implementation of MobilityReader for ns-2 movement files Reader is able to

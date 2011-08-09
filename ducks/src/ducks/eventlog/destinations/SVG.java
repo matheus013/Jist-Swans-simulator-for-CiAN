@@ -27,10 +27,11 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
-
 import jist.swans.Constants;
 import jist.swans.misc.Location;
+
+import org.apache.log4j.Logger;
+
 import ducks.driver.SimParams;
 import ducks.eventlog.EventLog;
 

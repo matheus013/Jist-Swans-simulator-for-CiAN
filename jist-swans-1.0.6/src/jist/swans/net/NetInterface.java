@@ -13,10 +13,9 @@
 
 package jist.swans.net;
 
+import jist.runtime.JistAPI;
 import jist.swans.mac.MacAddress;
 import jist.swans.misc.Message;
-
-import jist.runtime.JistAPI;
 
 /**
  * Defines the interface of all Network layer entity implementations.

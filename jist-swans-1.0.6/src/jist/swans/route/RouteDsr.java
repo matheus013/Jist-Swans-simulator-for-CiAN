@@ -12,19 +12,25 @@
 
 package jist.swans.route;
 
-import jist.swans.mac.MacAddress;
-import jist.swans.net.NetMessage;
-import jist.swans.net.NetAddress;
-import jist.swans.net.NetInterface;
-import jist.swans.misc.Message;
-import jist.swans.misc.Pickle;
-import jist.swans.Constants;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
 
 import jist.runtime.JistAPI;
+import jist.swans.Constants;
+import jist.swans.mac.MacAddress;
+import jist.swans.misc.Message;
+import jist.swans.misc.Pickle;
+import jist.swans.net.NetAddress;
+import jist.swans.net.NetInterface;
+import jist.swans.net.NetMessage;
 
 import org.apache.log4j.Logger;
-
-import java.util.*;
 
 /**
  * An implementation of the Dynamic Source Routing protocol.

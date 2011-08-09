@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 
 import jist.swans.Constants;
-
 import ext.util.ExtendedProperties;
 
 public class DucksCompositionStats implements StatsCollector {

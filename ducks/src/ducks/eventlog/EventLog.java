@@ -22,13 +22,13 @@ import java.util.Iterator;
 import java.util.Properties;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
-
-import ducks.driver.SimParams;
-
 import jist.runtime.JistAPI.DoNotRewrite;
 import jist.swans.field.Field;
 import jist.swans.misc.Location;
+
+import org.apache.log4j.Logger;
+
+import ducks.driver.SimParams;
 
 /**
  * 

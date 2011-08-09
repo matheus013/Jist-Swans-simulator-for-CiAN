@@ -18,13 +18,10 @@
  */
 package ext.jist.swans.net;
 
-import java.util.Properties;
-
-import ext.util.ExtendedProperties;
-import ext.util.stats.StatsCollector;
-
 import jist.swans.net.MessageQueue.NoDropMessageQueue;
 import jist.swans.net.QueuedMessage;
+import ext.util.ExtendedProperties;
+import ext.util.stats.StatsCollector;
 
 /**
  * DropTailMessageQueue is an extension to SWANS which does not come with a

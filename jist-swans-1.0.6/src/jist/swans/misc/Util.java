@@ -9,17 +9,17 @@
 
 package jist.swans.misc;
 
-import jist.swans.Constants;
-
-import java.io.File;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.FileInputStream;
 import java.lang.reflect.Array;
-import java.util.Vector;
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
+import java.util.Vector;
+
+import jist.swans.Constants;
 
 /**
  * Miscellaneous utility methods.

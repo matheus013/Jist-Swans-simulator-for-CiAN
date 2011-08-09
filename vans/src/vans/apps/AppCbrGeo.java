@@ -19,19 +19,18 @@
  */
 package vans.apps;
 
-import ext.jist.swans.app.AppCbrBase;
-import ext.util.ExtendedProperties;
-import ext.util.Region;
-
+import jist.runtime.JistAPI;
+import jist.swans.Constants;
+import jist.swans.field.Field.RadioData;
+import jist.swans.field.Placement;
+import jist.swans.misc.Location;
+import jist.swans.net.NetAddress;
 import vans.net.NetAddressGeo;
 import vans.straw.StreetMobility;
 import vans.straw.streets.RoadSegment;
-import jist.swans.Constants;
-import jist.swans.field.Placement;
-import jist.swans.field.Field.RadioData;
-import jist.swans.misc.Location;
-import jist.swans.net.NetAddress;
-import jist.runtime.JistAPI;
+import ext.jist.swans.app.AppCbrBase;
+import ext.util.ExtendedProperties;
+import ext.util.Region;
 
 public class AppCbrGeo extends AppCbrBase {
 

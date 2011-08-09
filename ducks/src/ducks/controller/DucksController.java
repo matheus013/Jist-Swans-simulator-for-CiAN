@@ -18,11 +18,11 @@
  */
 package ducks.controller;
 
+import jargs.gnu.CmdLineParser;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Vector;
-
-import jargs.gnu.CmdLineParser;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
@@ -35,7 +35,6 @@ import ducks.controller.simulation.Simulation;
 import ducks.controller.simulation.SimulationInstance;
 import ducks.controller.simulation.SimulationStudy;
 import ducks.misc.DucksException;
-
 import ext.util.ExtendedProperties;
 
 /**

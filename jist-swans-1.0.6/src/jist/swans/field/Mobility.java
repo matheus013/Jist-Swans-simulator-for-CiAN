@@ -12,12 +12,11 @@
 
 package jist.swans.field;
 
-import jist.swans.misc.Location;
-import jist.swans.misc.Util;
+import jist.runtime.JistAPI;
 import jist.swans.Constants;
 import jist.swans.Main;
-
-import jist.runtime.JistAPI;
+import jist.swans.misc.Location;
+import jist.swans.misc.Util;
 
 /**
  * Interface of all mobility models.

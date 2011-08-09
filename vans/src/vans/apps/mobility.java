@@ -1,7 +1,7 @@
 package vans.apps;
 
-import ext.jist.swans.mobility.*;
-import jist.swans.misc.*;
+import jist.swans.misc.Location;
+import ext.jist.swans.mobility.MobilityReaderNs2;
 
 public class mobility {
 

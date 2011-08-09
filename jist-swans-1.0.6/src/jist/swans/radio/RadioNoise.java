@@ -9,13 +9,11 @@
 
 package jist.swans.radio;
 
+import jist.runtime.JistAPI;
+import jist.swans.Constants;
 import jist.swans.field.FieldInterface;
 import jist.swans.mac.MacInterface;
 import jist.swans.misc.Message;
-
-import jist.swans.Constants;
-
-import jist.runtime.JistAPI;
 
 /**
  * <code>RadioNoise</code> is an abstract class which implements some

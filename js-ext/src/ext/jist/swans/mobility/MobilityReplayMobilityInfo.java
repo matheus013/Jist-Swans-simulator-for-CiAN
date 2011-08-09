@@ -21,9 +21,8 @@ package ext.jist.swans.mobility;
 
 import java.util.List;
 
-import ext.jist.swans.mobility.MobilityReplay.Waypoint;
-
 import jist.swans.field.Mobility.MobilityInfo;
+import ext.jist.swans.mobility.MobilityReplay.Waypoint;
 
 public class MobilityReplayMobilityInfo implements MobilityInfo {
 

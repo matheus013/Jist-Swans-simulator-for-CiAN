@@ -18,11 +18,7 @@
  */
 package ducks.driver;
 
-import jist.swans.field.Mobility;
-
 import org.apache.log4j.Logger;
-
-import vans.straw.StreetMobility;
 
 import ducks.eventlog.EventLog;
 import ext.util.ExtendedProperties;

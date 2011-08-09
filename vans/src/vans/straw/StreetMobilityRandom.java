@@ -31,15 +31,15 @@
  */
 package vans.straw;
 
+import java.awt.Color;
+import java.util.LinkedList;
+import java.util.Random;
+
 import jist.swans.field.FieldInterface;
 import jist.swans.misc.Location;
 import vans.straw.streets.Intersection;
 import vans.straw.streets.RoadSegment;
 import vans.straw.streets.StreetName;
-
-import java.awt.*;
-import java.util.LinkedList;
-import java.util.Random;
 
 /**
  * 

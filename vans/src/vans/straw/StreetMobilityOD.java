@@ -31,16 +31,20 @@
  */
 package vans.straw;
 
+import java.awt.Color;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
+import java.util.Vector;
+
 import jist.swans.Constants;
 import jist.swans.field.FieldInterface;
 import jist.swans.misc.Location;
 import vans.straw.streets.RoadSegment;
 import vans.straw.streets.SegmentNode;
 import vans.straw.streets.SegmentNodeInfo;
-
-import java.awt.*;
-import java.util.*;
-import java.util.List;
 
 /**
  * @author David Choffnes &lt;drchoffnes@cs.northwestern.edu&gt;

@@ -33,8 +33,8 @@ package vans.straw;
 
 import java.awt.Color;
 
-import vans.straw.streets.RoadSegment;
 import jist.swans.misc.Location;
+import vans.straw.streets.RoadSegment;
 
 /**
  * 

@@ -16,9 +16,10 @@
  */
 package ext.util;
 
+import java.awt.geom.Line2D;
+
 import jist.runtime.JistAPI;
 import jist.swans.misc.Location;
-import java.awt.geom.Line2D;
 
 /**
  * Immutable Regions based on jist.swans.misc.Location.

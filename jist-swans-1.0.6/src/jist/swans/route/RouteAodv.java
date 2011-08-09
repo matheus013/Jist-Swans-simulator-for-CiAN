@@ -9,6 +9,13 @@
 
 package jist.swans.route;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Set;
+
+import jist.runtime.JistAPI;
 import jist.swans.Constants;
 import jist.swans.mac.MacAddress;
 import jist.swans.misc.Message;
@@ -16,15 +23,6 @@ import jist.swans.misc.Util;
 import jist.swans.net.NetAddress;
 import jist.swans.net.NetInterface;
 import jist.swans.net.NetMessage;
-import jist.swans.net.NetMessage.Ip;
-
-import jist.runtime.JistAPI;
-
-import java.util.Iterator;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Set;
 
 /**
  * Ad-hoc On-demand Distance Vector (AODV) Routing Protocol Implementation.

@@ -9,9 +9,9 @@
 
 package jist.swans.net;
 
-import jist.swans.misc.Pickle;
-
 import java.net.InetAddress;
+
+import jist.swans.misc.Pickle;
 
 /**
  * Contains a Network address.

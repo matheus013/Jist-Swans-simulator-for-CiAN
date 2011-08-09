@@ -9,10 +9,9 @@
 
 package jist.runtime;
 
-import java.io.*;
-import org.apache.bcel.*;
-import org.apache.bcel.classfile.*;
-import org.apache.bcel.verifier.*;
+import org.apache.bcel.Repository;
+import org.apache.bcel.classfile.ClassParser;
+import org.apache.bcel.classfile.JavaClass;
 
 /**
  * Perform the basic Java class verification checks.

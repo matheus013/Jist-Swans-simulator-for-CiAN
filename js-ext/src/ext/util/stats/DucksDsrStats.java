@@ -18,9 +18,8 @@
  */
 package ext.util.stats;
 
-import ext.util.ExtendedProperties;
-import jist.swans.route.RouteAodv.AodvStats;
 import jist.swans.route.RouteDsr.DsrStats;
+import ext.util.ExtendedProperties;
 
 /**
  * StatsCollector - capable version of DsrStats for DUCKS

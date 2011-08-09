@@ -22,21 +22,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
-
-import vans.straw.Visualizer;
-import vans.straw.VisualizerInterface;
-
 import jist.swans.Constants;
 import jist.swans.field.Mobility;
 import jist.swans.field.Placement;
 import jist.swans.misc.Location;
+import jist.swans.misc.Location.Location2D;
 import jist.swans.misc.Mapper;
 import jist.swans.misc.Util;
-import jist.swans.misc.Location.Location2D;
 import jist.swans.net.PacketLoss;
 import jist.swans.radio.RadioInfo;
 
+import org.apache.log4j.Logger;
+
+import vans.straw.Visualizer;
+import vans.straw.VisualizerInterface;
 import ducks.misc.DucksException;
 import ext.jist.swans.mobility.MobilityReplay;
 import ext.util.ExtendedProperties;

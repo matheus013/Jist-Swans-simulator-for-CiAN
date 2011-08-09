@@ -36,7 +36,6 @@ import ducks.controller.simulation.Simulation;
 import ducks.controller.simulation.SimulationInstance;
 import ducks.controller.simulation.SimulationStudy;
 import ducks.misc.DucksException;
-
 import ext.util.ExtendedProperties;
 import ext.util.StringUtils;
 

@@ -9,9 +9,8 @@
 
 package jist.minisim;
 
+import jargs.gnu.CmdLineParser;
 import jist.runtime.JistAPI;
-
-import jargs.gnu.*; // Download from: http://jargs.sourceforge.net
 
 /**
  * Measures event throughput in JiST.

@@ -2,9 +2,6 @@ package vans.apps;
 
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
-
-import vans.net.NetAddressGeo;
 import jist.runtime.JistAPI;
 import jist.swans.Constants;
 import jist.swans.app.AppInterface;
@@ -14,6 +11,10 @@ import jist.swans.misc.Location;
 import jist.swans.misc.Message;
 import jist.swans.net.NetAddress;
 import jist.swans.net.NetInterface;
+
+import org.apache.log4j.Logger;
+
+import vans.net.NetAddressGeo;
 import ext.util.ExtendedProperties;
 import ext.util.Region;
 import ext.util.StringUtils;

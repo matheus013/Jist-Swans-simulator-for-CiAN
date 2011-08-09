@@ -31,13 +31,17 @@
  */
 package vans.straw.streets;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.ListIterator;
+import java.util.Vector;
+
 import jist.runtime.JistAPI;
 import jist.swans.Constants;
 import jist.swans.misc.Location;
 import vans.straw.StreetMobilityInfo;
 import vans.straw.VisualizerInterface;
-
-import java.util.*;
 
 /**
  * @author David Choffnes &lt;drchoffnes@cs.northwestern.edu&gt;

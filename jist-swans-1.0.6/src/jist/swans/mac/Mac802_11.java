@@ -13,20 +13,16 @@
 
 package jist.swans.mac;
 
-import ext.util.stats.DucksMac80211Stats;
-import ext.util.stats.DucksRadioNoiseAdditiveStats;
-import jist.swans.radio.RadioInfo;
-import jist.swans.radio.RadioInterface;
-import jist.swans.net.NetInterface;
-import jist.swans.net.NetMessage.Ip;
-import jist.swans.mac.MacMessage.Data;
-import jist.swans.misc.Message;
-import jist.swans.misc.Util;
-
+import jist.runtime.JistAPI;
 import jist.swans.Constants;
 import jist.swans.Main;
-
-import jist.runtime.JistAPI;
+import jist.swans.misc.Message;
+import jist.swans.misc.Util;
+import jist.swans.net.NetInterface;
+import jist.swans.net.NetMessage.Ip;
+import jist.swans.radio.RadioInfo;
+import jist.swans.radio.RadioInterface;
+import ext.util.stats.DucksMac80211Stats;
 
 /**
  * Implementation of IEEE 802_11b. Please refer to the standards document. For

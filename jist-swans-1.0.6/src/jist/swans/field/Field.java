@@ -14,14 +14,13 @@ package jist.swans.field;
 
 import java.util.Vector;
 
-import jist.swans.radio.RadioInterface;
-import jist.swans.radio.RadioInfo;
-import jist.swans.misc.Message;
-import jist.swans.misc.Location;
-import jist.swans.misc.Util;
-import jist.swans.Constants;
-
 import jist.runtime.JistAPI;
+import jist.swans.Constants;
+import jist.swans.misc.Location;
+import jist.swans.misc.Message;
+import jist.swans.misc.Util;
+import jist.swans.radio.RadioInfo;
+import jist.swans.radio.RadioInterface;
 
 import org.apache.log4j.Logger;
 

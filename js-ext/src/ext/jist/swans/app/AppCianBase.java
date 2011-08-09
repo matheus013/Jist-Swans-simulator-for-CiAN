@@ -1,18 +1,12 @@
 package ext.jist.swans.app;
 
 import jist.runtime.JistAPI;
-import jist.runtime.JistAPI.Continuation;
 import jist.swans.Constants;
 import jist.swans.app.AppInterface;
 import jist.swans.mac.MacAddress;
 import jist.swans.misc.Message;
 import jist.swans.net.NetAddress;
 import jist.swans.net.NetInterface;
-import jist.swans.trans.TcpSocket;
-import jist.swans.trans.TransInterface.TransTcpInterface;
-import jist.swans.trans.TransInterface.TransUdpInterface;
-import jist.swans.trans.TransTcp;
-import jist.swans.trans.TransUdp;
 import ext.util.stats.DucksCompositionStats;
 
 public abstract class AppCianBase implements AppInterface,
@@ -54,9 +48,10 @@ public abstract class AppCianBase implements AppInterface,
 	}
 
 	public abstract void run(String[] args);
-	
-	public abstract void receive(Message msg, NetAddress src, MacAddress lastHop,
-			byte macId, NetAddress dst, byte priority, byte ttl);
+
+	public abstract void receive(Message msg, NetAddress src,
+			MacAddress lastHop, byte macId, NetAddress dst, byte priority,
+			byte ttl);
 
 	/**
 	 * Set network entity.

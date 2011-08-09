@@ -12,16 +12,14 @@
 
 package jist.swans.radio;
 
-import ext.util.stats.DucksRadioNoiseAdditiveStats;
+import jist.runtime.JistAPI;
+import jist.swans.Constants;
+import jist.swans.Main;
 import jist.swans.mac.MacMessage.Data;
 import jist.swans.misc.Message;
 import jist.swans.misc.Util;
 import jist.swans.net.NetMessage.Ip;
-
-import jist.swans.Constants;
-import jist.swans.Main;
-
-import jist.runtime.JistAPI;
+import ext.util.stats.DucksRadioNoiseAdditiveStats;
 
 /**
  * <code>RadioNoiseAdditive</code> implements a radio with an additive noise

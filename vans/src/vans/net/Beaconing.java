@@ -4,12 +4,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
-
-import ext.util.ExtendedProperties;
-import ext.util.StringUtils;
-import ext.util.stats.StatsCollector;
-
 import jist.runtime.JistAPI;
 import jist.swans.Constants;
 import jist.swans.app.AppInterface;
@@ -17,6 +11,12 @@ import jist.swans.mac.MacAddress;
 import jist.swans.misc.Message;
 import jist.swans.net.NetAddress;
 import jist.swans.net.NetInterface;
+
+import org.apache.log4j.Logger;
+
+import ext.util.ExtendedProperties;
+import ext.util.StringUtils;
+import ext.util.stats.StatsCollector;
 
 /**
  * Beaconing is a class that can send out beacon messages periodically via

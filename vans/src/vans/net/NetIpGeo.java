@@ -20,9 +20,6 @@
 
 package vans.net;
 
-import org.apache.log4j.Logger;
-
-import ext.util.CacheMap;
 import jist.runtime.JistAPI;
 import jist.swans.Constants;
 import jist.swans.field.Field.RadioData;
@@ -35,6 +32,10 @@ import jist.swans.net.NetIpBase;
 import jist.swans.net.NetMessage;
 import jist.swans.net.PacketLoss;
 import jist.swans.route.RouteInterface;
+
+import org.apache.log4j.Logger;
+
+import ext.util.CacheMap;
 
 /**
  * Extension of NetIP that considers geographic addressing modes in NetAddress

@@ -48,7 +48,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
 
-import javax.swing.UIManager;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -62,6 +61,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -69,10 +69,9 @@ import javax.swing.event.ChangeListener;
 import jist.swans.Constants;
 import jist.swans.field.Field;
 import jist.swans.field.Mobility;
-import vans.straw.StreetMobility;
+import jist.swans.misc.Location;
 import vans.straw.streets.RoadSegment;
 import vans.straw.streets.Shape;
-import jist.swans.misc.Location;
 
 /**
  * <p>

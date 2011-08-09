@@ -27,7 +27,6 @@ import ducks.controller.DucksControllerModule;
 import ducks.controller.simulation.Simulation;
 import ducks.controller.simulation.SimulationStudy;
 import ducks.misc.DucksException;
-
 import ext.util.ExtendedProperties;
 
 /**
