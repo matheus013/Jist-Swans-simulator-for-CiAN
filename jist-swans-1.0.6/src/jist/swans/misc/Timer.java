@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////
+// ////////////////////////////////////////////////
 // JIST (Java In Simulation Time) Project
 // Timestamp: <Timer.java Tue 2004/04/06 11:46:57 barr pompom.cs.cornell.edu>
 //
@@ -16,11 +16,12 @@ package jist.swans.misc;
  * @version $Id: Timer.java,v 1.3 2004-04-06 16:07:49 barr Exp $
  * @since SWANS1.0
  */
-public interface Timer {
+public interface Timer
+{
 
-	/**
-	 * Timer expiration processing.
-	 */
-	void timeout();
+    /**
+     * Timer expiration processing.
+     */
+    void timeout();
 
 } // interface: Timer

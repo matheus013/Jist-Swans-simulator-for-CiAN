@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////
+// ////////////////////////////////////////////////
 // JIST (Java In Simulation Time) Project
 // Timestamp: <Timeless.java Tue 2004/04/06 11:25:49 barr pompom.cs.cornell.edu>
 //
@@ -20,5 +20,6 @@ package jist.runtime;
  * @since JIST1.0
  */
 
-public interface Timeless {
+public interface Timeless
+{
 }

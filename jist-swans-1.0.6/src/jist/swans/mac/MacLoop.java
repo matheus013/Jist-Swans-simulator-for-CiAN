@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////
+// ////////////////////////////////////////////////
 // JIST (Java In Simulation Time) Project
 // Timestamp: <MacLoop.java Tue 2004/04/06 11:32:19 barr pompom.cs.cornell.edu>
 //
@@ -22,80 +22,80 @@ import jist.swans.net.NetInterface;
  * @since SWANS1.0
  */
 
-public class MacLoop implements MacInterface {
-	// ////////////////////////////////////////////////
-	// locals
-	//
+public class MacLoop implements MacInterface
+{
+    // ////////////////////////////////////////////////
+    // locals
+    //
 
-	// entities
-	/** self-referencing proxy entity. */
-	private final MacInterface self;
-	/** network entity. */
-	private NetInterface netEntity;
-	/** network interface number. */
-	private byte netId;
+    // entities
+    /** self-referencing proxy entity. */
+    private final MacInterface self;
+    /** network entity. */
+    private NetInterface       netEntity;
+    /** network interface number. */
+    private byte               netId;
 
-	/**
-	 * Create new loopback interface.
-	 */
-	public MacLoop() {
-		self = (MacInterface) JistAPI.proxy(this, MacInterface.class);
-	}
+    /**
+     * Create new loopback interface.
+     */
+    public MacLoop() {
+        self = (MacInterface) JistAPI.proxy(this, MacInterface.class);
+    }
 
-	// ////////////////////////////////////////////////
-	// entity hookup
-	//
+    // ////////////////////////////////////////////////
+    // entity hookup
+    //
 
-	/**
-	 * Hook up with the network entity.
-	 * 
-	 * @param net
-	 *            network entity
-	 * @param netid
-	 *            network interface number
-	 */
-	public void setNetEntity(NetInterface net, byte netid) {
-		if (!JistAPI.isEntity(net))
-			throw new IllegalArgumentException("expected entity");
-		this.netEntity = net;
-		this.netId = netid;
-	}
+    /**
+     * Hook up with the network entity.
+     * 
+     * @param net
+     *            network entity
+     * @param netid
+     *            network interface number
+     */
+    public void setNetEntity(NetInterface net, byte netid) {
+        if (!JistAPI.isEntity(net))
+            throw new IllegalArgumentException("expected entity");
+        this.netEntity = net;
+        this.netId = netid;
+    }
 
-	/**
-	 * Return self-referencing proxy entity.
-	 * 
-	 * @return proxy entity
-	 */
-	public MacInterface getProxy() {
-		return self;
-	}
+    /**
+     * Return self-referencing proxy entity.
+     * 
+     * @return proxy entity
+     */
+    public MacInterface getProxy() {
+        return self;
+    }
 
-	// ////////////////////////////////////////////////
-	// MacInterface methods
-	//
+    // ////////////////////////////////////////////////
+    // MacInterface methods
+    //
 
-	/** {@inheritDoc} */
-	public void peek(Message msg) {
-		// no radio
-	}
+    /** {@inheritDoc} */
+    public void peek(Message msg) {
+        // no radio
+    }
 
-	/** {@inheritDoc} */
-	public void setRadioMode(byte mode) {
-		// no radio
-	}
+    /** {@inheritDoc} */
+    public void setRadioMode(byte mode) {
+        // no radio
+    }
 
-	/** {@inheritDoc} */
-	public void send(Message msg, MacAddress nextHop) {
-		JistAPI.sleep(Constants.LINK_DELAY);
-		netEntity.receive(msg, MacAddress.LOOP,
-				(byte) Constants.NET_INTERFACE_LOOPBACK, false, false);
-		JistAPI.sleep(Constants.EPSILON_DELAY);
-		netEntity.pump(netId);
-	}
+    /** {@inheritDoc} */
+    public void send(Message msg, MacAddress nextHop) {
+        JistAPI.sleep(Constants.LINK_DELAY);
+        netEntity.receive(msg, MacAddress.LOOP, (byte) Constants.NET_INTERFACE_LOOPBACK, false, false);
+        JistAPI.sleep(Constants.EPSILON_DELAY);
+        netEntity.pump(netId);
+    }
 
-	/** {@inheritDoc} */
-	public void receive(Message msg) {
-		// performed in send
-	}
+    /** {@inheritDoc} */
+    public void receive(Message msg) {
+        // performed in send
+    }
 
 }

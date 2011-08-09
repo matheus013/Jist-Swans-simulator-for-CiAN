@@ -1,7 +1,7 @@
 /*
  * Ulm University DUCKS project
  * 
- * Author:		Elmar Schoch <elmar.schoch@uni-ulm.de>
+ * Author: Elmar Schoch <elmar.schoch@uni-ulm.de>
  * 
  * (C) Copyright 2007, Ulm University, all rights reserved.
  * 
@@ -12,9 +12,8 @@
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
  */
 package ducks.driver;
 
@@ -46,102 +45,98 @@ import ext.util.stats.MultipleStatsCollector;
  * @author Elmar Schoch
  * 
  */
-public class GenericDriver implements DucksDriverModule {
+public class GenericDriver implements DucksDriverModule
+{
 
-	// log4j Logger
-	private static Logger log = Logger.getLogger(GenericNode.class.getName());
+    // log4j Logger
+    private static Logger            log       = Logger.getLogger(GenericNode.class.getName());
 
-	protected ExtendedProperties config;
-	protected Scene scene;
-	protected Nodes nodes;
+    protected ExtendedProperties     config;
+    protected Scene                  scene;
+    protected Nodes                  nodes;
 
-	protected MultipleStatsCollector collector = new MultipleStatsCollector();
+    protected MultipleStatsCollector collector = new MultipleStatsCollector();
 
-	public void configure(ExtendedProperties config) throws Exception {
+    public void configure(ExtendedProperties config) throws Exception {
 
-		this.config = config;
+        this.config = config;
 
-		// create scene
-		String sceneClass;
-		try {
-			sceneClass = config.getStringProperty(SimParams.SCENE_CLASS);
-		} catch (Exception e) {
-			throw new Exception(e.getMessage());
-		}
+        // create scene
+        String sceneClass;
+        try {
+            sceneClass = config.getStringProperty(SimParams.SCENE_CLASS);
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
 
-		try {
-			scene = (Scene) Class.forName(sceneClass).newInstance();
-			collector.registerCollector(scene);
-			ExtendedProperties scenecfg = config.getNamespace(
-					SimParams.SCENE_NAMEPSPACE, false);
-			scene.configure(scenecfg);
-			scene.setGlobalConfig(config);
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new Exception("Scene class could not be loaded: "
-					+ sceneClass + " Problem: " + e.getMessage());
-		}
+        try {
+            scene = (Scene) Class.forName(sceneClass).newInstance();
+            collector.registerCollector(scene);
+            ExtendedProperties scenecfg = config.getNamespace(SimParams.SCENE_NAMEPSPACE, false);
+            scene.configure(scenecfg);
+            scene.setGlobalConfig(config);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("Scene class could not be loaded: " + sceneClass + " Problem: " + e.getMessage());
+        }
 
-		// create nodes handler
-		String nodesClass;
-		try {
-			nodesClass = config.getStringProperty(SimParams.NODES_CLASS);
-		} catch (Exception e) {
-			throw new Exception(e.getMessage());
-		}
-		try {
-			nodes = (Nodes) Class.forName(nodesClass).newInstance();
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new Exception("Nodes class could not be loaded: "
-					+ nodesClass + ": " + e.getMessage());
-		}
-		// configure nodes
-		try {
-			nodes.setScene(scene);
-			nodes.setGlobalConfig(config);
-			collector.registerCollector(nodes);
-			nodes.configure(config);
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new Exception("Nodes could not be configured: "
-					+ e.getMessage());
-		}
+        // create nodes handler
+        String nodesClass;
+        try {
+            nodesClass = config.getStringProperty(SimParams.NODES_CLASS);
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+        try {
+            nodes = (Nodes) Class.forName(nodesClass).newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("Nodes class could not be loaded: " + nodesClass + ": " + e.getMessage());
+        }
+        // configure nodes
+        try {
+            nodes.setScene(scene);
+            nodes.setGlobalConfig(config);
+            collector.registerCollector(nodes);
+            nodes.configure(config);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("Nodes could not be configured: " + e.getMessage());
+        }
 
-		// initialize runtime logging
-		String logDest = null;
-		try {
-			logDest = config.getStringProperty(SimParams.EVENTLOG_DEST);
-		} catch (Exception e) {
-			log.info("Event logging destinations not defined. Skipping eventlogging ...");
-		}
+        // initialize runtime logging
+        String logDest = null;
+        try {
+            logDest = config.getStringProperty(SimParams.EVENTLOG_DEST);
+        } catch (Exception e) {
+            log.info("Event logging destinations not defined. Skipping eventlogging ...");
+        }
 
-		if (logDest != null) {
-			String[] dests = logDest.split(",");
-			for (int i = 0; i < dests.length; i++) {
-				while (dests[i].endsWith(" "))
-					dests[i] = dests[i].substring(0, dests[i].length() - 1);
-				EventLog.findEventLog(dests[i], config);
-			}
-			if (EventLog.hasEventLogs()) {
-				String[] logModule = config.getProperty(
-						SimParams.EVENTLOG_MODULES, "").split(",");
-				EventLog.loadModules(logModule, scene.getField(), config);
-			}
-		}
+        if (logDest != null) {
+            String[] dests = logDest.split(",");
+            for (int i = 0; i < dests.length; i++) {
+                while (dests[i].endsWith(" "))
+                    dests[i] = dests[i].substring(0, dests[i].length() - 1);
+                EventLog.findEventLog(dests[i], config);
+            }
+            if (EventLog.hasEventLogs()) {
+                String[] logModule = config.getProperty(SimParams.EVENTLOG_MODULES, "").split(",");
+                EventLog.loadModules(logModule, scene.getField(), config);
+            }
+        }
 
-	}
+    }
 
-	public ExtendedProperties getConfig() {
-		return this.config;
-	}
+    public ExtendedProperties getConfig() {
+        return this.config;
+    }
 
-	public String[] getStatParams() {
-		return collector.getStatParams();
-	}
+    public String[] getStatParams() {
+        return collector.getStatParams();
+    }
 
-	public ExtendedProperties getStats() {
-		return collector.getStats();
-	}
+    public ExtendedProperties getStats() {
+        return collector.getStats();
+    }
 
 }

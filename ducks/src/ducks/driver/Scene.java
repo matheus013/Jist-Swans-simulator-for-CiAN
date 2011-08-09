@@ -1,7 +1,7 @@
 /*
  * Ulm University DUCKS project
  * 
- * Author:		Elmar Schoch <elmar.schoch@uni-ulm.de>
+ * Author: Elmar Schoch <elmar.schoch@uni-ulm.de>
  * 
  * (C) Copyright 2007, Ulm University, all rights reserved.
  * 
@@ -12,9 +12,8 @@
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
  */
 package ducks.driver;
 
@@ -29,10 +28,11 @@ import ext.util.ExtendedProperties;
  * @author Elmar Schoch
  * 
  */
-public interface Scene extends DucksDriverModule {
+public interface Scene extends DucksDriverModule
+{
 
-	public void setGlobalConfig(ExtendedProperties config);
+    public void setGlobalConfig(ExtendedProperties config);
 
-	public Field getField();
+    public Field getField();
 
 }

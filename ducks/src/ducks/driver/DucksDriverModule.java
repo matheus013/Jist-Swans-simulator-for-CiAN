@@ -1,7 +1,7 @@
 /*
  * Ulm University DUCKS project
  * 
- * Author:		Elmar Schoch <elmar.schoch@uni-ulm.de>
+ * Author: Elmar Schoch <elmar.schoch@uni-ulm.de>
  * 
  * (C) Copyright 2007, Ulm University, all rights reserved.
  * 
@@ -12,9 +12,8 @@
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
  */
 package ducks.driver;
 
@@ -22,8 +21,9 @@ import ext.util.Configurable;
 import ext.util.ExtendedProperties;
 import ext.util.stats.StatsCollector;
 
-public interface DucksDriverModule extends Configurable, StatsCollector {
+public interface DucksDriverModule extends Configurable, StatsCollector
+{
 
-	public ExtendedProperties getConfig();
+    public ExtendedProperties getConfig();
 
 }

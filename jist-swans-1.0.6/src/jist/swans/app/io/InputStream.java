@@ -1,6 +1,7 @@
-//////////////////////////////////////////////////
+// ////////////////////////////////////////////////
 // JIST (Java In Simulation Time) Project
-// Timestamp: <InputStream.java Tue 2004/04/06 11:44:56 barr pompom.cs.cornell.edu>
+// Timestamp: <InputStream.java Tue 2004/04/06 11:44:56 barr
+// pompom.cs.cornell.edu>
 //
 
 // Copyright (C) 2004 by Cornell University
@@ -23,100 +24,99 @@ import jist.runtime.JistAPI;
  * @since SWANS1.0
  */
 
-public abstract class InputStream extends java.io.InputStream {
-	/** SKIP_BUFFER_SIZE is used to determine the size of skipBuffer. */
-	private static final int SKIP_BUFFER_SIZE = 2048;
-	/** skipBuffer is initialized in skip(long), if needed. */
-	private static byte[] skipBuffer;
+public abstract class InputStream extends java.io.InputStream
+{
+    /** SKIP_BUFFER_SIZE is used to determine the size of skipBuffer. */
+    private static final int SKIP_BUFFER_SIZE = 2048;
+    /** skipBuffer is initialized in skip(long), if needed. */
+    private static byte[]    skipBuffer;
 
-	/** @see java.io.InputStream */
-	public abstract int read() throws IOException, JistAPI.Continuable;
+    /** @see java.io.InputStream */
+    public abstract int read() throws IOException, JistAPI.Continuable;
 
-	/** @see java.io.InputStream */
-	public int read(byte[] b) throws IOException {
-		return read(b, 0, b.length);
-	}
+    /** @see java.io.InputStream */
+    public int read(byte[] b) throws IOException {
+        return read(b, 0, b.length);
+    }
 
-	/** @see java.io.InputStream */
-	public int read(byte[] b, int off, int len) throws IOException {
-		if (b == null) {
-			throw new NullPointerException();
-		} else if ((off < 0) || (off > b.length) || (len < 0)
-				|| ((off + len) > b.length) || ((off + len) < 0)) {
-			throw new IndexOutOfBoundsException();
-		} else if (len == 0) {
-			return 0;
-		}
+    /** @see java.io.InputStream */
+    public int read(byte[] b, int off, int len) throws IOException {
+        if (b == null) {
+            throw new NullPointerException();
+        } else if ((off < 0) || (off > b.length) || (len < 0) || ((off + len) > b.length) || ((off + len) < 0)) {
+            throw new IndexOutOfBoundsException();
+        } else if (len == 0) {
+            return 0;
+        }
 
-		int c = read();
-		if (c == -1) {
-			return -1;
-		}
-		b[off] = (byte) c;
+        int c = read();
+        if (c == -1) {
+            return -1;
+        }
+        b[off] = (byte) c;
 
-		int i = 1;
-		try {
-			for (; i < len; i++) {
-				c = read();
-				if (c == -1) {
-					break;
-				}
-				if (b != null) {
-					b[off + i] = (byte) c;
-				}
-			}
-		} catch (IOException ee) {
-		}
-		return i;
-	}
+        int i = 1;
+        try {
+            for (; i < len; i++) {
+                c = read();
+                if (c == -1) {
+                    break;
+                }
+                if (b != null) {
+                    b[off + i] = (byte) c;
+                }
+            }
+        } catch (IOException ee) {
+        }
+        return i;
+    }
 
-	/** @see java.io.InputStream */
-	public long skip(long n) throws IOException {
-		long remaining = n;
-		int nr;
-		if (skipBuffer == null)
-			skipBuffer = new byte[SKIP_BUFFER_SIZE];
+    /** @see java.io.InputStream */
+    public long skip(long n) throws IOException {
+        long remaining = n;
+        int nr;
+        if (skipBuffer == null)
+            skipBuffer = new byte[SKIP_BUFFER_SIZE];
 
-		byte[] localSkipBuffer = skipBuffer;
+        byte[] localSkipBuffer = skipBuffer;
 
-		if (n <= 0) {
-			return 0;
-		}
+        if (n <= 0) {
+            return 0;
+        }
 
-		while (remaining > 0) {
-			nr = read(localSkipBuffer, 0,
-					(int) StrictMath.min(SKIP_BUFFER_SIZE, remaining));
-			if (nr < 0) {
-				break;
-			}
-			remaining -= nr;
-		}
+        while (remaining > 0) {
+            nr = read(localSkipBuffer, 0, (int) StrictMath.min(SKIP_BUFFER_SIZE, remaining));
+            if (nr < 0) {
+                break;
+            }
+            remaining -= nr;
+        }
 
-		return n - remaining;
-	}
+        return n - remaining;
+    }
 
-	/** @see java.io.InputStream */
-	public int available() throws IOException {
-		return 0;
-	}
+    /** @see java.io.InputStream */
+    public int available() throws IOException {
+        return 0;
+    }
 
-	/** @see java.io.InputStream */
-	public void close() throws IOException {
-	}
+    /** @see java.io.InputStream */
+    public void close() throws IOException {
+    }
 
-	/** @see java.io.InputStream */
-	public synchronized void mark(int readlimit) {
-	}
+    /** @see java.io.InputStream */
+    public synchronized void mark(int readlimit) {
+    }
 
-	/** @see java.io.InputStream */
-	public synchronized void reset() throws IOException {
-		throw new IOException("mark/reset not supported");
-	}
+    /** @see java.io.InputStream */
+    public synchronized void reset() throws IOException {
+        throw new IOException("mark/reset not supported");
+    }
 
-	/** @see java.io.InputStream */
-	public boolean markSupported() {
-		return false;
-	}
+    /** @see java.io.InputStream */
+    public boolean markSupported() {
+        return false;
+    }
 
 } // class: InputStream
 

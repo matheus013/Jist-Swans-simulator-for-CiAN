@@ -1,7 +1,7 @@
 /*
  * Ulm University DUCKS project
  * 
- * Author:		Elmar Schoch <elmar.schoch@uni-ulm.de>
+ * Author: Elmar Schoch <elmar.schoch@uni-ulm.de>
  * 
  * (C) Copyright 2007, Ulm University, all rights reserved.
  * 
@@ -12,9 +12,8 @@
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
  */
 package ducks.controller.output;
 
@@ -23,17 +22,17 @@ import ducks.controller.simulation.Simulation;
 import ducks.controller.simulation.SimulationStudy;
 import ducks.misc.DucksException;
 
-public interface StorageProvider extends DucksControllerModule {
+public interface StorageProvider extends DucksControllerModule
+{
 
-	// namespaces to be excluded by default from being saved.
-	// Note that this may be different from the parameters excluded from
-	// multiplexing in ducks.controller.simulation.SimulationMultiplexer
+    // namespaces to be excluded by default from being saved.
+    // Note that this may be different from the parameters excluded from
+    // multiplexing in ducks.controller.simulation.SimulationMultiplexer
 
-	public static final String[] CFG_EXCLUDE_PARAMS = new String[] {
-			"ducks.config", "ducks.servers", "ducks.stats", "ducks.eventlog" };
+    public static final String[] CFG_EXCLUDE_PARAMS = new String[] { "ducks.config", "ducks.servers", "ducks.stats",
+            "ducks.eventlog"                       };
 
-	public void saveSimulationStudy(SimulationStudy study)
-			throws DucksException;
+    public void saveSimulationStudy(SimulationStudy study) throws DucksException;
 
-	public void saveSimulation(Simulation simu) throws DucksException;
+    public void saveSimulation(Simulation simu) throws DucksException;
 }

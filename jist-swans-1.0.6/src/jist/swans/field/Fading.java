@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////
+// ////////////////////////////////////////////////
 // JIST (Java In Simulation Time) Project
 // Timestamp: <Fading.java Wed 2004/06/23 09:16:53 barr pompom.cs.cornell.edu>
 //
@@ -19,176 +19,171 @@ import jist.swans.Constants;
  * @since SWANS1.0
  */
 
-public interface Fading {
-	// ////////////////////////////////////////////////
-	// interface
-	//
+public interface Fading
+{
+    // ////////////////////////////////////////////////
+    // interface
+    //
 
-	/**
-	 * Compute the fading loss.
-	 * 
-	 * @return fading loss (units: dB)
-	 */
-	double compute();
+    /**
+     * Compute the fading loss.
+     * 
+     * @return fading loss (units: dB)
+     */
+    double compute();
 
-	// ////////////////////////////////////////////////
-	// implementations
-	//
+    // ////////////////////////////////////////////////
+    // implementations
+    //
 
-	/**
-	 * Computes zero fading.
-	 * 
-	 * @author Rimon Barr &lt;barr+jist@cs.cornell.edu&gt;
-	 * @since SWANS1.0
-	 */
-	final class None implements Fading {
-		// Fading interface
-		/** {@inheritDoc} */
-		public double compute() {
-			return 0.0;
-		}
-	}
+    /**
+     * Computes zero fading.
+     * 
+     * @author Rimon Barr &lt;barr+jist@cs.cornell.edu&gt;
+     * @since SWANS1.0
+     */
+    final class None implements Fading
+    {
+        // Fading interface
+        /** {@inheritDoc} */
+        public double compute() {
+            return 0.0;
+        }
+    }
 
-	/**
-	 * Computes Rayleigh fading. Equivalent to GloMoSim code.
-	 * 
-	 * @author Rimon Barr &lt;barr+jist@cs.cornell.edu&gt;
-	 * @since SWANS1.0
-	 */
-	final class Rayleigh implements Fading {
-		/** Rayleigh distribution variance constant. */
-		private static final double VARIANCE = 0.6366197723676;
+    /**
+     * Computes Rayleigh fading. Equivalent to GloMoSim code.
+     * 
+     * @author Rimon Barr &lt;barr+jist@cs.cornell.edu&gt;
+     * @since SWANS1.0
+     */
+    final class Rayleigh implements Fading
+    {
+        /** Rayleigh distribution variance constant. */
+        private static final double VARIANCE = 0.6366197723676;
 
-		// Fading interface
-		/** {@inheritDoc} */
-		public double compute() {
-			// compute fading_dB; positive values are signal gains
-			return 5.0
-					* StrictMath.log(-2.0 * VARIANCE
-							* StrictMath.log(Constants.random.nextDouble()))
-					/ Constants.log10;
-		}
-	}
+        // Fading interface
+        /** {@inheritDoc} */
+        public double compute() {
+            // compute fading_dB; positive values are signal gains
+            return 5.0 * StrictMath.log(-2.0 * VARIANCE * StrictMath.log(Constants.random.nextDouble()))
+                    / Constants.log10;
+        }
+    }
 
-	/**
-	 * Computes Rician fading. Equivalent to GloMoSim code.
-	 * 
-	 * @author Rimon Barr &lt;barr+jist@cs.cornell.edu&gt;
-	 * @since SWANS1.0
-	 */
-	final class Rician implements Fading {
-		/** distribution parameters. */
-		private final double kFactor, stddev;
+    /**
+     * Computes Rician fading. Equivalent to GloMoSim code.
+     * 
+     * @author Rimon Barr &lt;barr+jist@cs.cornell.edu&gt;
+     * @since SWANS1.0
+     */
+    final class Rician implements Fading
+    {
+        /** distribution parameters. */
+        private final double kFactor, stddev;
 
-		/**
-		 * Create new Rician fading model object.
-		 * 
-		 * @param kFactor
-		 *            k
-		 */
-		public Rician(double kFactor) {
-			this.kFactor = kFactor;
-			this.stddev = computeStandardDeviation(kFactor);
-		}
+        /**
+         * Create new Rician fading model object.
+         * 
+         * @param kFactor
+         *            k
+         */
+        public Rician(double kFactor) {
+            this.kFactor = kFactor;
+            this.stddev = computeStandardDeviation(kFactor);
+        }
 
-		/**
-		 * Compute zero-order Bessel function.
-		 * 
-		 * @param x
-		 *            input
-		 * @return output of Bessel
-		 */
-		private static double Besseli0(double x) {
-			double ax = StrictMath.abs(x);
-			if (ax < 3.75) {
-				double y = x / 3.75;
-				y *= y;
-				return 1.0
-						+ y
-						* (3.5156229 + y
-								* (3.0899424 + y
-										* (1.2067492 + y
-												* (0.2659732 + y
-														* (0.360768e-1 + y * 0.45813e-2)))));
-			} else {
-				double y = 3.75 / ax;
-				return (StrictMath.exp(ax) / StrictMath.sqrt(ax))
-						* (0.39894228 + y
-								* (0.1328592e-1 + y
-										* (0.225319e-2 + y
-												* (-0.157565e-2 + y
-														* (0.916281e-2 + y
-																* (-0.2057706e-1 + y
-																		* (0.2635537e-1 + y
-																				* (-0.1647633e-1 + y * 0.392377e-2))))))));
-			}
-		}
+        /**
+         * Compute zero-order Bessel function.
+         * 
+         * @param x
+         *            input
+         * @return output of Bessel
+         */
+        private static double Besseli0(double x) {
+            double ax = StrictMath.abs(x);
+            if (ax < 3.75) {
+                double y = x / 3.75;
+                y *= y;
+                return 1.0
+                        + y
+                        * (3.5156229 + y
+                                * (3.0899424 + y * (1.2067492 + y * (0.2659732 + y * (0.360768e-1 + y * 0.45813e-2)))));
+            } else {
+                double y = 3.75 / ax;
+                return (StrictMath.exp(ax) / StrictMath.sqrt(ax))
+                        * (0.39894228 + y
+                                * (0.1328592e-1 + y
+                                        * (0.225319e-2 + y
+                                                * (-0.157565e-2 + y
+                                                        * (0.916281e-2 + y
+                                                                * (-0.2057706e-1 + y
+                                                                        * (0.2635537e-1 + y
+                                                                                * (-0.1647633e-1 + y * 0.392377e-2))))))));
+            }
+        }
 
-		/**
-		 * Compute first-order Bessel function.
-		 * 
-		 * @param x
-		 *            input
-		 * @return output of Bessel
-		 */
-		private static double Besseli1(double x) {
-			double ax = StrictMath.abs(x);
-			if (ax < 3.75) {
-				double y = x / 3.75;
-				y *= y;
-				return x
-						* (0.5 + y
-								* (0.87890494 + y
-										* (0.51498869 + y
-												* (0.15084934 + y
-														* (0.2658733e-1 + y
-																* (0.301532e-2 + y * 0.32411e-3))))));
-			} else {
-				double y = 3.75 / ax;
-				return StrictMath
-						.abs((StrictMath.exp(ax) / StrictMath.sqrt(ax))
-								* (0.39894228 + y
-										* (-0.3988024e-1 + y
-												* (-0.362018e-2 + y
-														* (0.163801e-2 + y
-																* (-0.1031555e-1 + y
-																		* (0.2282967e-1 + y
-																				* (-0.2895312e-1 + y
-																						* (0.1787654e-1 - y * 0.420059e-2)))))))));
-			}
-		}
+        /**
+         * Compute first-order Bessel function.
+         * 
+         * @param x
+         *            input
+         * @return output of Bessel
+         */
+        private static double Besseli1(double x) {
+            double ax = StrictMath.abs(x);
+            if (ax < 3.75) {
+                double y = x / 3.75;
+                y *= y;
+                return x
+                        * (0.5 + y
+                                * (0.87890494 + y
+                                        * (0.51498869 + y
+                                                * (0.15084934 + y * (0.2658733e-1 + y * (0.301532e-2 + y * 0.32411e-3))))));
+            } else {
+                double y = 3.75 / ax;
+                return StrictMath
+                        .abs((StrictMath.exp(ax) / StrictMath.sqrt(ax))
+                                * (0.39894228 + y
+                                        * (-0.3988024e-1 + y
+                                                * (-0.362018e-2 + y
+                                                        * (0.163801e-2 + y
+                                                                * (-0.1031555e-1 + y
+                                                                        * (0.2282967e-1 + y
+                                                                                * (-0.2895312e-1 + y
+                                                                                        * (0.1787654e-1 - y * 0.420059e-2)))))))));
+            }
+        }
 
-		/**
-		 * Computes standard deviation for Rician distribution such that mean is
-		 * 1.
-		 * 
-		 * @param kFactor
-		 *            k
-		 * @return Rician standard deviation
-		 */
-		private static double computeStandardDeviation(double kFactor) {
-			return 1.0 / (StrictMath.sqrt(StrictMath.PI / 2.0)
-					* StrictMath.exp(-kFactor / 2.0) * ((1 + kFactor)
-					* Besseli0(kFactor / 2.0) + kFactor
-					* Besseli1(kFactor / 2.0)));
-		}
+        /**
+         * Computes standard deviation for Rician distribution such that mean is
+         * 1.
+         * 
+         * @param kFactor
+         *            k
+         * @return Rician standard deviation
+         */
+        private static double computeStandardDeviation(double kFactor) {
+            return 1.0 / (StrictMath.sqrt(StrictMath.PI / 2.0) * StrictMath.exp(-kFactor / 2.0) * ((1 + kFactor)
+                    * Besseli0(kFactor / 2.0) + kFactor * Besseli1(kFactor / 2.0)));
+        }
 
-		// Fading interface
-		/** {@inheritDoc} */
-		public double compute() {
-			// compute fading_dB; positive values are signal gains
-			double a = StrictMath.sqrt(2.0 * kFactor * stddev * stddev), r, v1, v2;
-			do {
-				v1 = -1.0 + 2.0 * Constants.random.nextDouble();
-				v2 = -1.0 + 2.0 * Constants.random.nextDouble();
-				r = v1 * v1 + v2 * v2;
-			} while (r > 1.0);
-			r = StrictMath.sqrt(-2.0 * StrictMath.log(r) / r);
-			v1 = a + stddev * v1 * r;
-			v2 = stddev * v2 * r;
-			return 5.0 * StrictMath.log(v1 * v1 + v2 * v2) / Constants.log10;
-		}
-	}
+        // Fading interface
+        /** {@inheritDoc} */
+        public double compute() {
+            // compute fading_dB; positive values are signal gains
+            double a = StrictMath.sqrt(2.0 * kFactor * stddev * stddev), r, v1, v2;
+            do {
+                v1 = -1.0 + 2.0 * Constants.random.nextDouble();
+                v2 = -1.0 + 2.0 * Constants.random.nextDouble();
+                r = v1 * v1 + v2 * v2;
+            } while (r > 1.0);
+            r = StrictMath.sqrt(-2.0 * StrictMath.log(r) / r);
+            v1 = a + stddev * v1 * r;
+            v2 = stddev * v2 * r;
+            return 5.0 * StrictMath.log(v1 * v1 + v2 * v2) / Constants.log10;
+        }
+    }
 
 } // class: Fading
 

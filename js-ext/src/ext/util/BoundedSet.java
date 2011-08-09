@@ -1,7 +1,7 @@
 /*
  * Ulm University JiST/SWANS Extension Project
  * 
- * Author:		Michael Feiri <michael.feiri@uni-ulm.de>
+ * Author: Michael Feiri <michael.feiri@uni-ulm.de>
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -10,9 +10,8 @@
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
  */
 package ext.util;
 
@@ -25,40 +24,41 @@ import java.util.HashSet;
  * 
  * @author Michael Feiri
  */
-public class BoundedSet extends HashSet {
+public class BoundedSet extends HashSet
+{
 
-	private static final float defaultLoadFactor = 0.75f; // same as HashMap
-	private int maxEntries;
+    private static final float defaultLoadFactor = 0.75f; // same as HashMap
+    private int                maxEntries;
 
-	public BoundedSet(int capacity) {
-		super((int) (capacity / defaultLoadFactor) + 1, defaultLoadFactor);
-		maxEntries = capacity;
-	}
+    public BoundedSet(int capacity) {
+        super((int) (capacity / defaultLoadFactor) + 1, defaultLoadFactor);
+        maxEntries = capacity;
+    }
 
-	public BoundedSet(int capacity, float loadFactor) {
-		super((int) (capacity / loadFactor) + 1, loadFactor);
-		maxEntries = capacity;
-	}
+    public BoundedSet(int capacity, float loadFactor) {
+        super((int) (capacity / loadFactor) + 1, loadFactor);
+        maxEntries = capacity;
+    }
 
-	public BoundedSet(Collection o) {
-		super(o);
-		maxEntries = o.size();
-	}
+    public BoundedSet(Collection o) {
+        super(o);
+        maxEntries = o.size();
+    }
 
-	public boolean add(Object o) {
-		if (size() >= maxEntries) {
-			return false;
-		} else {
-			return super.add(o);
-		}
-	}
+    public boolean add(Object o) {
+        if (size() >= maxEntries) {
+            return false;
+        } else {
+            return super.add(o);
+        }
+    }
 
-	public int capacity() {
-		return maxEntries;
-	}
+    public int capacity() {
+        return maxEntries;
+    }
 
-	public boolean isFull() {
-		return size() == maxEntries;
-	}
+    public boolean isFull() {
+        return size() == maxEntries;
+    }
 
 }

@@ -17,17 +17,18 @@ import jist.swans.misc.Location;
  * @author eschoch
  * 
  */
-public class PlacementReplay implements Placement {
+public class PlacementReplay implements Placement
+{
 
-	private MobilityReplay mobility;
-	private int currentNode = 0;
+    private MobilityReplay mobility;
+    private int            currentNode = 0;
 
-	public PlacementReplay(MobilityReplay mobility) {
-		this.mobility = mobility;
-	}
+    public PlacementReplay(MobilityReplay mobility) {
+        this.mobility = mobility;
+    }
 
-	public Location getNextLocation() {
-		return mobility.getInitialPosition(currentNode++);
-	}
+    public Location getNextLocation() {
+        return mobility.getInitialPosition(currentNode++);
+    }
 
 }

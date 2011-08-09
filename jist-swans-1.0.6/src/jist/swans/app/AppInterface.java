@@ -1,6 +1,7 @@
-//////////////////////////////////////////////////
+// ////////////////////////////////////////////////
 // JIST (Java In Simulation Time) Project
-// Timestamp: <AppInterface.java Wed 2005/03/09 15:45:35 barr rimbase.rimonbarr.com>
+// Timestamp: <AppInterface.java Wed 2005/03/09 15:45:35 barr
+// rimbase.rimonbarr.com>
 //
 
 // Copyright (C) 2004 by Cornell University
@@ -21,70 +22,72 @@ import jist.swans.trans.TransInterface;
  * @since SWANS1.0
  */
 
-public interface AppInterface extends JistAPI.Proxiable {
+public interface AppInterface extends JistAPI.Proxiable
+{
 
-	/**
-	 * Run application.
-	 */
-	void run();
+    /**
+     * Run application.
+     */
+    void run();
 
-	/**
-	 * Run application.
-	 * 
-	 * @param args
-	 *            command-line parameters
-	 */
-	void run(String[] args);
+    /**
+     * Run application.
+     * 
+     * @param args
+     *            command-line parameters
+     */
+    void run(String[] args);
 
-	/**
-	 * Application that supports TCP sockets.
-	 */
-	public static interface TcpApp {
-		/**
-		 * Return application TCP entity.
-		 * 
-		 * @return application TCP entity
-		 * @throws JistAPI.Continuation
-		 *             not thrown; marker for rewriter
-		 */
-		TransInterface.TransTcpInterface getTcpEntity()
-				throws JistAPI.Continuation;
-	}
+    /**
+     * Application that supports TCP sockets.
+     */
+    public static interface TcpApp
+    {
+        /**
+         * Return application TCP entity.
+         * 
+         * @return application TCP entity
+         * @throws JistAPI.Continuation
+         *             not thrown; marker for rewriter
+         */
+        TransInterface.TransTcpInterface getTcpEntity() throws JistAPI.Continuation;
+    }
 
-	/**
-	 * Application that supports UDP sockets.
-	 */
-	public static interface UdpApp {
-		/**
-		 * Return application UDP entity.
-		 * 
-		 * @return application UDP entity
-		 * @throws JistAPI.Continuation
-		 *             not thrown; marker for rewriter
-		 */
-		TransInterface.TransUdpInterface getUdpEntity()
-				throws JistAPI.Continuation;
-	}
+    /**
+     * Application that supports UDP sockets.
+     */
+    public static interface UdpApp
+    {
+        /**
+         * Return application UDP entity.
+         * 
+         * @return application UDP entity
+         * @throws JistAPI.Continuation
+         *             not thrown; marker for rewriter
+         */
+        TransInterface.TransUdpInterface getUdpEntity() throws JistAPI.Continuation;
+    }
 
-	/**
-	 * Application that supports threading.
-	 */
-	public interface ThreadedApp {
-		/**
-		 * Get current thread from thread context.
-		 * 
-		 * @return thread entity
-		 */
-		public SimtimeThread getCurrentThread();
+    /**
+     * Application that supports threading.
+     */
+    public interface ThreadedApp
+    {
+        /**
+         * Get current thread from thread context.
+         * 
+         * @return thread entity
+         */
+        public SimtimeThread getCurrentThread();
 
-		/**
-		 * Set current thread in thread context.
-		 * 
-		 * @param thread
-		 *            thread entity
-		 */
-		public void setCurrentThread(SimtimeThread t);
-	}
+        /**
+         * Set current thread in thread context.
+         * 
+         * @param thread
+         *            thread entity
+         */
+        public void setCurrentThread(SimtimeThread t);
+    }
 
 } // interface: AppInterface
 

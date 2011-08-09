@@ -1,6 +1,7 @@
-//////////////////////////////////////////////////
+// ////////////////////////////////////////////////
 // JIST (Java In Simulation Time) Project
-// Timestamp: <OutputStream.java Tue 2004/04/06 11:45:09 barr pompom.cs.cornell.edu>
+// Timestamp: <OutputStream.java Tue 2004/04/06 11:45:09 barr
+// pompom.cs.cornell.edu>
 //
 
 // Copyright (C) 2004 by Cornell University
@@ -24,38 +25,38 @@ import jist.runtime.JistAPI;
  * @since SWANS1.0
  */
 
-public abstract class OutputStream {
+public abstract class OutputStream
+{
 
-	/** @see java.io.OutputStream */
-	public abstract void write(int b) throws IOException, JistAPI.Continuable;
+    /** @see java.io.OutputStream */
+    public abstract void write(int b) throws IOException, JistAPI.Continuable;
 
-	/** @see java.io.OutputStream */
-	public void write(byte[] b) throws IOException {
-		write(b, 0, b.length);
-	}
+    /** @see java.io.OutputStream */
+    public void write(byte[] b) throws IOException {
+        write(b, 0, b.length);
+    }
 
-	/** @see java.io.OutputStream */
-	public void write(byte[] b, int off, int len) throws IOException {
-		if (b == null) {
-			throw new NullPointerException();
-		} else if ((off < 0) || (off > b.length) || (len < 0)
-				|| ((off + len) > b.length) || ((off + len) < 0)) {
-			throw new IndexOutOfBoundsException();
-		} else if (len == 0) {
-			return;
-		}
-		for (int i = 0; i < len; i++) {
-			write(b[off + i]);
-		}
-	}
+    /** @see java.io.OutputStream */
+    public void write(byte[] b, int off, int len) throws IOException {
+        if (b == null) {
+            throw new NullPointerException();
+        } else if ((off < 0) || (off > b.length) || (len < 0) || ((off + len) > b.length) || ((off + len) < 0)) {
+            throw new IndexOutOfBoundsException();
+        } else if (len == 0) {
+            return;
+        }
+        for (int i = 0; i < len; i++) {
+            write(b[off + i]);
+        }
+    }
 
-	/** @see java.io.OutputStream */
-	public void flush() throws IOException {
-	}
+    /** @see java.io.OutputStream */
+    public void flush() throws IOException {
+    }
 
-	/** @see java.io.OutputStream */
-	public void close() throws IOException {
-	}
+    /** @see java.io.OutputStream */
+    public void close() throws IOException {
+    }
 
 } // class: OutputStream
 

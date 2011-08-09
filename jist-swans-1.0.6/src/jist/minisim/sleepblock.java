@@ -1,6 +1,7 @@
-//////////////////////////////////////////////////
+// ////////////////////////////////////////////////
 // JIST (Java In Simulation Time) Project
-// Timestamp: <sleepblock.java Thu 2005/02/24 22:46:17 barr rimbase.rimonbarr.com>
+// Timestamp: <sleepblock.java Thu 2005/02/24 22:46:17 barr
+// rimbase.rimonbarr.com>
 //
 
 // Copyright (C) 2004 by Cornell University
@@ -20,50 +21,50 @@ import jist.runtime.JistAPI;
  * @since JIST1.0
  */
 
-public class sleepblock implements JistAPI.Entity {
-	/**
-	 * Program entry point: show difference between blocking and non-blocking
-	 * events with an extended "hello world!" example.
-	 * 
-	 * @param args
-	 *            command-line parameters
-	 */
-	public static void main(String[] args) {
-		System.out.println("starting simulation.");
-		sleepblock hl = new sleepblock();
-		hl.nonblock();
-		hl.block();
-	}
+public class sleepblock implements JistAPI.Entity
+{
+    /**
+     * Program entry point: show difference between blocking and non-blocking
+     * events with an extended "hello world!" example.
+     * 
+     * @param args
+     *            command-line parameters
+     */
+    public static void main(String[] args) {
+        System.out.println("starting simulation.");
+        sleepblock hl = new sleepblock();
+        hl.nonblock();
+        hl.block();
+    }
 
-	/**
-	 * Initialize sleepblock entity.
-	 */
-	public sleepblock() {
-		System.out.println("Creating new object sleepblock at t = "
-				+ JistAPI.getTime());
-	}
+    /**
+     * Initialize sleepblock entity.
+     */
+    public sleepblock() {
+        System.out.println("Creating new object sleepblock at t = " + JistAPI.getTime());
+    }
 
-	public void hello(String msg) {
-		System.out.println(msg + ": hello world at t = " + JistAPI.getTime());
-	}
+    public void hello(String msg) {
+        System.out.println(msg + ": hello world at t = " + JistAPI.getTime());
+    }
 
-	public void nonblock() {
-		for (int i = 0; i < 3; i++) {
-			System.out.println("nonblock i=" + i);
-			hello("nonblock i=" + i);
-			JistAPI.sleep(1);
-		}
-		System.out.println("nonblock DONE.");
-	}
+    public void nonblock() {
+        for (int i = 0; i < 3; i++) {
+            System.out.println("nonblock i=" + i);
+            hello("nonblock i=" + i);
+            JistAPI.sleep(1);
+        }
+        System.out.println("nonblock DONE.");
+    }
 
-	public void block() {
-		for (int i = 0; i < 3; i++) {
-			System.out.println("   block i=" + i);
-			hello("   block i=" + i);
-			JistAPI.sleepBlock(1);
-		}
-		System.out.println("   block DONE.");
-	}
+    public void block() {
+        for (int i = 0; i < 3; i++) {
+            System.out.println("   block i=" + i);
+            hello("   block i=" + i);
+            JistAPI.sleepBlock(1);
+        }
+        System.out.println("   block DONE.");
+    }
 
 } // class: sleepblock
 

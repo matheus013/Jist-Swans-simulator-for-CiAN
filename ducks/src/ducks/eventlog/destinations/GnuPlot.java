@@ -1,7 +1,7 @@
 /*
  * Ulm University DUCKS project
  * 
- * Author:		Stefan Schlott <stefan.schlott@uni-ulm.de>
+ * Author: Stefan Schlott <stefan.schlott@uni-ulm.de>
  * 
  * (C) Copyright 2006, Ulm University, all rights reserved.
  * 
@@ -12,9 +12,8 @@
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
  */
 package ducks.eventlog.destinations;
 
@@ -44,67 +43,61 @@ import ducks.eventlog.EventLog;
  * @author Stefan Schlott
  * 
  */
-public class GnuPlot extends EventLog {
-	String datafilename;
-	PrintWriter out;
-	Map<Integer, PrintWriter> dataout;
-	boolean skipfirstvalue = false;
+public class GnuPlot extends EventLog
+{
+    String                    datafilename;
+    PrintWriter               out;
+    Map<Integer, PrintWriter> dataout;
+    boolean                   skipfirstvalue = false;
 
-	@Override
-	public void configure(Properties config, String configprefix) {
-		dataout = new Hashtable<Integer, PrintWriter>();
-		datafilename = configStringReplacer(config,
-				config.getProperty(configprefix + ".outputfile"));
-		try {
-			out = new PrintWriter(new FileOutputStream(datafilename, false));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		out.println("set multiplot");
-		out.println("set xrange [0:"
-				+ config.getProperty(SimParams.SCENE_NAMEPSPACE + "."
-						+ SimParams.SCENE_FIELD_SIZE_X) + "]");
-		out.println("set yrange [0:"
-				+ config.getProperty(SimParams.SCENE_NAMEPSPACE + "."
-						+ SimParams.SCENE_FIELD_SIZE_Y) + "]");
-		String skip = config.getProperty(configprefix + ".skipfirstvalue");
-		if ((skip != null)
-				&& (skip.equalsIgnoreCase("true") || skip.equals("1")))
-			skipfirstvalue = true;
-	}
+    @Override
+    public void configure(Properties config, String configprefix) {
+        dataout = new Hashtable<Integer, PrintWriter>();
+        datafilename = configStringReplacer(config, config.getProperty(configprefix + ".outputfile"));
+        try {
+            out = new PrintWriter(new FileOutputStream(datafilename, false));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        out.println("set multiplot");
+        out.println("set xrange [0:"
+                + config.getProperty(SimParams.SCENE_NAMEPSPACE + "." + SimParams.SCENE_FIELD_SIZE_X) + "]");
+        out.println("set yrange [0:"
+                + config.getProperty(SimParams.SCENE_NAMEPSPACE + "." + SimParams.SCENE_FIELD_SIZE_Y) + "]");
+        String skip = config.getProperty(configprefix + ".skipfirstvalue");
+        if ((skip != null) && (skip.equalsIgnoreCase("true") || skip.equals("1")))
+            skipfirstvalue = true;
+    }
 
-	@Override
-	public void finalize() {
-		Iterator i = dataout.keySet().iterator();
+    @Override
+    public void finalize() {
+        Iterator i = dataout.keySet().iterator();
 
-		while (i.hasNext()) {
-			((PrintWriter) dataout.get(i.next())).flush();
-		}
-		out.flush();
-	}
+        while (i.hasNext()) {
+            ((PrintWriter) dataout.get(i.next())).flush();
+        }
+        out.flush();
+    }
 
-	@Override
-	public void logEvent(int node, long time, Location loc, String type,
-			String comment) {
-		// Node movement
-		if (type.equals("move")) {
-			PrintWriter dout = (PrintWriter) dataout.get(node);
-			if (dout == null) {
-				try {
-					dout = new PrintWriter(new FileOutputStream(datafilename
-							+ "." + node, false));
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-				}
-				dataout.put(node, dout);
-				out.println("plot '" + datafilename + "." + node
-						+ "' using 1:2 with lines notitle");
-				if (skipfirstvalue)
-					return;
-			}
-			dout.println(loc.getX() + "\t" + loc.getY());
-		}
+    @Override
+    public void logEvent(int node, long time, Location loc, String type, String comment) {
+        // Node movement
+        if (type.equals("move")) {
+            PrintWriter dout = (PrintWriter) dataout.get(node);
+            if (dout == null) {
+                try {
+                    dout = new PrintWriter(new FileOutputStream(datafilename + "." + node, false));
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+                dataout.put(node, dout);
+                out.println("plot '" + datafilename + "." + node + "' using 1:2 with lines notitle");
+                if (skipfirstvalue)
+                    return;
+            }
+            dout.println(loc.getX() + "\t" + loc.getY());
+        }
 
-	}
+    }
 
 }

@@ -1,11 +1,12 @@
-/////////////////////////////////////////////////////////////////
+// ///////////////////////////////////////////////////////////////
 // JiST/SWANS extensions by UULM
 //
-// Note: This "new" NetIp class replaces the original NetIp class from JiST/SWANS,
+// Note: This "new" NetIp class replaces the original NetIp class from
+// JiST/SWANS,
 // which was renamed to "NetIpBase" and made abstract to be able to derive
 // new types of network layers from this base class.
 //
-// 
+//
 // Copyright (C) 2006 by Michael Feiri
 //
 
@@ -20,9 +21,9 @@ import jist.swans.misc.Mapper;
  * @author Michael Feiri &lt;michael.feiri@uni-ulm.de&gt;
  */
 
-public class NetIp extends NetIpBase implements NetInterface {
-	public NetIp(NetAddress addr, Mapper protocolMap, PacketLoss in,
-			PacketLoss out) {
-		super(addr, protocolMap, in, out);
-	}
+public class NetIp extends NetIpBase implements NetInterface
+{
+    public NetIp(NetAddress addr, Mapper protocolMap, PacketLoss in, PacketLoss out) {
+        super(addr, protocolMap, in, out);
+    }
 }

@@ -1,7 +1,7 @@
 /*
  * Ulm University DUCKS project
  * 
- * Author:		Elmar Schoch <elmar.schoch@uni-ulm.de>
+ * Author: Elmar Schoch <elmar.schoch@uni-ulm.de>
  * 
  * (C) Copyright 2007, Ulm University, all rights reserved.
  * 
@@ -12,9 +12,8 @@
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
  */
 package ducks.controller.simulation;
 
@@ -23,18 +22,17 @@ import java.util.List;
 import ducks.misc.DucksException;
 import ext.util.ExtendedProperties;
 
-public interface SimulationMultiplexer {
+public interface SimulationMultiplexer
+{
 
-	// namespaces in the config file that are excluded during multiplexing of
-	// parameters
-	// Note that this may be different from the parameters excluded from
-	// saving. In particular, do not exclude any parameters that are required by
-	// the
-	// driver !
-	public static final String[] CFG_EXCLUDE_PARAMS = new String[] {
-			"ducks.config", "ducks.servers", "ducks.stats" };
+    // namespaces in the config file that are excluded during multiplexing of
+    // parameters
+    // Note that this may be different from the parameters excluded from
+    // saving. In particular, do not exclude any parameters that are required by
+    // the
+    // driver !
+    public static final String[] CFG_EXCLUDE_PARAMS = new String[] { "ducks.config", "ducks.servers", "ducks.stats" };
 
-	public List<ExtendedProperties> getSimulations(ExtendedProperties config)
-			throws DucksException;
+    public List<ExtendedProperties> getSimulations(ExtendedProperties config) throws DucksException;
 
 }

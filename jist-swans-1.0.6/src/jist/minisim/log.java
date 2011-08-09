@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////
+// ////////////////////////////////////////////////
 // JIST (Java In Simulation Time) Project
 // Timestamp: <log.java Tue 2004/04/06 11:28:03 barr pompom.cs.cornell.edu>
 //
@@ -19,15 +19,16 @@ import jist.runtime.JistAPI;
  * @since JIST1.0
  */
 
-public class log {
-	/**
-	 * Program entry point: Write something to the JiST log.
-	 * 
-	 * @param args
-	 *            command-line parameters
-	 */
-	public static void main(String[] args) {
-		JistAPI.log("show me the log!");
-	}
+public class log
+{
+    /**
+     * Program entry point: Write something to the JiST log.
+     * 
+     * @param args
+     *            command-line parameters
+     */
+    public static void main(String[] args) {
+        JistAPI.log("show me the log!");
+    }
 
 } // class: log

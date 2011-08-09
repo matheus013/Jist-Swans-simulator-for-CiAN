@@ -1,6 +1,7 @@
-//////////////////////////////////////////////////
+// ////////////////////////////////////////////////
 // JIST (Java In Simulation Time) Project
-// Timestamp: <FilterInputStream.java Tue 2004/04/06 11:44:49 barr pompom.cs.cornell.edu>
+// Timestamp: <FilterInputStream.java Tue 2004/04/06 11:44:49 barr
+// pompom.cs.cornell.edu>
 //
 
 // Copyright (C) 2004 by Cornell University
@@ -23,60 +24,60 @@ import jist.runtime.JistAPI;
  * @since SWANS1.0
  */
 
-public class FilterInputStream extends InputStream {
+public class FilterInputStream extends InputStream
+{
 
-	/** @see java.io.FilterInputStream */
-	protected InputStream in;
+    /** @see java.io.FilterInputStream */
+    protected InputStream in;
 
-	/** @see java.io.FilterInputStream */
-	protected FilterInputStream(InputStream in) {
-		this.in = in;
-	}
+    /** @see java.io.FilterInputStream */
+    protected FilterInputStream(InputStream in) {
+        this.in = in;
+    }
 
-	/** @see java.io.FilterInputStream */
-	public int read() throws IOException, JistAPI.Continuation {
-		return in.read();
-	}
+    /** @see java.io.FilterInputStream */
+    public int read() throws IOException, JistAPI.Continuation {
+        return in.read();
+    }
 
-	/** @see java.io.FilterInputStream */
-	public int read(byte[] b) throws IOException, JistAPI.Continuation {
-		return read(b, 0, b.length);
-	}
+    /** @see java.io.FilterInputStream */
+    public int read(byte[] b) throws IOException, JistAPI.Continuation {
+        return read(b, 0, b.length);
+    }
 
-	/** @see java.io.FilterInputStream */
-	public int read(byte[] b, int off, int len) throws IOException,
-			JistAPI.Continuation {
-		return in.read(b, off, len);
-	}
+    /** @see java.io.FilterInputStream */
+    public int read(byte[] b, int off, int len) throws IOException, JistAPI.Continuation {
+        return in.read(b, off, len);
+    }
 
-	/** @see java.io.FilterInputStream */
-	public long skip(long n) throws IOException, JistAPI.Continuation {
-		return in.skip(n);
-	}
+    /** @see java.io.FilterInputStream */
+    public long skip(long n) throws IOException, JistAPI.Continuation {
+        return in.skip(n);
+    }
 
-	/** @see java.io.FilterInputStream */
-	public int available() throws IOException, JistAPI.Continuation {
-		return in.available();
-	}
+    /** @see java.io.FilterInputStream */
+    public int available() throws IOException, JistAPI.Continuation {
+        return in.available();
+    }
 
-	/** @see java.io.FilterInputStream */
-	public void close() throws IOException, JistAPI.Continuation {
-		in.close();
-	}
+    /** @see java.io.FilterInputStream */
+    public void close() throws IOException, JistAPI.Continuation {
+        in.close();
+    }
 
-	/** @see java.io.FilterInputStream */
-	public synchronized void mark(int readlimit) throws JistAPI.Continuation {
-		in.mark(readlimit);
-	}
+    /** @see java.io.FilterInputStream */
+    public synchronized void mark(int readlimit) throws JistAPI.Continuation {
+        in.mark(readlimit);
+    }
 
-	/** @see java.io.FilterInputStream */
-	public synchronized void reset() throws IOException, JistAPI.Continuation {
-		in.reset();
-	}
+    /** @see java.io.FilterInputStream */
+    public synchronized void reset() throws IOException, JistAPI.Continuation {
+        in.reset();
+    }
 
-	/** @see java.io.FilterInputStream */
-	public boolean markSupported() throws JistAPI.Continuation {
-		return in.markSupported();
-	}
+    /** @see java.io.FilterInputStream */
+    public boolean markSupported() throws JistAPI.Continuation {
+        return in.markSupported();
+    }
 
 }

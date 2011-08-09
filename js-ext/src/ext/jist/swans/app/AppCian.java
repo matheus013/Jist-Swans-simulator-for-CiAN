@@ -17,99 +17,117 @@ import jist.swans.trans.TransUdp.UdpMessage;
 import system.CiAN;
 import ext.util.stats.DucksCompositionStats;
 
-public class AppCian implements AppInterface, AppInterface.TcpApp,
-		AppInterface.UdpApp, SocketHandler {
+public class AppCian implements AppInterface, AppInterface.TcpApp, AppInterface.UdpApp, SocketHandler
+{
 
-	// network entity.
-	protected NetInterface netEntity;
+    // network entity.
+    protected NetInterface          netEntity;
 
-	protected TransTcp transTCP;
+    protected TransTcp              transTCP;
 
-	protected TransUdp transUDP;
+    protected TransUdp              transUDP;
 
-	// self-referencing proxy entity.
-	protected Object self;
+    // self-referencing proxy entity.
+    protected Object                self;
 
-	protected int nodeId;
+    protected int                   nodeId;
 
-	// composition stats accumulator
-	protected DucksCompositionStats compositionStats;
+    // composition stats accumulator
+    protected DucksCompositionStats compositionStats;
 
-	protected String[] args;
+    protected String[]              args;
 
-	public AppCian(int nodeId, DucksCompositionStats compositionStats,
-			String[] args) {
-		this.nodeId = nodeId;
-		this.compositionStats = compositionStats;
-		this.args = args;
-		// init self reference
-		this.self = JistAPI.proxyMany(this, new Class[] { AppInterface.class,
-				AppInterface.TcpApp.class, AppInterface.UdpApp.class });
+    public AppCian(int nodeId, DucksCompositionStats compositionStats, String[] args) {
+        this.nodeId = nodeId;
+        this.compositionStats = compositionStats;
+        this.args = args;
+        // init self reference
+        this.self = JistAPI.proxyMany(this, new Class[] { AppInterface.class, AppInterface.TcpApp.class,
+                AppInterface.UdpApp.class });
 
-		this.transTCP = new TransTcp();
-		this.transUDP = new TransUdp();
-	}
+        this.transTCP = new TransTcp();
+        this.transUDP = new TransUdp();
+    }
 
-	public void send(Message msg, NetAddress addr) throws Exception {
-		if (msg instanceof TcpMessage) {
-			TcpMessage tcpMsg = (TcpMessage) msg;
-			transTCP.send(tcpMsg, addr, tcpMsg.getDstPort(),
-					tcpMsg.getSrcPort(), Constants.NET_PRIORITY_NORMAL);
-		} else if (msg instanceof UdpMessage) {
-			UdpMessage udpMsg = (UdpMessage) msg;
-			transUDP.send(udpMsg.getPayload(), addr, udpMsg.getDstPort(),
-					udpMsg.getSrcPort(), Constants.NET_PRIORITY_NORMAL);
-		} else {
-			throw new Exception("Invalid message type");
-		}
-	}
+    public void send(Message msg, NetAddress addr) throws Exception {
+        if (msg instanceof TcpMessage) {
+            TcpMessage tcpMsg = (TcpMessage) msg;
+            transTCP.send(tcpMsg, addr, tcpMsg.getDstPort(), tcpMsg.getSrcPort(), Constants.NET_PRIORITY_NORMAL);
+        } else if (msg instanceof UdpMessage) {
+            UdpMessage udpMsg = (UdpMessage) msg;
+            transUDP.send(udpMsg.getPayload(), addr, udpMsg.getDstPort(), udpMsg.getSrcPort(),
+                    Constants.NET_PRIORITY_NORMAL);
+        } else {
+            throw new Exception("Invalid message type");
+        }
+    }
 
-	public void receive(Message msg, NetAddress src, int srcPort)
-			throws Continuation {
-		// TODO Auto-generated method stub
+    public void receive(Message msg, NetAddress src, int srcPort) throws Continuation {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	public void run() {
-		run(this.args);
-	}
+    public void run() {
+        run(this.args);
+    }
 
-	public void run(String[] args) {
-		compositionStats.incrementNumReq();
+    public void run(String[] args) {
+        compositionStats.incrementNumReq();
 
-		CiAN.main(args);
-	}
+        new CiANThread(args).start();
+    }
 
-	/**
-	 * Set network entity.
-	 * 
-	 * @param netEntity
-	 *            network entity
-	 */
-	public void setNetEntity(NetInterface netEntity) {
-		this.netEntity = netEntity;
-		this.transTCP.setNetEntity(netEntity);
-		this.transUDP.setNetEntity(netEntity);
-	}
+    /**
+     * Set network entity.
+     * 
+     * @param netEntity
+     *            network entity
+     */
+    public void setNetEntity(NetInterface netEntity) {
+        this.netEntity = netEntity;
+        this.transTCP.setNetEntity(netEntity);
+        this.transUDP.setNetEntity(netEntity);
+    }
 
-	public AppInterface getAppProxy() {
-		return (AppInterface) self;
-	}
+    public AppInterface getAppProxy() {
+        return (AppInterface) self;
+    }
 
-	public AppInterface.TcpApp getTcpAppProxy() {
-		return (AppInterface.TcpApp) self;
-	}
+    public AppInterface.TcpApp getTcpAppProxy() {
+        return (AppInterface.TcpApp) self;
+    }
 
-	public AppInterface.UdpApp getUdpAppProxy() {
-		return (AppInterface.UdpApp) self;
-	}
+    public AppInterface.UdpApp getUdpAppProxy() {
+        return (AppInterface.UdpApp) self;
+    }
 
-	public TransTcpInterface getTcpEntity() throws Continuation {
-		return transTCP.getProxy();
-	}
+    public TransTcpInterface getTcpEntity() throws Continuation {
+        return transTCP.getProxy();
+    }
 
-	public TransUdpInterface getUdpEntity() throws Continuation {
-		return transUDP.getProxy();
-	}
+    public TransUdpInterface getUdpEntity() throws Continuation {
+        return transUDP.getProxy();
+    }
+
+    class CiANThread extends Thread
+    {
+        private String[] args;
+
+        public CiANThread(String[] args) {
+            super("CiaNThread for node " + nodeId);
+            this.args = args;
+            setContextClassLoader(new CiANClassLoader());
+        }
+
+        @Override
+        public void run() {
+            CiAN.main(this.args);
+        }
+    }
+
+    class CiANClassLoader extends ClassLoader
+    {
+
+    }
 
 }

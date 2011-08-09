@@ -1,6 +1,7 @@
-//////////////////////////////////////////////////
+// ////////////////////////////////////////////////
 // JIST (Java In Simulation Time) Project
-// Timestamp: <unthreaded.java Fri 2005/02/25 09:48:35 barr rimbase.rimonbarr.com>
+// Timestamp: <unthreaded.java Fri 2005/02/25 09:48:35 barr
+// rimbase.rimonbarr.com>
 //
 
 // Copyright (C) 2004 by Cornell University
@@ -20,28 +21,28 @@ import jist.runtime.JistAPI;
  * @version $Id: unthreaded.java,v 1.1 2005-03-03 13:05:39 barr Exp $
  * @since JIST1.0
  */
-public class unthreaded implements JistAPI.Entity {
-	/** 'Thread' processing. */
-	public void process(int id) {
-		for (int i = 1; i <= 5; i++) {
-			System.out.println("@t=" + JistAPI.getTime() + " 'thread'=" + id
-					+ ": i=" + i);
-			JistAPI.sleepBlock(1);
-		}
-	}
+public class unthreaded implements JistAPI.Entity
+{
+    /** 'Thread' processing. */
+    public void process(int id) {
+        for (int i = 1; i <= 5; i++) {
+            System.out.println("@t=" + JistAPI.getTime() + " 'thread'=" + id + ": i=" + i);
+            JistAPI.sleepBlock(1);
+        }
+    }
 
-	/**
-	 * Program entry point: show difference between Java and JiST execution
-	 * models.
-	 * 
-	 * @param args
-	 *            command-line parameters
-	 */
-	public static void main(String args[]) {
-		unthreaded t = new unthreaded();
-		t.process(1);
-		t.process(2);
-		t.process(3);
-	}
+    /**
+     * Program entry point: show difference between Java and JiST execution
+     * models.
+     * 
+     * @param args
+     *            command-line parameters
+     */
+    public static void main(String args[]) {
+        unthreaded t = new unthreaded();
+        t.process(1);
+        t.process(2);
+        t.process(3);
+    }
 
 } // class: unthreaded

@@ -1,7 +1,7 @@
 /*
  * Ulm University DUCKS project
  * 
- * Author:		Elmar Schoch <elmar.schoch@uni-ulm.de>
+ * Author: Elmar Schoch <elmar.schoch@uni-ulm.de>
  * 
  * (C) Copyright 2006, Ulm University, all rights reserved.
  * 
@@ -12,9 +12,8 @@
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
  */
 package ext.util.stats;
 
@@ -31,24 +30,25 @@ import ext.util.ExtendedProperties;
  * @author Elmar Schoch
  * 
  */
-public interface StatsCollector {
+public interface StatsCollector
+{
 
-	/**
-	 * Must return a properties object that contains result parameters in the
-	 * format defined by DUCKS (i.e. properties format) Also note, that the
-	 * result parameters reflect the database structure (see DBManager for
-	 * details).
-	 * 
-	 * @return
-	 */
-	public ExtendedProperties getStats();
+    /**
+     * Must return a properties object that contains result parameters in the
+     * format defined by DUCKS (i.e. properties format) Also note, that the
+     * result parameters reflect the database structure (see DBManager for
+     * details).
+     * 
+     * @return
+     */
+    public ExtendedProperties getStats();
 
-	/**
-	 * Must return an array of result parameter strings that will be contained
-	 * when "getStats()" is called.
-	 * 
-	 * @return
-	 */
-	public String[] getStatParams();
+    /**
+     * Must return an array of result parameter strings that will be contained
+     * when "getStats()" is called.
+     * 
+     * @return
+     */
+    public String[] getStatParams();
 
 }

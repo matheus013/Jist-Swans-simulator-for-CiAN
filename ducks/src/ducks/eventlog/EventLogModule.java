@@ -1,7 +1,7 @@
 /*
  * Ulm University DUCKS project
  * 
- * Author:		Stefan Schlott <stefan.schlott@uni-ulm.de>
+ * Author: Stefan Schlott <stefan.schlott@uni-ulm.de>
  * 
  * (C) Copyright 2006, Ulm University, all rights reserved.
  * 
@@ -12,9 +12,8 @@
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
  */
 
 package ducks.eventlog;
@@ -30,10 +29,11 @@ import jist.swans.field.Field;
  * @author Stefan Schlott
  * 
  */
-public interface EventLogModule extends DoNotRewrite {
-	public void configure(Field field, Properties config, String configPrefix);
+public interface EventLogModule extends DoNotRewrite
+{
+    public void configure(Field field, Properties config, String configPrefix);
 
-	public void enable();
+    public void enable();
 
-	public void disable();
+    public void disable();
 }

@@ -1,7 +1,7 @@
 /*
  * Ulm University DUCKS project
  * 
- * Author:		Stefan Schlott <stefan.schlott@uni-ulm.de>
+ * Author: Stefan Schlott <stefan.schlott@uni-ulm.de>
  * 
  * (C) Copyright 2006, Ulm University, all rights reserved.
  * 
@@ -12,9 +12,8 @@
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
  */
 package ducks.eventlog.modules;
 
@@ -32,22 +31,23 @@ import ducks.eventlog.EventLogModule;
  * @author Stefan Schlott
  * 
  */
-public class Movement implements EventLogModule, MovementListenerInterface {
-	Field field;
+public class Movement implements EventLogModule, MovementListenerInterface
+{
+    Field field;
 
-	public void configure(Field field, Properties config, String configPrefix) {
-		this.field = field;
-	}
+    public void configure(Field field, Properties config, String configPrefix) {
+        this.field = field;
+    }
 
-	public void enable() {
-		field.addMovementListener(this);
-	}
+    public void enable() {
+        field.addMovementListener(this);
+    }
 
-	public void disable() {
-		field.removeMovementListener(this);
-	}
+    public void disable() {
+        field.removeMovementListener(this);
+    }
 
-	public void move(long time, Location loc, int node) {
-		EventLog.log(node, time, loc, "move", null);
-	}
+    public void move(long time, Location loc, int node) {
+        EventLog.log(node, time, loc, "move", null);
+    }
 }

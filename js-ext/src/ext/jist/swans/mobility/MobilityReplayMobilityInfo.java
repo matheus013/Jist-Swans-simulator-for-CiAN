@@ -1,8 +1,8 @@
 /*
  * Ulm University JiST/SWANS project
  * 
- * Author:		Elmar Schoch <elmar.schoch@uni-ulm.de>
- * Version:		0.2
+ * Author: Elmar Schoch <elmar.schoch@uni-ulm.de>
+ * Version: 0.2
  * 
  * (C) Copyright 2006, Ulm University, all rights reserved.
  * 
@@ -13,9 +13,8 @@
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
  */
 package ext.jist.swans.mobility;
 
@@ -24,50 +23,51 @@ import java.util.List;
 import jist.swans.field.Mobility.MobilityInfo;
 import ext.jist.swans.mobility.MobilityReplay.Waypoint;
 
-public class MobilityReplayMobilityInfo implements MobilityInfo {
+public class MobilityReplayMobilityInfo implements MobilityInfo
+{
 
-	// base data
-	List<Waypoint> waypoints;
+    // base data
+    List<Waypoint> waypoints;
 
-	// concurrent data
-	Waypoint lastWaypoint = null;
-	Waypoint nextWaypoint = null;
+    // concurrent data
+    Waypoint       lastWaypoint = null;
+    Waypoint       nextWaypoint = null;
 
-	int steps;
-	int remainingSteps;
-	long stepTime;
+    int            steps;
+    int            remainingSteps;
+    long           stepTime;
 
-	/**
-	 * Returns waypoint next to the current time, or null, if no further
-	 * waypoint is available
-	 * 
-	 * @param curTime
-	 *            Current JiST time (in nanoseconds which is the official JiST
-	 *            time)
-	 * @return Next waypoint
-	 */
-	public Waypoint getNextWaypoint(long curTime) {
-		long minTime = Long.MAX_VALUE;
-		Waypoint wp = null;
-		for (Waypoint w : waypoints) {
-			if (w.time >= curTime && w.time < minTime) {
-				minTime = w.time;
-				wp = w;
-			}
-		}
-		if (wp != null) {
-			waypoints.remove(wp);
-		}
-		return wp;
-	}
+    /**
+     * Returns waypoint next to the current time, or null, if no further
+     * waypoint is available
+     * 
+     * @param curTime
+     *            Current JiST time (in nanoseconds which is the official JiST
+     *            time)
+     * @return Next waypoint
+     */
+    public Waypoint getNextWaypoint(long curTime) {
+        long minTime = Long.MAX_VALUE;
+        Waypoint wp = null;
+        for (Waypoint w : waypoints) {
+            if (w.time >= curTime && w.time < minTime) {
+                minTime = w.time;
+                wp = w;
+            }
+        }
+        if (wp != null) {
+            waypoints.remove(wp);
+        }
+        return wp;
+    }
 
-	public Waypoint getNextWaypoint() {
-		Waypoint wp = null;
-		if (waypoints.size() > 0) {
-			wp = waypoints.get(0);
-			waypoints.remove(0);
-		}
-		return wp;
-	}
+    public Waypoint getNextWaypoint() {
+        Waypoint wp = null;
+        if (waypoints.size() > 0) {
+            wp = waypoints.get(0);
+            waypoints.remove(0);
+        }
+        return wp;
+    }
 
 }

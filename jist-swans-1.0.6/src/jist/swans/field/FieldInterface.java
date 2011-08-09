@@ -1,6 +1,7 @@
-//////////////////////////////////////////////////
+// ////////////////////////////////////////////////
 // JIST (Java In Simulation Time) Project
-// Timestamp: <FieldInterface.java Tue 2004/04/06 11:30:59 barr pompom.cs.cornell.edu>
+// Timestamp: <FieldInterface.java Tue 2004/04/06 11:30:59 barr
+// pompom.cs.cornell.edu>
 //
 
 // Copyright (C) 2004 by Cornell University
@@ -22,47 +23,48 @@ import jist.swans.radio.RadioInfo;
  * @since SWANS1.0
  */
 
-public interface FieldInterface extends JistAPI.Proxiable {
+public interface FieldInterface extends JistAPI.Proxiable
+{
 
-	// ////////////////////////////////////////////////
-	// communication
-	//
+    // ////////////////////////////////////////////////
+    // communication
+    //
 
-	/**
-	 * Transmit physical-layer message. Called from radio entity.
-	 * 
-	 * @param srcInfo
-	 *            source radio information
-	 * @param msg
-	 *            physical layer packet
-	 * @param duration
-	 *            transmission duration
-	 */
-	void transmit(RadioInfo srcInfo, Message msg, long duration);
+    /**
+     * Transmit physical-layer message. Called from radio entity.
+     * 
+     * @param srcInfo
+     *            source radio information
+     * @param msg
+     *            physical layer packet
+     * @param duration
+     *            transmission duration
+     */
+    void transmit(RadioInfo srcInfo, Message msg, long duration);
 
-	// ////////////////////////////////////////////////
-	// radio management
-	//
+    // ////////////////////////////////////////////////
+    // radio management
+    //
 
-	/**
-	 * Move radio to different location on field.
-	 * 
-	 * @param id
-	 *            unique radio identifier
-	 * @param loc
-	 *            new radio coordinates
-	 */
-	void moveRadio(Integer id, Location loc);
+    /**
+     * Move radio to different location on field.
+     * 
+     * @param id
+     *            unique radio identifier
+     * @param loc
+     *            new radio coordinates
+     */
+    void moveRadio(Integer id, Location loc);
 
-	/**
-	 * Move radio to different relative location on field.
-	 * 
-	 * @param id
-	 *            unique radio identifier
-	 * @param delta
-	 *            radio offset coordinates
-	 */
-	void moveRadioOff(Integer id, Location delta);
+    /**
+     * Move radio to different relative location on field.
+     * 
+     * @param id
+     *            unique radio identifier
+     * @param delta
+     *            radio offset coordinates
+     */
+    void moveRadioOff(Integer id, Location delta);
 
 } // interface: FieldInterface
 

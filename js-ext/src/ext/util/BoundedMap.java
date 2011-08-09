@@ -1,7 +1,7 @@
 /*
  * Ulm University JiST/SWANS Extension Project
  * 
- * Author:		Michael Feiri <michael.feiri@uni-ulm.de>
+ * Author: Michael Feiri <michael.feiri@uni-ulm.de>
  * 
  * (C) Copyright 2006, Ulm University, all rights reserved.
  * 
@@ -12,9 +12,8 @@
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- *
  */
 package ext.util;
 
@@ -27,40 +26,41 @@ import java.util.Map;
  * 
  * @author Michael Feiri
  */
-public class BoundedMap extends HashMap {
+public class BoundedMap extends HashMap
+{
 
-	private static final float defaultLoadFactor = 0.75f; // same as HashMap
-	private int maxEntries;
+    private static final float defaultLoadFactor = 0.75f; // same as HashMap
+    private int                maxEntries;
 
-	public BoundedMap(int capacity) {
-		super((int) (capacity / defaultLoadFactor) + 1, defaultLoadFactor);
-		maxEntries = capacity;
-	}
+    public BoundedMap(int capacity) {
+        super((int) (capacity / defaultLoadFactor) + 1, defaultLoadFactor);
+        maxEntries = capacity;
+    }
 
-	public BoundedMap(int capacity, float loadFactor) {
-		super((int) (capacity / loadFactor) + 1, loadFactor);
-		maxEntries = capacity;
-	}
+    public BoundedMap(int capacity, float loadFactor) {
+        super((int) (capacity / loadFactor) + 1, loadFactor);
+        maxEntries = capacity;
+    }
 
-	public BoundedMap(Map m) {
-		super(m);
-		maxEntries = m.size();
-	}
+    public BoundedMap(Map m) {
+        super(m);
+        maxEntries = m.size();
+    }
 
-	public Object put(Object key, Object value) {
-		if (size() >= maxEntries) {
-			return null;
-		} else {
-			return super.put(key, value);
-		}
-	}
+    public Object put(Object key, Object value) {
+        if (size() >= maxEntries) {
+            return null;
+        } else {
+            return super.put(key, value);
+        }
+    }
 
-	public int capacity() {
-		return maxEntries;
-	}
+    public int capacity() {
+        return maxEntries;
+    }
 
-	public boolean isFull() {
-		return size() == maxEntries;
-	}
+    public boolean isFull() {
+        return size() == maxEntries;
+    }
 
 }

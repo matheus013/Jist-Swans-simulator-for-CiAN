@@ -1,7 +1,7 @@
 /*
  * Ulm University DUCKS project
  * 
- * Author:		Elmar Schoch <elmar.schoch@uni-ulm.de>
+ * Author: Elmar Schoch <elmar.schoch@uni-ulm.de>
  * 
  * (C) Copyright 2006, Ulm University, all rights reserved.
  * 
@@ -12,9 +12,8 @@
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
  */
 
 package ducks.misc;
@@ -24,19 +23,20 @@ package ducks.misc;
  * 
  * @author Elmar Schoch
  */
-public class DucksException extends Exception {
+public class DucksException extends Exception
+{
 
-	/**
+    /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public DucksException() {
-		super();
-	}
+    public DucksException() {
+        super();
+    }
 
-	public DucksException(String reason) {
-		super(reason);
-	}
+    public DucksException(String reason) {
+        super(reason);
+    }
 
 }
