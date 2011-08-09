@@ -11,8 +11,8 @@ package jist.swans.app.lang;
 
 import jist.runtime.JistAPI;
 
-public interface ThreadInterface
-{
-  void ThreadRun();  // intentionally non-blocking
-  void ThreadJoin() throws JistAPI.Continuation;
+public interface ThreadInterface {
+	void ThreadRun(); // intentionally non-blocking
+
+	void ThreadJoin() throws JistAPI.Continuation;
 }

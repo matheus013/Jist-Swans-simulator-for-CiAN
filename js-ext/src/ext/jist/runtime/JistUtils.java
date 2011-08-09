@@ -25,16 +25,17 @@ import jist.swans.Constants;
  * JistUtils collects a number of useful things regarding JiST.
  * 
  * @author eschoch
- *
+ * 
  */
 public class JistUtils {
 
 	/**
 	 * Get simulation time in seconds formatting
+	 * 
 	 * @return time string
 	 */
 	public static String getSimulationTime() {
 		long t = JistAPI.getTime();
-		return (t / Constants.SECOND) +"."+ (t % Constants.SECOND);
+		return (t / Constants.SECOND) + "." + (t % Constants.SECOND);
 	}
 }

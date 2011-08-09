@@ -25,5 +25,5 @@ import ext.util.stats.StatsCollector;
 public interface DucksDriverModule extends Configurable, StatsCollector {
 
 	public ExtendedProperties getConfig();
-	
+
 }

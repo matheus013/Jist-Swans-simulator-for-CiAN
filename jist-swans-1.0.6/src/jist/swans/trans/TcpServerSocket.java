@@ -24,412 +24,379 @@ import java.net.InetAddress;
 import java.net.SocketAddress;
 import java.net.InetSocketAddress;
 
-
 /**
  * SWANS Implementation of Server Socket entity.
- *
+ * 
  * @author Kelwin Tamtoro &lt;kt222@cs.cornell.edu&gt;
  * @author Rimon Barr &lt;barr+jist@cs.cornell.edu&gt;
  * @version $Id: TcpServerSocket.java,v 1.11 2004-04-06 16:07:51 barr Exp $
  * @since SWANS1.0
  */
-public class TcpServerSocket implements SocketInterface.TcpServerSocketInterface
-{
-  
-  //////////////////////////////////////////////////
-  // Private variables
-  //
+public class TcpServerSocket implements
+		SocketInterface.TcpServerSocketInterface {
 
+	// ////////////////////////////////////////////////
+	// Private variables
+	//
 
-  // proxy variables
-  
-  /**
-   * Entity reference to TcpServerSocket.
-   */
-  private SocketInterface.TcpServerSocketInterface self;
-  
-  
-  // socket variables
+	// proxy variables
 
-  /** Local port. */  
-  private int lport;
+	/**
+	 * Entity reference to TcpServerSocket.
+	 */
+	private SocketInterface.TcpServerSocketInterface self;
 
-  /** Local address. */  
-  private InetAddress laddr;
+	// socket variables
 
-  /** Channel (for blocking implementation). */  
-  private Channel channel;
+	/** Local port. */
+	private int lport;
 
-  /** Reference to the server socket's callback. */  
-  private TransInterface.SocketHandler.TcpHandler callback;
+	/** Local address. */
+	private InetAddress laddr;
 
-  /** Entity reference to transport layer. */  
-  private TransInterface.TransTcpInterface tcpEntity;
+	/** Channel (for blocking implementation). */
+	private Channel channel;
 
-  /** The bind state of the server socket. */  
-  private boolean isBound;
+	/** Reference to the server socket's callback. */
+	private TransInterface.SocketHandler.TcpHandler callback;
 
-  /** The state of the socket (true if socket is closed). */  
-  private boolean isClosed;
+	/** Entity reference to transport layer. */
+	private TransInterface.TransTcpInterface tcpEntity;
 
-  /** Backlog. */  
-  private int backlog;
+	/** The bind state of the server socket. */
+	private boolean isBound;
 
-  /** Indicator if socket is to be bound when created. */  
-  private boolean bindInConstructor;
+	/** The state of the socket (true if socket is closed). */
+	private boolean isClosed;
 
-  /** Current state of the socket. */  
-  private int currentState;
+	/** Backlog. */
+	private int backlog;
 
+	/** Indicator if socket is to be bound when created. */
+	private boolean bindInConstructor;
 
-  //////////////////////////////////////////////////
-  // Proxy Methods
-  //
-  
-  /**
-   * Create an entity reference to itself.
-   */
-  public void createProxy ()
-  {
-    self = (SocketInterface.TcpServerSocketInterface)JistAPI.proxy(
-        this, SocketInterface.TcpServerSocketInterface.class);        
-  }
-  
-  /**
-   * Returns the entity reference to the server socket itself.
-   *
-   * @return Entity reference to TcpServerSocket
-   */
-  public SocketInterface.TcpServerSocketInterface getProxy()
-  {
-    return self;
-  }
+	/** Current state of the socket. */
+	private int currentState;
 
-  /** {@inheritDoc} */
-  public void setTcpEntity (TransInterface.TransTcpInterface tcpEntity)
-  {
-    this.tcpEntity = tcpEntity;
-  }
-  
+	// ////////////////////////////////////////////////
+	// Proxy Methods
+	//
 
-  //////////////////////////////////////////////////
-  // Constructors
-  //
+	/**
+	 * Create an entity reference to itself.
+	 */
+	public void createProxy() {
+		self = (SocketInterface.TcpServerSocketInterface) JistAPI.proxy(this,
+				SocketInterface.TcpServerSocketInterface.class);
+	}
 
-  /**
-   * Creates an unbound server socket.
-   */
-  public TcpServerSocket () 
-  {
-    initializeAll (null, 0, 50, false);
-  }
-  
-  /**
-   * Creates a server socket, bound to the specified port.
-   *
-   * @param port the port number, or 0 to use any free port.
-   */
-  public TcpServerSocket (int port)
-  {
-    this (port, 50, null);
-  }
-  
-  /**
-   * Creates a server socket and binds it to the specified 
-   * local port number, with the specified backlog.
-   *
-   * @param port the specified port, or 0 to use any free port.
-   * @param backlog the maximum length of the queue. 
-   */
-  public TcpServerSocket (int port, int backlog)
-  {
-    this (port, backlog, null);
-  }
-  
-  /**
-   * Creates a server with the specified port, listen backlog, 
-   * and local IP address to bind to.
-   *
-   * @param port the local TCP port
-   * @param backlog the listen backlog
-   * @param bindAddr the local InetAddress the server will bind to 
-   */
-  public TcpServerSocket (int port, int backlog, InetAddress bindAddr)
-  {
-    initializeAll (bindAddr, port, backlog, true);
-  }
-  
-  /** {@inheritDoc} */
-  public void _jistPostInit()
-  {
-    if (bindInConstructor)
-    {
-      bind(new InetSocketAddress(laddr, lport), backlog);
-    }
-  }
+	/**
+	 * Returns the entity reference to the server socket itself.
+	 * 
+	 * @return Entity reference to TcpServerSocket
+	 */
+	public SocketInterface.TcpServerSocketInterface getProxy() {
+		return self;
+	}
 
+	/** {@inheritDoc} */
+	public void setTcpEntity(TransInterface.TransTcpInterface tcpEntity) {
+		this.tcpEntity = tcpEntity;
+	}
 
-  //////////////////////////////////////////////////
-  // Socket methods
-  //
+	// ////////////////////////////////////////////////
+	// Constructors
+	//
 
-  /** {@inheritDoc} */
-  public TcpSocket accept()
-  {
-    // wait for SYN packets
-    currentState = Constants.TCPSTATES.LISTEN;
-    TcpSocket ts = (TcpSocket)channel.receive();
-    // wait for ACK packet
-    ts.establishingConnection ();
-    return ts;
-  }
-  
-  /** {@inheritDoc} */
-  public void bind (SocketAddress bindpoint)
-  {
-    bind(new InetSocketAddress(laddr, lport), 50);
-  }
-  
-  /** {@inheritDoc} */
-  public void bind (SocketAddress endpoint, int backlog)
-  {
-    InetSocketAddress inetAddr = (InetSocketAddress)endpoint;
-    this.lport = inetAddr.getPort();
-    this.laddr = inetAddr.getAddress();
-    this.backlog = backlog;
-    if(isBound)
-    {
-      tcpEntity.delSocketHandler(lport);
-    }
-    tcpEntity.addSocketHandler(this.lport, callback);
-    isBound = true;
-  }
-  
-  /** {@inheritDoc} */
-  public void close ()
-  {
-    if(isBound)
-    {
-      tcpEntity.delSocketHandler(lport);
-      isBound = false;
-    }
-    isClosed = true;
-  }
-  
-  /** {@inheritDoc} */
-  public ServerSocketChannel getChannel ()
-  {
-      throw new RuntimeException("not implemented");
-  }
-  
-  /** {@inheritDoc} */
-  public InetAddress getInetAddress ()
-  {
-     return laddr;
-  }
-  
-  /** {@inheritDoc} */
-  public int getLocalPort ()
-  {
-     return lport;
-  }
-  
-  /** {@inheritDoc} */
-  public SocketAddress getLocalSocketAddress ()
-  {
-    return isBound ? new InetSocketAddress(laddr, lport) : null;
-  }
-  
-  /** {@inheritDoc} */
-  public int getReceiveBufferSize ()
-  {
-    throw new RuntimeException("not implemented");
-  }
-  
-  /** {@inheritDoc} */
-  public boolean getReuseAddress ()
-  {
-    throw new RuntimeException("not implemented");
-  }
-  
-  /** {@inheritDoc} */
-  public int getSoTimeout ()
-  {
-    throw new RuntimeException("not implemented");
-  }
+	/**
+	 * Creates an unbound server socket.
+	 */
+	public TcpServerSocket() {
+		initializeAll(null, 0, 50, false);
+	}
 
-  /**
-   * Subclasses of ServerSocket use this method to override 
-   * accept() to return their own subclass of socket.
-   *
-   * @param s the Socket
-   */  
-  protected void implAccept (Socket s)
-  {
-    throw new RuntimeException("not implemented");
-  }
-  
-  /** {@inheritDoc} */
-  public boolean isBound()
-  {
-    return isBound;
-  }
-  
-  /** {@inheritDoc} */
-  public boolean isClosed()
-  {
-    return isClosed;
-  }
-  
-  /** {@inheritDoc} */
-  public void setReceiveBufferSize (int size)
-  {
-    throw new RuntimeException("not implemented");
-  }
-  
-  /** {@inheritDoc} */
-  public void setReuseAddress (boolean on)
-  {
-    throw new RuntimeException("not implemented");
-  }
-  
-  /**
-   * Sets the server socket implementation factory for the application.
-   *
-   * @param fac the desired factory.
-   */
-  public static void setSocketFactory (SocketImplFactory fac)
-  {
-    throw new RuntimeException("not implemented");
-  }
-  
-  /** {@inheritDoc} */
-  public void setSoTimeout (int timeout)
-  {
-    throw new RuntimeException("not implemented");
-  }
-  
-  /** {@inheritDoc} */
-  public String toString()
-  {
-    return "TcpServerSocket:("+laddr+":"+lport+")";
-  }
-  
+	/**
+	 * Creates a server socket, bound to the specified port.
+	 * 
+	 * @param port
+	 *            the port number, or 0 to use any free port.
+	 */
+	public TcpServerSocket(int port) {
+		this(port, 50, null);
+	}
 
+	/**
+	 * Creates a server socket and binds it to the specified local port number,
+	 * with the specified backlog.
+	 * 
+	 * @param port
+	 *            the specified port, or 0 to use any free port.
+	 * @param backlog
+	 *            the maximum length of the queue.
+	 */
+	public TcpServerSocket(int port, int backlog) {
+		this(port, backlog, null);
+	}
 
-  //////////////////////////////////////////////////
-  // Helper private calls
-  //
+	/**
+	 * Creates a server with the specified port, listen backlog, and local IP
+	 * address to bind to.
+	 * 
+	 * @param port
+	 *            the local TCP port
+	 * @param backlog
+	 *            the listen backlog
+	 * @param bindAddr
+	 *            the local InetAddress the server will bind to
+	 */
+	public TcpServerSocket(int port, int backlog, InetAddress bindAddr) {
+		initializeAll(bindAddr, port, backlog, true);
+	}
 
-  /**
-   * Initializes all of the server socket variables.
-   *
-   * @param lAddr local address
-   * @param lPort local port
-   * @param backlog listen backlog length
-   * @param doBind true if socket is to be bound when created
-   */
-  private void initializeAll (InetAddress lAddr, int lPort, int backlog, boolean doBind)
-  {
-    createProxy();
-    this.lport = lPort;
-    this.laddr = lAddr;
-    this.backlog = backlog;
-    this.channel = JistAPI.createChannel();
-    this.callback = new TcpServerSocketCallback(getProxy());
-    isBound = false;
-    isClosed = false;
-    currentState = Constants.TCPSTATES.CLOSED;
-    bindInConstructor = doBind;
-  }
-  
+	/** {@inheritDoc} */
+	public void _jistPostInit() {
+		if (bindInConstructor) {
+			bind(new InetSocketAddress(laddr, lport), backlog);
+		}
+	}
 
-  //////////////////////////////////////////////////
-  // Accessors and Callback calls
-  //
+	// ////////////////////////////////////////////////
+	// Socket methods
+	//
 
-  /** {@inheritDoc} */
-  public void checkPacketandState(TcpMessage msg, NetAddress src)
-  {
-    
-    if (TcpSocket.PRINTOUT >= TcpSocket.TCP_DEBUG)
-    {
-      System.out.println ("TcpServerSocket::checkPacketandState: " + msg);
-    }
-    
-    switch(currentState)
-    {
-      case Constants.TCPSTATES.LISTEN:
-        // check if we receive a SYN packet
-        if (msg.getSYN() && !msg.getACK())
-        {
-          // create new socket
-          // lport = 0 --> look for random local port         
-          TcpSocket newSocket = new TcpSocket (this.tcpEntity, src.getIP(), 
-          msg.getSrcPort(), laddr, (short)0, msg.getSeqNum(), msg.getWindowSize());
-          // bind the port (have to be done here because this cant be
-          // called in constructor --> will give exception because
-          // the constructor will be continuable)
-          newSocket.bind(new InetSocketAddress(laddr, 0));
-          // send SYNACK packet back
-          newSocket.sendSYNACKPacket ();
-          // start reset timer
-          //newSocket.getProxy().startResetTimer();
-          // send the new socket back
-          channel.sendNonBlock (newSocket, true, false);
-        }
-        break;
-      default:
-        break;
-    }
-  }
+	/** {@inheritDoc} */
+	public TcpSocket accept() {
+		// wait for SYN packets
+		currentState = Constants.TCPSTATES.LISTEN;
+		TcpSocket ts = (TcpSocket) channel.receive();
+		// wait for ACK packet
+		ts.establishingConnection();
+		return ts;
+	}
 
+	/** {@inheritDoc} */
+	public void bind(SocketAddress bindpoint) {
+		bind(new InetSocketAddress(laddr, lport), 50);
+	}
 
-  //////////////////////////////////////////////////
-  // Private methods
-  //
-  
-  /** 
-   * Method to get a random sequence number.
-   *
-   * @return random number less than 1000000
-   */
-  public static int getRandomSequenceNumber ()
-  {
-    return (StrictMath.abs(Constants.random.nextInt()) % 1000000);
-  }
-  
-  
-  //////////////////////////////////////////////////
-  // TcpServerSocket callback
-  //
-  
-  /**
-   * Implementation of Socket Callback for TcpServerSocket.
-   */
-  public static class TcpServerSocketCallback implements TransInterface.SocketHandler.TcpHandler
-  {
-    
-    /** Entity reference to TcpServerSocket. */
-    private SocketInterface.TcpServerSocketInterface serverSocketEntity;
+	/** {@inheritDoc} */
+	public void bind(SocketAddress endpoint, int backlog) {
+		InetSocketAddress inetAddr = (InetSocketAddress) endpoint;
+		this.lport = inetAddr.getPort();
+		this.laddr = inetAddr.getAddress();
+		this.backlog = backlog;
+		if (isBound) {
+			tcpEntity.delSocketHandler(lport);
+		}
+		tcpEntity.addSocketHandler(this.lport, callback);
+		isBound = true;
+	}
 
-    /**
-     * Constructor.
-     *
-     * @param entity the entity reference to TcpServerSocket
-     */
-    public TcpServerSocketCallback(SocketInterface.TcpServerSocketInterface entity)
-    {
-      serverSocketEntity = entity;
-    }
+	/** {@inheritDoc} */
+	public void close() {
+		if (isBound) {
+			tcpEntity.delSocketHandler(lport);
+			isBound = false;
+		}
+		isClosed = true;
+	}
 
-    /** {@inheritDoc} */
-    public void receive(Message msg, NetAddress src, int srcPort)
-    {
-      serverSocketEntity.checkPacketandState ((TcpMessage)msg, src);
-    }
+	/** {@inheritDoc} */
+	public ServerSocketChannel getChannel() {
+		throw new RuntimeException("not implemented");
+	}
 
-  } // class: TcpServerSocketCallback
+	/** {@inheritDoc} */
+	public InetAddress getInetAddress() {
+		return laddr;
+	}
+
+	/** {@inheritDoc} */
+	public int getLocalPort() {
+		return lport;
+	}
+
+	/** {@inheritDoc} */
+	public SocketAddress getLocalSocketAddress() {
+		return isBound ? new InetSocketAddress(laddr, lport) : null;
+	}
+
+	/** {@inheritDoc} */
+	public int getReceiveBufferSize() {
+		throw new RuntimeException("not implemented");
+	}
+
+	/** {@inheritDoc} */
+	public boolean getReuseAddress() {
+		throw new RuntimeException("not implemented");
+	}
+
+	/** {@inheritDoc} */
+	public int getSoTimeout() {
+		throw new RuntimeException("not implemented");
+	}
+
+	/**
+	 * Subclasses of ServerSocket use this method to override accept() to return
+	 * their own subclass of socket.
+	 * 
+	 * @param s
+	 *            the Socket
+	 */
+	protected void implAccept(Socket s) {
+		throw new RuntimeException("not implemented");
+	}
+
+	/** {@inheritDoc} */
+	public boolean isBound() {
+		return isBound;
+	}
+
+	/** {@inheritDoc} */
+	public boolean isClosed() {
+		return isClosed;
+	}
+
+	/** {@inheritDoc} */
+	public void setReceiveBufferSize(int size) {
+		throw new RuntimeException("not implemented");
+	}
+
+	/** {@inheritDoc} */
+	public void setReuseAddress(boolean on) {
+		throw new RuntimeException("not implemented");
+	}
+
+	/**
+	 * Sets the server socket implementation factory for the application.
+	 * 
+	 * @param fac
+	 *            the desired factory.
+	 */
+	public static void setSocketFactory(SocketImplFactory fac) {
+		throw new RuntimeException("not implemented");
+	}
+
+	/** {@inheritDoc} */
+	public void setSoTimeout(int timeout) {
+		throw new RuntimeException("not implemented");
+	}
+
+	/** {@inheritDoc} */
+	public String toString() {
+		return "TcpServerSocket:(" + laddr + ":" + lport + ")";
+	}
+
+	// ////////////////////////////////////////////////
+	// Helper private calls
+	//
+
+	/**
+	 * Initializes all of the server socket variables.
+	 * 
+	 * @param lAddr
+	 *            local address
+	 * @param lPort
+	 *            local port
+	 * @param backlog
+	 *            listen backlog length
+	 * @param doBind
+	 *            true if socket is to be bound when created
+	 */
+	private void initializeAll(InetAddress lAddr, int lPort, int backlog,
+			boolean doBind) {
+		createProxy();
+		this.lport = lPort;
+		this.laddr = lAddr;
+		this.backlog = backlog;
+		this.channel = JistAPI.createChannel();
+		this.callback = new TcpServerSocketCallback(getProxy());
+		isBound = false;
+		isClosed = false;
+		currentState = Constants.TCPSTATES.CLOSED;
+		bindInConstructor = doBind;
+	}
+
+	// ////////////////////////////////////////////////
+	// Accessors and Callback calls
+	//
+
+	/** {@inheritDoc} */
+	public void checkPacketandState(TcpMessage msg, NetAddress src) {
+
+		if (TcpSocket.PRINTOUT >= TcpSocket.TCP_DEBUG) {
+			System.out.println("TcpServerSocket::checkPacketandState: " + msg);
+		}
+
+		switch (currentState) {
+		case Constants.TCPSTATES.LISTEN:
+			// check if we receive a SYN packet
+			if (msg.getSYN() && !msg.getACK()) {
+				// create new socket
+				// lport = 0 --> look for random local port
+				TcpSocket newSocket = new TcpSocket(this.tcpEntity,
+						src.getIP(), msg.getSrcPort(), laddr, (short) 0,
+						msg.getSeqNum(), msg.getWindowSize());
+				// bind the port (have to be done here because this cant be
+				// called in constructor --> will give exception because
+				// the constructor will be continuable)
+				newSocket.bind(new InetSocketAddress(laddr, 0));
+				// send SYNACK packet back
+				newSocket.sendSYNACKPacket();
+				// start reset timer
+				// newSocket.getProxy().startResetTimer();
+				// send the new socket back
+				channel.sendNonBlock(newSocket, true, false);
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+	// ////////////////////////////////////////////////
+	// Private methods
+	//
+
+	/**
+	 * Method to get a random sequence number.
+	 * 
+	 * @return random number less than 1000000
+	 */
+	public static int getRandomSequenceNumber() {
+		return (StrictMath.abs(Constants.random.nextInt()) % 1000000);
+	}
+
+	// ////////////////////////////////////////////////
+	// TcpServerSocket callback
+	//
+
+	/**
+	 * Implementation of Socket Callback for TcpServerSocket.
+	 */
+	public static class TcpServerSocketCallback implements
+			TransInterface.SocketHandler.TcpHandler {
+
+		/** Entity reference to TcpServerSocket. */
+		private SocketInterface.TcpServerSocketInterface serverSocketEntity;
+
+		/**
+		 * Constructor.
+		 * 
+		 * @param entity
+		 *            the entity reference to TcpServerSocket
+		 */
+		public TcpServerSocketCallback(
+				SocketInterface.TcpServerSocketInterface entity) {
+			serverSocketEntity = entity;
+		}
+
+		/** {@inheritDoc} */
+		public void receive(Message msg, NetAddress src, int srcPort) {
+			serverSocketEntity.checkPacketandState((TcpMessage) msg, src);
+		}
+
+	} // class: TcpServerSocketCallback
 
 } // class: TcpServerSocket
 

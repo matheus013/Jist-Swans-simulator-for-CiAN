@@ -23,24 +23,35 @@ import jist.swans.route.RouteAodv.AodvStats;
 
 /**
  * StatsCollector - capable version of AodvStats for DUCKS
+ * 
  * @author Elmar Schoch
- *
+ * 
  */
 public class DucksAodvStats extends AodvStats implements StatsCollector {
 
 	public ExtendedProperties getStats() {
 		ExtendedProperties stats = new ExtendedProperties();
 
-		stats.put("ducks.routing.aodv.rreq.sent", Long.toString(send.rreqPackets));  
-		stats.put("ducks.routing.aodv.rreq.recv", Long.toString(recv.rreqPackets));
-		stats.put("ducks.routing.aodv.rrep.sent", Long.toString(send.rrepPackets));
-		stats.put("ducks.routing.aodv.rrep.recv", Long.toString(recv.rrepPackets));
-		stats.put("ducks.routing.aodv.rerr.sent", Long.toString(send.rerrPackets));
-		stats.put("ducks.routing.aodv.rerr.recv", Long.toString(recv.rerrPackets));
-		stats.put("ducks.routing.aodv.hello.sent", Long.toString(send.helloPackets));
-		stats.put("ducks.routing.aodv.hello.recv", Long.toString(recv.helloPackets));
-		stats.put("ducks.routing.aodv.total.sent", Long.toString(send.aodvPackets));
-		stats.put("ducks.routing.aodv.total.recv", Long.toString(recv.aodvPackets));
+		stats.put("ducks.routing.aodv.rreq.sent",
+				Long.toString(send.rreqPackets));
+		stats.put("ducks.routing.aodv.rreq.recv",
+				Long.toString(recv.rreqPackets));
+		stats.put("ducks.routing.aodv.rrep.sent",
+				Long.toString(send.rrepPackets));
+		stats.put("ducks.routing.aodv.rrep.recv",
+				Long.toString(recv.rrepPackets));
+		stats.put("ducks.routing.aodv.rerr.sent",
+				Long.toString(send.rerrPackets));
+		stats.put("ducks.routing.aodv.rerr.recv",
+				Long.toString(recv.rerrPackets));
+		stats.put("ducks.routing.aodv.hello.sent",
+				Long.toString(send.helloPackets));
+		stats.put("ducks.routing.aodv.hello.recv",
+				Long.toString(recv.helloPackets));
+		stats.put("ducks.routing.aodv.total.sent",
+				Long.toString(send.aodvPackets));
+		stats.put("ducks.routing.aodv.total.recv",
+				Long.toString(recv.aodvPackets));
 		stats.put("ducks.routing.aodv.rreq", Long.toString(rreqOrig));
 		stats.put("ducks.routing.aodv.rrep", Long.toString(rrepOrig));
 		stats.put("ducks.routing.aodv.rreq.succ", Long.toString(rreqSucc));
@@ -57,11 +68,11 @@ public class DucksAodvStats extends AodvStats implements StatsCollector {
 		stats[5] = "ducks.routing.aodv.rerr.recv";
 		stats[6] = "ducks.routing.aodv.hello.sent";
 		stats[7] = "ducks.routing.aodv.hello.recv";
-	    stats[8] = "ducks.routing.aodv.total.sent";
-	    stats[9] = "ducks.routing.aodv.total.recv";
-	    stats[10] = "ducks.routing.aodv.rreq";
-	    stats[11] = "ducks.routing.aodv.rrep";
-	    stats[12] = "ducks.routing.aodv.rreq.succ";
+		stats[8] = "ducks.routing.aodv.total.sent";
+		stats[9] = "ducks.routing.aodv.total.recv";
+		stats[10] = "ducks.routing.aodv.rreq";
+		stats[11] = "ducks.routing.aodv.rrep";
+		stats[12] = "ducks.routing.aodv.rreq.succ";
 		return stats;
 	}
 

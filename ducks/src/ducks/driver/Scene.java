@@ -22,20 +22,17 @@ import jist.swans.field.Field;
 import ext.util.ExtendedProperties;
 
 /**
- * The Scene interface needs to be implemented by a class which wants
- * to replace the GenericScene implementation within the DUCKS driver
- * model. If the GenericDriver is not to be used, this is of course
- * not required.
+ * The Scene interface needs to be implemented by a class which wants to replace
+ * the GenericScene implementation within the DUCKS driver model. If the
+ * GenericDriver is not to be used, this is of course not required.
  * 
  * @author Elmar Schoch
- *
+ * 
  */
 public interface Scene extends DucksDriverModule {
 
-	
-	
 	public void setGlobalConfig(ExtendedProperties config);
-	
+
 	public Field getField();
 
 }

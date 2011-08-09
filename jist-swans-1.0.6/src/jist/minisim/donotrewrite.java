@@ -14,44 +14,36 @@ import jist.runtime.JistAPI;
 /**
  * Hello World of simulations, but with rewritting DISABLED. In other words,
  * none of the JiST API functions will work. They will throw exceptions.
- *
+ * 
  * @author Rimon Barr &lt;barr+jist@cs.cornell.edu&gt;
  * @version $Id: donotrewrite.java,v 1.2 2004-12-02 16:08:54 barr Exp $
  * @since JIST1.0
  */
-public class donotrewrite implements JistAPI.Entity, JistAPI.DoNotRewrite
-{
-  public void myEvent()
-  {
-    ///////////////////////////////////////////////////////
-    // this line would throw an exception, because the 
-    // rewriter has been turned off for this class!
-    ///////////////////////////////////////////////////////
-    JistAPI.sleep(1);
-    myEvent();
-    System.out.println("hello world, t="
-        +JistAPI.getTime());
-    // delay execution
-    try 
-    { 
-      Thread.sleep(500); 
-    }
-    catch(InterruptedException e) 
-    { 
-    }
-  }
+public class donotrewrite implements JistAPI.Entity, JistAPI.DoNotRewrite {
+	public void myEvent() {
+		// /////////////////////////////////////////////////////
+		// this line would throw an exception, because the
+		// rewriter has been turned off for this class!
+		// /////////////////////////////////////////////////////
+		JistAPI.sleep(1);
+		myEvent();
+		System.out.println("hello world, t=" + JistAPI.getTime());
+		// delay execution
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+		}
+	}
 
-  public static void main(String[] args)
-  {
-    System.out.println("starting simulation.");
-    donotrewrite h = new donotrewrite();
-    ///////////////////////////////////////////////////////
-    // this line will not actually schedule an event...
-    // it is a regular function call, because the rewriter
-    // has been turned off for this class!
-    ///////////////////////////////////////////////////////
-    h.myEvent();
-  }
+	public static void main(String[] args) {
+		System.out.println("starting simulation.");
+		donotrewrite h = new donotrewrite();
+		// /////////////////////////////////////////////////////
+		// this line will not actually schedule an event...
+		// it is a regular function call, because the rewriter
+		// has been turned off for this class!
+		// /////////////////////////////////////////////////////
+		h.myEvent();
+	}
 
 }
-

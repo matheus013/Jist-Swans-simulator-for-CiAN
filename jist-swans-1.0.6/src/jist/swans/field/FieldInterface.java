@@ -15,49 +15,55 @@ import jist.swans.misc.Message;
 
 import jist.runtime.JistAPI;
 
-/** 
+/**
  * Interface for Field entities.
- *
+ * 
  * @author Rimon Barr &lt;barr+jist@cs.cornell.edu&gt;
  * @version $Id: FieldInterface.java,v 1.17 2004-04-06 16:07:47 barr Exp $
  * @since SWANS1.0
  */
 
-public interface FieldInterface extends JistAPI.Proxiable
-{
+public interface FieldInterface extends JistAPI.Proxiable {
 
-  //////////////////////////////////////////////////
-  // communication
-  //
+	// ////////////////////////////////////////////////
+	// communication
+	//
 
-  /**
-   * Transmit physical-layer message. Called from radio entity.
-   *
-   * @param srcInfo source radio information
-   * @param msg physical layer packet
-   * @param duration transmission duration
-   */
-  void transmit(RadioInfo srcInfo, Message msg, long duration);
+	/**
+	 * Transmit physical-layer message. Called from radio entity.
+	 * 
+	 * @param srcInfo
+	 *            source radio information
+	 * @param msg
+	 *            physical layer packet
+	 * @param duration
+	 *            transmission duration
+	 */
+	void transmit(RadioInfo srcInfo, Message msg, long duration);
 
-  //////////////////////////////////////////////////
-  // radio management
-  //
+	// ////////////////////////////////////////////////
+	// radio management
+	//
 
-  /**
-   * Move radio to different location on field.
-   *
-   * @param id unique radio identifier
-   * @param loc new radio coordinates
-   */
-  void moveRadio(Integer id, Location loc);
+	/**
+	 * Move radio to different location on field.
+	 * 
+	 * @param id
+	 *            unique radio identifier
+	 * @param loc
+	 *            new radio coordinates
+	 */
+	void moveRadio(Integer id, Location loc);
 
-  /**
-   * Move radio to different relative location on field.
-   *
-   * @param id unique radio identifier
-   * @param delta radio offset coordinates
-   */
-  void moveRadioOff(Integer id, Location delta);
+	/**
+	 * Move radio to different relative location on field.
+	 * 
+	 * @param id
+	 *            unique radio identifier
+	 * @param delta
+	 *            radio offset coordinates
+	 */
+	void moveRadioOff(Integer id, Location delta);
 
 } // interface: FieldInterface
 

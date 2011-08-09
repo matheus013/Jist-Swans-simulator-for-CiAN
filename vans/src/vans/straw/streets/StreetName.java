@@ -33,103 +33,105 @@ package vans.straw.streets;
 
 /**
  * @author David Choffnes &lt;drchoffnes@cs.northwestern.edu&gt;
- *
+ * 
  *         The StreetName class stores information about a street name.
  */
 public class StreetName {
 	/** prefix (e.g, North, South, ...) */
-    String prefix;
-    /** street name */
-    String name;
-    /** street type */
-    String type;
-    /** suffix (e.g., St, Rd, Blvd, etc) */
-    String suffix;
+	String prefix;
+	/** street name */
+	String name;
+	/** street type */
+	String type;
+	/** suffix (e.g., St, Rd, Blvd, etc) */
+	String suffix;
 
+	/**
+	 * @param prefix
+	 * @param name
+	 * @param type
+	 * @param suffix
+	 */
+	public StreetName(String prefix, String name, String type, String suffix) {
+		super();
+		this.prefix = prefix.trim();
+		this.name = name.trim();
+		this.type = type.trim();
+		this.suffix = suffix.trim();
+	}
 
-    /**
-     * @param prefix
-     * @param name
-     * @param type
-     * @param suffix
-     */
-    public StreetName(String prefix, String name, String type, String suffix) {
-        super();
-        this.prefix = prefix.trim();
-        this.name = name.trim();
-        this.type = type.trim();
-        this.suffix = suffix.trim();
-    }
-
-    /**
+	/**
      * 
      */
-    public StreetName() {
+	public StreetName() {
 
-        this.prefix = "";
-        this.name = "No name";
-        this.type = "";
-        this.suffix = "";
-    }
+		this.prefix = "";
+		this.name = "No name";
+		this.type = "";
+		this.suffix = "";
+	}
 
-    /**
-     * @return Returns the name.
-     */
-    public String getName() {
-        return name;
-    }
+	/**
+	 * @return Returns the name.
+	 */
+	public String getName() {
+		return name;
+	}
 
-    /**
-     * @param name The name to set.
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
+	/**
+	 * @param name
+	 *            The name to set.
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    /**
-     * @return Returns the prefix.
-     */
-    public String getPrefix() {
-        return prefix;
-    }
+	/**
+	 * @return Returns the prefix.
+	 */
+	public String getPrefix() {
+		return prefix;
+	}
 
-    /**
-     * @param prefix The prefix to set.
-     */
-    public void setPrefix(String prefix) {
-        this.prefix = prefix;
-    }
+	/**
+	 * @param prefix
+	 *            The prefix to set.
+	 */
+	public void setPrefix(String prefix) {
+		this.prefix = prefix;
+	}
 
-    /**
-     * @return Returns the suffix.
-     */
-    public String getSuffix() {
-        return suffix;
-    }
+	/**
+	 * @return Returns the suffix.
+	 */
+	public String getSuffix() {
+		return suffix;
+	}
 
-    /**
-     * @param suffix The suffix to set.
-     */
-    public void setSuffix(String suffix) {
-        this.suffix = suffix;
-    }
+	/**
+	 * @param suffix
+	 *            The suffix to set.
+	 */
+	public void setSuffix(String suffix) {
+		this.suffix = suffix;
+	}
 
-    /**
-     * @return Returns the type.
-     */
-    public String getType() {
-        return type;
-    }
+	/**
+	 * @return Returns the type.
+	 */
+	public String getType() {
+		return type;
+	}
 
-    /**
-     * @param type The type to set.
-     */
-    public void setType(String type) {
-        this.type = type;
-    }
+	/**
+	 * @param type
+	 *            The type to set.
+	 */
+	public void setType(String type) {
+		this.type = type;
+	}
 
-    public String toString()
-    {
-        return prefix.trim() + " " + name.trim() + " " + suffix.trim();
-    }
+	public String toString() {
+		return prefix.trim() + " " + name.trim() + " " + suffix.trim();
+	}
 }

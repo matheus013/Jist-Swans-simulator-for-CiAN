@@ -11,32 +11,33 @@ package jist.swans.misc;
 
 /**
  * Interface of all packets sent around the various SWANS layers.
- *
+ * 
  * @author Rimon Barr &lt;barr+jist@cs.cornell.edu&gt;
  * @version $Id: Message.java,v 1.6 2004-04-06 16:07:48 barr Exp $
  * @since SWANS1.0
  */
 
-public interface Message extends jist.runtime.JistAPI.Timeless
-{
+public interface Message extends jist.runtime.JistAPI.Timeless {
 
-  /** A null/empty message. */
-  Message NULL = new MessageBytes(MessageBytes.EMPTY);
+	/** A null/empty message. */
+	Message NULL = new MessageBytes(MessageBytes.EMPTY);
 
-  /**
-   * Return packet size or Constants.ZERO_WIRE_SIZE.
-   *
-   * @return packet size
-   */
-  int getSize();
+	/**
+	 * Return packet size or Constants.ZERO_WIRE_SIZE.
+	 * 
+	 * @return packet size
+	 */
+	int getSize();
 
-  /**
-   * Store packet into byte array.
-   *
-   * @param msg destination byte array
-   * @param offset byte array starting offset
-   */
-  void getBytes(byte[] msg, int offset);
+	/**
+	 * Store packet into byte array.
+	 * 
+	 * @param msg
+	 *            destination byte array
+	 * @param offset
+	 *            byte array starting offset
+	 */
+	void getBytes(byte[] msg, int offset);
 
 } // interface Message
 

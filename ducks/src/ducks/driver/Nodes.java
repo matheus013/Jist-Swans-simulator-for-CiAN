@@ -22,16 +22,17 @@ import ext.util.ExtendedProperties;
 
 /**
  * The Nodes interface is required to be implemented by a class that shall
- * represent the nodes collection of the simulation, at least if the
- * higher level class (GenericDriver) is to be used.
- * If the GenericDriver is not used as provided by Ducks, the own
- * implementation may of course process nodes totally different.
+ * represent the nodes collection of the simulation, at least if the higher
+ * level class (GenericDriver) is to be used. If the GenericDriver is not used
+ * as provided by Ducks, the own implementation may of course process nodes
+ * totally different.
  * 
  * @author Elmar Schoch
- *
+ * 
  */
 public interface Nodes extends DucksDriverModule {
 
 	public void setScene(Scene scene);
+
 	public void setGlobalConfig(ExtendedProperties config);
 }

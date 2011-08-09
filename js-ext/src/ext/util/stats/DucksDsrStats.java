@@ -24,29 +24,42 @@ import jist.swans.route.RouteDsr.DsrStats;
 
 /**
  * StatsCollector - capable version of DsrStats for DUCKS
+ * 
  * @author Elmar Schoch
- *
+ * 
  */
 public class DucksDsrStats extends DsrStats implements StatsCollector {
 
 	public ExtendedProperties getStats() {
 		ExtendedProperties stats = new ExtendedProperties();
 
-		stats.put("ducks.routing.dsr.rreq.sent.orig", Long.toString(originated.rreqPackets));
-		stats.put("ducks.routing.dsr.rreq.sent.forward", Long.toString(forwarded.rreqPackets));
-		stats.put("ducks.routing.dsr.rreq.recv", Long.toString(recv.rreqPackets));
-		
-		stats.put("ducks.routing.dsr.rrep.sent.orig", Long.toString(originated.rrepPackets));
-		stats.put("ducks.routing.dsr.rrep.sent.forwarded", Long.toString(forwarded.rrepPackets));
-		stats.put("ducks.routing.dsr.rrep.recv", Long.toString(recv.rrepPackets));
-		
-		stats.put("ducks.routing.dsr.rerr.sent.orig", Long.toString(originated.rerrPackets));
-		stats.put("ducks.routing.dsr.rerr.sent.forward", Long.toString(forwarded.rerrPackets));
-		stats.put("ducks.routing.dsr.rerr.recv", Long.toString(recv.rerrPackets));
-		
-		stats.put("ducks.routing.dsr.total.sent.orig", Long.toString(originated.totalDsrPackets()));
-		stats.put("ducks.routing.dsr.total.sent.forward", Long.toString(forwarded.totalDsrPackets()));
-		stats.put("ducks.routing.dsr.total.recv", Long.toString(recv.totalDsrPackets()));
+		stats.put("ducks.routing.dsr.rreq.sent.orig",
+				Long.toString(originated.rreqPackets));
+		stats.put("ducks.routing.dsr.rreq.sent.forward",
+				Long.toString(forwarded.rreqPackets));
+		stats.put("ducks.routing.dsr.rreq.recv",
+				Long.toString(recv.rreqPackets));
+
+		stats.put("ducks.routing.dsr.rrep.sent.orig",
+				Long.toString(originated.rrepPackets));
+		stats.put("ducks.routing.dsr.rrep.sent.forwarded",
+				Long.toString(forwarded.rrepPackets));
+		stats.put("ducks.routing.dsr.rrep.recv",
+				Long.toString(recv.rrepPackets));
+
+		stats.put("ducks.routing.dsr.rerr.sent.orig",
+				Long.toString(originated.rerrPackets));
+		stats.put("ducks.routing.dsr.rerr.sent.forward",
+				Long.toString(forwarded.rerrPackets));
+		stats.put("ducks.routing.dsr.rerr.recv",
+				Long.toString(recv.rerrPackets));
+
+		stats.put("ducks.routing.dsr.total.sent.orig",
+				Long.toString(originated.totalDsrPackets()));
+		stats.put("ducks.routing.dsr.total.sent.forward",
+				Long.toString(forwarded.totalDsrPackets()));
+		stats.put("ducks.routing.dsr.total.recv",
+				Long.toString(recv.totalDsrPackets()));
 		return stats;
 	}
 
@@ -61,9 +74,9 @@ public class DucksDsrStats extends DsrStats implements StatsCollector {
 		stats[6] = "ducks.routing.dsr.rerr.sent.orig";
 		stats[7] = "ducks.routing.dsr.rerr.sent.forward";
 		stats[8] = "ducks.routing.dsr.rerr.recv";
-	    stats[9] = "ducks.routing.dsr.total.sent.orig";
-	    stats[10] = "ducks.routing.dsr.total.sent.forward";
-	    stats[11] = "ducks.routing.dsr.total.recv";
+		stats[9] = "ducks.routing.dsr.total.sent.orig";
+		stats[10] = "ducks.routing.dsr.total.sent.forward";
+		stats[11] = "ducks.routing.dsr.total.recv";
 		return stats;
 	}
 

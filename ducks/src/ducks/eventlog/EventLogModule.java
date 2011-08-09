@@ -28,10 +28,12 @@ import jist.swans.field.Field;
  * Interface for all event log modules.
  * 
  * @author Stefan Schlott
- *
+ * 
  */
 public interface EventLogModule extends DoNotRewrite {
 	public void configure(Field field, Properties config, String configPrefix);
+
 	public void enable();
+
 	public void disable();
 }

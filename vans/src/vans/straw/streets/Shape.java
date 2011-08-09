@@ -31,32 +31,35 @@
  */
 package vans.straw.streets;
 
-
 import jist.swans.misc.Location;
 
 /**
  * @author David Choffnes &lt;drchoffnes@cs.northwestern.edu&gt;
- *
+ * 
  *         The Shape class represents the shape of a RoadSegment.
  */
 public class Shape {
-    public final Location points[];
+	public final Location points[];
 
-    /**
-     * @param points array of points along the RoadSegment
-     */
-    public Shape(Location[] points) {
-        super();
-        this.points = points;
-    }
+	/**
+	 * @param points
+	 *            array of points along the RoadSegment
+	 */
+	public Shape(Location[] points) {
+		super();
+		this.points = points;
+	}
 
-    /* (non-Javadoc)
-    * @see java.lang.Object#toString()
-    */
-    public String toString() {
-        String s = "";
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString() {
+		String s = "";
 
-        for (int i = 0; i < points.length; i++) s += "[" + i + "] " + points[i];
-        return s;
-    }
+		for (int i = 0; i < points.length; i++)
+			s += "[" + i + "] " + points[i];
+		return s;
+	}
 }

@@ -19,8 +19,7 @@
  */
 
 package vans.net;
- 
- 
+
 import java.net.InetAddress;
 
 import ext.util.Region;
@@ -30,14 +29,13 @@ import jist.swans.net.NetAddress;
  * A geographic network address.
  * 
  * Geographic addresses consist of a Region elemtent that specifies the
- * destination area and an InetAddress that indicated addressing modes.
- * A real implementation might store this additional data in an IPv4
- * option field. Using this interface is simply a matter of convenience.
+ * destination area and an InetAddress that indicated addressing modes. A real
+ * implementation might store this additional data in an IPv4 option field.
+ * Using this interface is simply a matter of convenience.
  * 
- * NetAddressGeo(r, NetAddress.NULL) -> Geobroadcast, Geocast
- * NetAddressGeo(r, NetAddress.ANY)  -> Geoanycast
- * NetAddressGeo(r, NetAddress(ip))  -> Geounicast
- * NetAddressGeo(r, NetAddress(ip))  -> Geomulticast (not implemented yet)
+ * NetAddressGeo(r, NetAddress.NULL) -> Geobroadcast, Geocast NetAddressGeo(r,
+ * NetAddress.ANY) -> Geoanycast NetAddressGeo(r, NetAddress(ip)) -> Geounicast
+ * NetAddressGeo(r, NetAddress(ip)) -> Geomulticast (not implemented yet)
  * 
  * @author Michael Feiri &lt;michael.feiri@uni-ulm.de&gt;
  */
@@ -55,14 +53,17 @@ public class NetAddressGeo extends NetAddress {
 		super(n.getIP());
 		this.region = r;
 	}
+
 	public NetAddressGeo(Region r, InetAddress ip) {
 		super(ip);
 		this.region = r;
 	}
+
 	public NetAddressGeo(Region r, byte[] addr) {
 		super(addr);
 		this.region = r;
 	}
+
 	public NetAddressGeo(Region r, int i) {
 		super(i);
 		this.region = r;
@@ -75,22 +76,27 @@ public class NetAddressGeo extends NetAddress {
 
 	/** {@inheritDoc} */
 	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (!(o instanceof NetAddressGeo)) return false; 
+		if (this == o)
+			return true;
+		if (!(o instanceof NetAddressGeo))
+			return false;
 		NetAddressGeo nag = (NetAddressGeo) o;
-	    if (!this.getIP().equals(nag.getIP())) return false;
-		if (!this.region.equals(nag.region)) return false;
+		if (!this.getIP().equals(nag.getIP()))
+			return false;
+		if (!this.region.equals(nag.region))
+			return false;
 		return true;
 	}
 
 	/** {@inheritDoc} */
 	public String toString() {
-		return new String("IP:" + super.toString() + " Geo:" + region.toString());
+		return new String("IP:" + super.toString() + " Geo:"
+				+ region.toString());
 	}
 
 	/** {@inheritDoc} */
 	public int getSize() {
-		return super.getSize()+region.getSize();
+		return super.getSize() + region.getSize();
 	}
 
 	/**
@@ -101,5 +107,5 @@ public class NetAddressGeo extends NetAddress {
 	public Region getRegion() {
 		return region;
 	}
-	
+
 }

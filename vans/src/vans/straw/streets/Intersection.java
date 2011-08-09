@@ -41,464 +41,472 @@ import java.util.*;
 
 /**
  * @author David Choffnes &lt;drchoffnes@cs.northwestern.edu&gt;
- *
- *         The Intersection class represents a convergence of one or
- *         more RoadSegments. This class maintains information regarding
- *         numbers of streets and types of traffic control in addition to
- *         performing the traffic control itself.
+ * 
+ *         The Intersection class represents a convergence of one or more
+ *         RoadSegments. This class maintains information regarding numbers of
+ *         streets and types of traffic control in addition to performing the
+ *         traffic control itself.
  */
 public class Intersection {
 	/** segments at this intersection */
-    LinkedList segments;
-    /** Location of this intersection. */
-    final Location loc;
-    /** number of unique streets at intersection */
-    int numberOfStreets=0;
-    /** street indexes, for access to RoadSegment objects */
-    Vector streetIndexes = new Vector();
-    /** debug switch */
-    final static boolean DEBUG = false;
-    
-    /** constants for intersection types */
-    int numRural = 0;
-    int numSecondary = 0;
-    int numUSHighway = 0;
-    int numInterstate = 0;
-    int numRamps = 0;
+	LinkedList segments;
+	/** Location of this intersection. */
+	final Location loc;
+	/** number of unique streets at intersection */
+	int numberOfStreets = 0;
+	/** street indexes, for access to RoadSegment objects */
+	Vector streetIndexes = new Vector();
+	/** debug switch */
+	final static boolean DEBUG = false;
 
-    /* synchronization fields for stop sign interaction */
-    int currentStreet = -1;
-    boolean occupied = false;
-    /** Queue of nodes waiting to cross intersection */
-    LinkedList waiting = new LinkedList();
-    /** SMI for vehicle crossing intersection */
-    private StreetMobilityInfo occupier = null;
-    
-    /** The time to spend stopped when there is no contention at intersection. */
-    private static final int STOP_SIGN_PAUSE_NO_CONTENTION = 1;
-    /** the time for a vehicle to clear the intersection */
-    private static final int STOP_SIGN_WAIT = 3;
+	/** constants for intersection types */
+	int numRural = 0;
+	int numSecondary = 0;
+	int numUSHighway = 0;
+	int numInterstate = 0;
+	int numRamps = 0;
 
-    /**
-     * The intersection constructor.
-     *
-     * @param loc the location of the intersection
-     */
-    public Intersection(Location loc) {
-        super();
-        this.loc = loc;
-        this.segments = new LinkedList();
-    }
+	/* synchronization fields for stop sign interaction */
+	int currentStreet = -1;
+	boolean occupied = false;
+	/** Queue of nodes waiting to cross intersection */
+	LinkedList waiting = new LinkedList();
+	/** SMI for vehicle crossing intersection */
+	private StreetMobilityInfo occupier = null;
 
-    /**
-     * Adds a street to the intersection and updates data structures.
-     *
-     * @param rs the RoadSegment to add.
-     */
-    public void addStreet(RoadSegment rs)
-    {
-        /* for counting unique streets */
-        RoadSegment next;
-        boolean found = false;
+	/** The time to spend stopped when there is no contention at intersection. */
+	private static final int STOP_SIGN_PAUSE_NO_CONTENTION = 1;
+	/** the time for a vehicle to clear the intersection */
+	private static final int STOP_SIGN_WAIT = 3;
 
-        segments.add(rs); // add to list   
+	/**
+	 * The intersection constructor.
+	 * 
+	 * @param loc
+	 *            the location of the intersection
+	 */
+	public Intersection(Location loc) {
+		super();
+		this.loc = loc;
+		this.segments = new LinkedList();
+	}
 
-        // increment number of unique streets 
-        ListIterator it = segments.listIterator();
-        while (it.hasNext())
-        {
-            next = (RoadSegment)it.next();
-            if (next.streetIndex==rs.streetIndex && next.selfIndex != rs.selfIndex)
-            {                
-                found = true;
-                break;
-            }
-        }
-        if (!found)
-        {
-            streetIndexes.add(new Integer(rs.streetIndex));
-            numberOfStreets++;
-            incrementRoadType(rs.getRoadClass());
-        }
-    }
+	/**
+	 * Adds a street to the intersection and updates data structures.
+	 * 
+	 * @param rs
+	 *            the RoadSegment to add.
+	 */
+	public void addStreet(RoadSegment rs) {
+		/* for counting unique streets */
+		RoadSegment next;
+		boolean found = false;
 
-    /**
-     * Increments counters according to road type.
-     * @param roadClass the character representing the road class.
-     */
-    private void incrementRoadType(char roadClass) {
-        // Primary Road with limited access/ Interstate Highway - unseparated
-        if (roadClass >= 11 && roadClass <= 14)
-            numInterstate++;
+		segments.add(rs); // add to list
 
-            // Primary Road with limited access/ Interstate Highway - separated
-        else if (roadClass >= 15 && roadClass <= 18)
-            numInterstate++;
+		// increment number of unique streets
+		ListIterator it = segments.listIterator();
+		while (it.hasNext()) {
+			next = (RoadSegment) it.next();
+			if (next.streetIndex == rs.streetIndex
+					&& next.selfIndex != rs.selfIndex) {
+				found = true;
+				break;
+			}
+		}
+		if (!found) {
+			streetIndexes.add(new Integer(rs.streetIndex));
+			numberOfStreets++;
+			incrementRoadType(rs.getRoadClass());
+		}
+	}
 
-            // Primary Road without limited access/ US Highway - unseparated
-        else if (roadClass >= 21 && roadClass <= 24)
-            numUSHighway++;
+	/**
+	 * Increments counters according to road type.
+	 * 
+	 * @param roadClass
+	 *            the character representing the road class.
+	 */
+	private void incrementRoadType(char roadClass) {
+		// Primary Road with limited access/ Interstate Highway - unseparated
+		if (roadClass >= 11 && roadClass <= 14)
+			numInterstate++;
 
-            // Primary Road without limited access / US Highway - separated
-        else if (roadClass >= 25 && roadClass <= 28)
-            numUSHighway++;
+		// Primary Road with limited access/ Interstate Highway - separated
+		else if (roadClass >= 15 && roadClass <= 18)
+			numInterstate++;
 
-            // Secondary and Connecting Roads / State Highways - unseparated
-        else if (roadClass >= 31 && roadClass <= 34)
-            numSecondary++;
+		// Primary Road without limited access/ US Highway - unseparated
+		else if (roadClass >= 21 && roadClass <= 24)
+			numUSHighway++;
 
-            // Secondary and Connecting Roads / State Highways - separated
-        else if (roadClass >= 35 && roadClass <= 38)
-            numSecondary++;
+		// Primary Road without limited access / US Highway - separated
+		else if (roadClass >= 25 && roadClass <= 28)
+			numUSHighway++;
 
-            // Local, Rural, Neighborhood / City Street - unseparated
-        else if (roadClass >= 41 && roadClass <= 44)
-            numRural++;
+		// Secondary and Connecting Roads / State Highways - unseparated
+		else if (roadClass >= 31 && roadClass <= 34)
+			numSecondary++;
 
-            // Local, Rural, Neighborhood / City Street - separated
-        else if (roadClass >= 45 && roadClass <= 48)
-            numRural++;
-            // access ramp
-        else if (roadClass >= 62 && roadClass <= 63)
-            numRamps++;
-        else
-            System.err.println("Unknown road class " + (int) roadClass + " encountered\n");
+		// Secondary and Connecting Roads / State Highways - separated
+		else if (roadClass >= 35 && roadClass <= 38)
+			numSecondary++;
 
-    }
+		// Local, Rural, Neighborhood / City Street - unseparated
+		else if (roadClass >= 41 && roadClass <= 44)
+			numRural++;
 
-    /**
-     * Returns the pause time at this intersection for the vehicle
-     * described by "smi". Anything above zero means that the vehicle
-     * had better slow down before reaching the intersection. This method
-     * defines the traffic control types based on the types of roads at
-     * the intersection. It would be nice to have per-intersection traffic
-     * control info...
-     *
-     * @param current the current road segment
-     * @param next    the next road segment after crossing the intersection
-     * @param smi     the vehicle's SMI object
-     * @return the number of seconds to pause
-     */
-    public float getPauseTime(RoadSegment current, RoadSegment next, StreetMobilityInfo smi)
-    {
-    	// determine whether the vehicle is turning
-        boolean turn=(current.getStreetIndex()!=next.getStreetIndex());
-        
-        
-        // Local, Rural, Neighborhood / City Street - unseparated
-        // Local, Rural, Neighborhood / City Street - separated
-        if (current.roadClass >= 41 && current.roadClass <= 48)
-        {
-            if (next.roadClass >=62 && next.roadClass <=63)
-                return 0; // no pause for ramps
-            else // otherwise, there is a stop sign
-            {                   
-               return stopSign(current, next, smi);                
-            }
-        }
+		// Local, Rural, Neighborhood / City Street - separated
+		else if (roadClass >= 45 && roadClass <= 48)
+			numRural++;
+		// access ramp
+		else if (roadClass >= 62 && roadClass <= 63)
+			numRamps++;
+		else
+			System.err.println("Unknown road class " + (int) roadClass
+					+ " encountered\n");
 
-        // Secondary and Connecting Roads / State Highways - unseparated
-        // Secondary and Connecting Roads / State Highways - separated
-        else if (current.roadClass >= 31 && current.roadClass <= 38)
-        {
-            if (next.roadClass >=62 && next.roadClass <=63)
-                return 0; // no pause for ramps
-            else // otherwise, pause for stoplight time
-            {
-                // bias in favor of highway
-                if (numUSHighway > 0 || numInterstate > 0)
-                {
-                    return stopLightPause(30, 0.75, false);
-                }
-                // equal time
-                else if (numSecondary > 1)
-                {
-                    return stopLightPause(30, 0.5, true);
-                }
-                else  // no light for lesser roads
-                {
-                    // TODO there should be no stoplight...the intersecting road 
-                    // should have a stop sign.
-                    return 0;
-                }
-            }
-        }
+	}
 
-        // Primary Road without limited access/ US Highway - unseparated
-        // Primary Road without limited access / US Highway - separated
-        else if (current.roadClass >= 21 && current.roadClass <= 28)
-        {
-            if (next.roadClass >=62 && next.roadClass <=63)
-                return 0; // no pause for ramps
-            else // otherwise, pause for stoplight time
-            {
-                // equal stop time
-                if (numUSHighway > 1 || numInterstate > 0)
-                {
-                    return stopLightPause(30, 0.5, true);
-                }
-                else if (numSecondary > 0)  // bias light in favor of highway
-                {
-                    return stopLightPause(30, 0.75, true);
-                }
-                else
-                {
-                    return 0; // no stopping for lesser streets
-                }
-            }
-        }
+	/**
+	 * Returns the pause time at this intersection for the vehicle described by
+	 * "smi". Anything above zero means that the vehicle had better slow down
+	 * before reaching the intersection. This method defines the traffic control
+	 * types based on the types of roads at the intersection. It would be nice
+	 * to have per-intersection traffic control info...
+	 * 
+	 * @param current
+	 *            the current road segment
+	 * @param next
+	 *            the next road segment after crossing the intersection
+	 * @param smi
+	 *            the vehicle's SMI object
+	 * @return the number of seconds to pause
+	 */
+	public float getPauseTime(RoadSegment current, RoadSegment next,
+			StreetMobilityInfo smi) {
+		// determine whether the vehicle is turning
+		boolean turn = (current.getStreetIndex() != next.getStreetIndex());
 
-        // Primary Road with limited access/ Interstate Highway - unseparated
-        // Primary Road with limited access/ Interstate Highway - separated
-        else if (current.roadClass <= 18)
-        {
-           if (!turn || next.roadClass >=62 && next.roadClass <=63)
-               return 0; // no pause for ramps or staying on same road
-           else // otherwise, pause for stoplight time
-           {
-               // equal stop time
-               if (numUSHighway > 0 || numInterstate > 1)
-               {                
-                   return stopLightPause(30, 0.5, true);
-               }
-               else if (numSecondary > 0)  // bias light in favor of highway
-               {
-                   return stopLightPause(30, 0.75, true);
-               }
-               else
-               {
-                    return 0; // no stopping for lesser streets
-                }
-            }
-        } // end primary road
+		// Local, Rural, Neighborhood / City Street - unseparated
+		// Local, Rural, Neighborhood / City Street - separated
+		if (current.roadClass >= 41 && current.roadClass <= 48) {
+			if (next.roadClass >= 62 && next.roadClass <= 63)
+				return 0; // no pause for ramps
+			else // otherwise, there is a stop sign
+			{
+				return stopSign(current, next, smi);
+			}
+		}
 
+		// Secondary and Connecting Roads / State Highways - unseparated
+		// Secondary and Connecting Roads / State Highways - separated
+		else if (current.roadClass >= 31 && current.roadClass <= 38) {
+			if (next.roadClass >= 62 && next.roadClass <= 63)
+				return 0; // no pause for ramps
+			else // otherwise, pause for stoplight time
+			{
+				// bias in favor of highway
+				if (numUSHighway > 0 || numInterstate > 0) {
+					return stopLightPause(30, 0.75, false);
+				}
+				// equal time
+				else if (numSecondary > 1) {
+					return stopLightPause(30, 0.5, true);
+				} else // no light for lesser roads
+				{
+					// TODO there should be no stoplight...the intersecting road
+					// should have a stop sign.
+					return 0;
+				}
+			}
+		}
 
-        // access ramp
-        else if (current.roadClass >=62 && current.roadClass <=63)
-        {
-            if (next.roadClass >=62 && next.roadClass <=63)
-                return 0; // no pause for ramps
-            else // otherwise, pause for stoplight time
-            {
-                // no pause for highway
-                if (next.roadClass <=28)
-                {
-                    return 0;
-                }
-                else  // stop sign
-                { // TODO implement stop lights at secondary roads?
-                    return stopSign(current, next, smi);
-                }
-            }
-        }
-        else 
-            System.err.println("Unknown road class " + current.roadClass + " encountered\n");
-        return 0;
+		// Primary Road without limited access/ US Highway - unseparated
+		// Primary Road without limited access / US Highway - separated
+		else if (current.roadClass >= 21 && current.roadClass <= 28) {
+			if (next.roadClass >= 62 && next.roadClass <= 63)
+				return 0; // no pause for ramps
+			else // otherwise, pause for stoplight time
+			{
+				// equal stop time
+				if (numUSHighway > 1 || numInterstate > 0) {
+					return stopLightPause(30, 0.5, true);
+				} else if (numSecondary > 0) // bias light in favor of highway
+				{
+					return stopLightPause(30, 0.75, true);
+				} else {
+					return 0; // no stopping for lesser streets
+				}
+			}
+		}
 
-    }
+		// Primary Road with limited access/ Interstate Highway - unseparated
+		// Primary Road with limited access/ Interstate Highway - separated
+		else if (current.roadClass <= 18) {
+			if (!turn || next.roadClass >= 62 && next.roadClass <= 63)
+				return 0; // no pause for ramps or staying on same road
+			else // otherwise, pause for stoplight time
+			{
+				// equal stop time
+				if (numUSHighway > 0 || numInterstate > 1) {
+					return stopLightPause(30, 0.5, true);
+				} else if (numSecondary > 0) // bias light in favor of highway
+				{
+					return stopLightPause(30, 0.75, true);
+				} else {
+					return 0; // no stopping for lesser streets
+				}
+			}
+		} // end primary road
 
-    /**
-     * Enables real-world stop sign behavior. Vehicles traveling parallel to each
-     * other are all allowed to go at once. Otherwise, this method produces
-     * lockstep behavior around parallel roads under contention.
-     *
-     * @param oldRS
-     * @param next
-     * @param smi
-     * @return
-     */
-    private int stopSign(RoadSegment oldRS, RoadSegment next, StreetMobilityInfo smi) 
-    {
-        int pause;
-        VisualizerInterface v = smi.v;
-        
-        // tried to cross, but no room. Add to the waiting list.
-        if (occupier!=null && occupier.waiting < 0 )
-        {
-            if (!waiting.contains(occupier)) waiting.add(occupier);
-            occupied = false;
-            occupier = null;
-            // set next street to move; this ensures total ordering under contention
-            int nextIndex = streetIndexes.indexOf(new Integer(currentStreet))+1;
-            nextIndex = nextIndex % streetIndexes.size();
-            currentStreet = ((Integer)streetIndexes.get(nextIndex)).intValue();
-        }
-        
-        // node actually at intersection
-        if (smi.getRemainingDist()< RoadSegment.CAR_LENGTH/2)
-        {            
-            // must wait
-            if (occupied && currentStreet != oldRS.streetIndex && occupier != smi) // not your turn
-            {
-                pause = STOP_SIGN_WAIT;
-                // check if vehicle is currently in list
-                if (!waiting.contains(smi))
-                {
-                    waiting.add(smi);
-                }
-                
-                // determine if the current set of cars have cleared the intersection
-                if (occupier != null)
-                {
-                    if (occupier.getNextIntersection() != this )
-                    {
-                        occupied = false;
-                        occupier = null;
-                        // set next street to move; this ensures total ordering under contention
-                        int nextIndex = streetIndexes.indexOf(new Integer(currentStreet)) + 1;
-                        nextIndex = nextIndex % streetIndexes.size();
-                        currentStreet = ((Integer) streetIndexes.get(nextIndex)).intValue();
-                    }
-                } // end if intersection is occupied
-            } // end case not this lane's turn
-            else if (!occupied && currentStreet != oldRS.streetIndex) // ok, whose turn is it?
-            {
-                if (waiting.size() > 1) // more than just the current car
-                {
-                    if (((StreetMobilityInfo)waiting.getFirst()).getNextIntersection() != this)
-                    {
-                        waiting.removeFirst();
-                    }
-                    if (oldRS.streetIndex != ((StreetMobilityInfo)waiting.getFirst()).getCurrentRS().streetIndex 
-                            //&& ((StreetMobilityInfo)waiting.getFirst()).waiting == false
-                            )
-                    {
-                        // now wait
-                        // check if vehicle is currently in list
-                        if (!waiting.contains(smi))
-                        {
-                            waiting.add(smi);
-                        }
-                        pause = STOP_SIGN_WAIT;
-                    }
-                    else // you can go because the first in the list is waiting for the same street as you
-                    {                        
-                        pause = 0;
-                	    currentStreet = oldRS.streetIndex;
-                        occupied = true;
-                        occupier = smi;
-                        while (waiting.remove(smi)){;};
-                    }
+		// access ramp
+		else if (current.roadClass >= 62 && current.roadClass <= 63) {
+			if (next.roadClass >= 62 && next.roadClass <= 63)
+				return 0; // no pause for ramps
+			else // otherwise, pause for stoplight time
+			{
+				// no pause for highway
+				if (next.roadClass <= 28) {
+					return 0;
+				} else // stop sign
+				{ // TODO implement stop lights at secondary roads?
+					return stopSign(current, next, smi);
+				}
+			}
+		} else
+			System.err.println("Unknown road class " + current.roadClass
+					+ " encountered\n");
+		return 0;
 
-                } // end case not occupied, but current lane is not chosen for going
-                else // no one is waiting, so just go
-                {
-                    pause = 0;
-                    currentStreet = oldRS.streetIndex;
-                    occupied = true;
-                    occupier = smi;
-                    while (waiting.remove(smi)){;};
-                }
-                
-                }
-            else // no wait
-            {
-                pause = 0;
-                currentStreet = oldRS.streetIndex;
-                occupied = true;
-                occupier = smi;
+	}
 
-                while (waiting.remove(smi)){;};
-            }
-                                   
-        } // end case node at intersection
-        else // node determining if it needs to slow down before intersection
-        {
-            pause = STOP_SIGN_PAUSE_NO_CONTENTION;
+	/**
+	 * Enables real-world stop sign behavior. Vehicles traveling parallel to
+	 * each other are all allowed to go at once. Otherwise, this method produces
+	 * lockstep behavior around parallel roads under contention.
+	 * 
+	 * @param oldRS
+	 * @param next
+	 * @param smi
+	 * @return
+	 */
+	private int stopSign(RoadSegment oldRS, RoadSegment next,
+			StreetMobilityInfo smi) {
+		int pause;
+		VisualizerInterface v = smi.v;
 
-            // determine if the current set of cars have cleared the intersection
-            if (occupier != null)
-            {
-                if (occupier.getNextIntersection() != this)
-                {
-                    occupied = false;
-                    occupier = null;
-                    // set next street to move; this ensures total ordering under contention
-                    int nextIndex = streetIndexes.indexOf(new Integer(currentStreet)) + 1;
-                    nextIndex = nextIndex % streetIndexes.size();
-                    currentStreet = ((Integer) streetIndexes.get(nextIndex)).intValue();
-                }
-            }
-        }
+		// tried to cross, but no room. Add to the waiting list.
+		if (occupier != null && occupier.waiting < 0) {
+			if (!waiting.contains(occupier))
+				waiting.add(occupier);
+			occupied = false;
+			occupier = null;
+			// set next street to move; this ensures total ordering under
+			// contention
+			int nextIndex = streetIndexes.indexOf(new Integer(currentStreet)) + 1;
+			nextIndex = nextIndex % streetIndexes.size();
+			currentStreet = ((Integer) streetIndexes.get(nextIndex)).intValue();
+		}
 
-        return pause; // ensures that vehicles know that they will have to stop
-    }
+		// node actually at intersection
+		if (smi.getRemainingDist() < RoadSegment.CAR_LENGTH / 2) {
+			// must wait
+			if (occupied && currentStreet != oldRS.streetIndex
+					&& occupier != smi) // not your turn
+			{
+				pause = STOP_SIGN_WAIT;
+				// check if vehicle is currently in list
+				if (!waiting.contains(smi)) {
+					waiting.add(smi);
+				}
 
-    /**
-     * Note that all stop lights are changing at the exact same time. Bad idea,
-     * but simple to implement.
-     *
-     * @param period number of seconds that each road gets to move freely if
-     *               "green light" time is distributed equally
-     * @param bias   percent of period that light is green for caller
-     * @param longer True if the caller will get a longer light
-     * @return the pause time
-     */
+				// determine if the current set of cars have cleared the
+				// intersection
+				if (occupier != null) {
+					if (occupier.getNextIntersection() != this) {
+						occupied = false;
+						occupier = null;
+						// set next street to move; this ensures total ordering
+						// under contention
+						int nextIndex = streetIndexes.indexOf(new Integer(
+								currentStreet)) + 1;
+						nextIndex = nextIndex % streetIndexes.size();
+						currentStreet = ((Integer) streetIndexes.get(nextIndex))
+								.intValue();
+					}
+				} // end if intersection is occupied
+			} // end case not this lane's turn
+			else if (!occupied && currentStreet != oldRS.streetIndex) // ok,
+																		// whose
+																		// turn
+																		// is
+																		// it?
+			{
+				if (waiting.size() > 1) // more than just the current car
+				{
+					if (((StreetMobilityInfo) waiting.getFirst())
+							.getNextIntersection() != this) {
+						waiting.removeFirst();
+					}
+					if (oldRS.streetIndex != ((StreetMobilityInfo) waiting
+							.getFirst()).getCurrentRS().streetIndex
+					// && ((StreetMobilityInfo)waiting.getFirst()).waiting ==
+					// false
+					) {
+						// now wait
+						// check if vehicle is currently in list
+						if (!waiting.contains(smi)) {
+							waiting.add(smi);
+						}
+						pause = STOP_SIGN_WAIT;
+					} else // you can go because the first in the list is
+							// waiting for the same street as you
+					{
+						pause = 0;
+						currentStreet = oldRS.streetIndex;
+						occupied = true;
+						occupier = smi;
+						while (waiting.remove(smi)) {
+							;
+						}
+						;
+					}
 
-    public float stopLightPause(int period, double bias, boolean longer)
-    {
-        int retVal;
-    	period*=(numInterstate+numSecondary+numUSHighway);
-        long modTime = (JistAPI.getTime()%(period*Constants.SECOND))/Constants.SECOND;
-        if (longer)
-        {
-	        if (modTime <= period*bias) retVal = 0;
-	        else retVal = Math.abs((int)(period-modTime));
-        }
-        else
-        {
-	        if (modTime > period*bias) retVal = 0;
-	        else retVal = Math.abs((int)(period*bias - modTime));
-        }
+				} // end case not occupied, but current lane is not chosen for
+					// going
+				else // no one is waiting, so just go
+				{
+					pause = 0;
+					currentStreet = oldRS.streetIndex;
+					occupied = true;
+					occupier = smi;
+					while (waiting.remove(smi)) {
+						;
+					}
+					;
+				}
 
-        return retVal;
-    }
+			} else // no wait
+			{
+				pause = 0;
+				currentStreet = oldRS.streetIndex;
+				occupied = true;
+				occupier = smi;
 
-    /**
-     * Returns the roads at this intersection.
-     * @return a LinkedList of RoadSegments.
-     */
-    public LinkedList getRoads()
-    {
-        return (LinkedList) segments.clone();
-    }
+				while (waiting.remove(smi)) {
+					;
+				}
+				;
+			}
 
-    /**
-     * @return Returns the location of the intersection.
-     */
-    public Location getLoc() {
-        return loc;
-    }
+		} // end case node at intersection
+		else // node determining if it needs to slow down before intersection
+		{
+			pause = STOP_SIGN_PAUSE_NO_CONTENTION;
 
-    /**
-     * @return Returns the number of streets at this intersection.
-     */
-    public int getSize() {
-        return numberOfStreets;
-    }
+			// determine if the current set of cars have cleared the
+			// intersection
+			if (occupier != null) {
+				if (occupier.getNextIntersection() != this) {
+					occupied = false;
+					occupier = null;
+					// set next street to move; this ensures total ordering
+					// under contention
+					int nextIndex = streetIndexes.indexOf(new Integer(
+							currentStreet)) + 1;
+					nextIndex = nextIndex % streetIndexes.size();
+					currentStreet = ((Integer) streetIndexes.get(nextIndex))
+							.intValue();
+				}
+			}
+		}
 
-    /**
-     * Prints the streets at this intersection
-     * @param streets the HashMap of street names.
-     * @return The String to print.
-     */
-    public String printStreets(HashMap streets) {
-        String s = "\nLocation: " + loc + "\nStreet list:\n----------\n";
-        Iterator it = segments.iterator();
-        while (it.hasNext())
-        {
-            s += ((RoadSegment) it.next()).printStreetName(streets) + "\n";
-        }
+		return pause; // ensures that vehicles know that they will have to stop
+	}
 
-        return s;
-    }
+	/**
+	 * Note that all stop lights are changing at the exact same time. Bad idea,
+	 * but simple to implement.
+	 * 
+	 * @param period
+	 *            number of seconds that each road gets to move freely if
+	 *            "green light" time is distributed equally
+	 * @param bias
+	 *            percent of period that light is green for caller
+	 * @param longer
+	 *            True if the caller will get a longer light
+	 * @return the pause time
+	 */
 
-    /**
-     * Removes a vehicle from the list of those waiting.
-     * @param smi The vehicle to remove.
-     */
-    public void removeWaiting(StreetMobilityInfo smi) {
-        waiting.remove(smi);
-    }
+	public float stopLightPause(int period, double bias, boolean longer) {
+		int retVal;
+		period *= (numInterstate + numSecondary + numUSHighway);
+		long modTime = (JistAPI.getTime() % (period * Constants.SECOND))
+				/ Constants.SECOND;
+		if (longer) {
+			if (modTime <= period * bias)
+				retVal = 0;
+			else
+				retVal = Math.abs((int) (period - modTime));
+		} else {
+			if (modTime > period * bias)
+				retVal = 0;
+			else
+				retVal = Math.abs((int) (period * bias - modTime));
+		}
+
+		return retVal;
+	}
+
+	/**
+	 * Returns the roads at this intersection.
+	 * 
+	 * @return a LinkedList of RoadSegments.
+	 */
+	public LinkedList getRoads() {
+		return (LinkedList) segments.clone();
+	}
+
+	/**
+	 * @return Returns the location of the intersection.
+	 */
+	public Location getLoc() {
+		return loc;
+	}
+
+	/**
+	 * @return Returns the number of streets at this intersection.
+	 */
+	public int getSize() {
+		return numberOfStreets;
+	}
+
+	/**
+	 * Prints the streets at this intersection
+	 * 
+	 * @param streets
+	 *            the HashMap of street names.
+	 * @return The String to print.
+	 */
+	public String printStreets(HashMap streets) {
+		String s = "\nLocation: " + loc + "\nStreet list:\n----------\n";
+		Iterator it = segments.iterator();
+		while (it.hasNext()) {
+			s += ((RoadSegment) it.next()).printStreetName(streets) + "\n";
+		}
+
+		return s;
+	}
+
+	/**
+	 * Removes a vehicle from the list of those waiting.
+	 * 
+	 * @param smi
+	 *            The vehicle to remove.
+	 */
+	public void removeWaiting(StreetMobilityInfo smi) {
+		waiting.remove(smi);
+	}
 
 }

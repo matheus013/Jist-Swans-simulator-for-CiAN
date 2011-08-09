@@ -28,10 +28,12 @@ public interface StorageProvider extends DucksControllerModule {
 	// namespaces to be excluded by default from being saved.
 	// Note that this may be different from the parameters excluded from
 	// multiplexing in ducks.controller.simulation.SimulationMultiplexer
-	
-	public static final String[] CFG_EXCLUDE_PARAMS = new String[] { "ducks.config", "ducks.servers", 
-        "ducks.stats", "ducks.eventlog" };
-	
-	public void saveSimulationStudy(SimulationStudy study) throws DucksException;
+
+	public static final String[] CFG_EXCLUDE_PARAMS = new String[] {
+			"ducks.config", "ducks.servers", "ducks.stats", "ducks.eventlog" };
+
+	public void saveSimulationStudy(SimulationStudy study)
+			throws DucksException;
+
 	public void saveSimulation(Simulation simu) throws DucksException;
 }

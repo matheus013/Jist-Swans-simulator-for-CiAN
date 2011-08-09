@@ -33,16 +33,16 @@ import ducks.eventlog.EventLog;
 /**
  * Plot log data in gnuplot file
  * 
- * Required parameter: ducks.eventlog.dest.GnuPlot.outputfile
- * Optional parameter: ducks.eventlog.dest.GnuPlot.skipfirstvalue
+ * Required parameter: ducks.eventlog.dest.GnuPlot.outputfile Optional
+ * parameter: ducks.eventlog.dest.GnuPlot.skipfirstvalue
  * 
- * The outputfilename may contain placeholders {your.property.name}, which will 
- * be replaced by the given property of the simulation instance.
- * For example, "trace-{ducks.general.nodes}.txt" will create a file named
- * "trace-100.txt" if the simulation instance had a setting "ducks.general.nodes=100".
+ * The outputfilename may contain placeholders {your.property.name}, which will
+ * be replaced by the given property of the simulation instance. For example,
+ * "trace-{ducks.general.nodes}.txt" will create a file named "trace-100.txt" if
+ * the simulation instance had a setting "ducks.general.nodes=100".
  * 
  * @author Stefan Schlott
- *
+ * 
  */
 public class GnuPlot extends EventLog {
 	String datafilename;
@@ -53,26 +53,32 @@ public class GnuPlot extends EventLog {
 	@Override
 	public void configure(Properties config, String configprefix) {
 		dataout = new Hashtable<Integer, PrintWriter>();
-		datafilename = configStringReplacer(config,config.getProperty(configprefix+".outputfile"));
+		datafilename = configStringReplacer(config,
+				config.getProperty(configprefix + ".outputfile"));
 		try {
-			out = new PrintWriter(new FileOutputStream(datafilename,false));
+			out = new PrintWriter(new FileOutputStream(datafilename, false));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 		out.println("set multiplot");
-		out.println("set xrange [0:"+config.getProperty(SimParams.SCENE_NAMEPSPACE+"."+SimParams.SCENE_FIELD_SIZE_X)+"]");
-		out.println("set yrange [0:"+config.getProperty(SimParams.SCENE_NAMEPSPACE+"."+SimParams.SCENE_FIELD_SIZE_Y)+"]");
-		String skip = config.getProperty(configprefix+".skipfirstvalue");
-		if ((skip!=null) && (skip.equalsIgnoreCase("true") || skip.equals("1")))
-			skipfirstvalue=true;
+		out.println("set xrange [0:"
+				+ config.getProperty(SimParams.SCENE_NAMEPSPACE + "."
+						+ SimParams.SCENE_FIELD_SIZE_X) + "]");
+		out.println("set yrange [0:"
+				+ config.getProperty(SimParams.SCENE_NAMEPSPACE + "."
+						+ SimParams.SCENE_FIELD_SIZE_Y) + "]");
+		String skip = config.getProperty(configprefix + ".skipfirstvalue");
+		if ((skip != null)
+				&& (skip.equalsIgnoreCase("true") || skip.equals("1")))
+			skipfirstvalue = true;
 	}
-	
+
 	@Override
 	public void finalize() {
 		Iterator i = dataout.keySet().iterator();
-		
+
 		while (i.hasNext()) {
-			((PrintWriter)dataout.get(i.next())).flush();
+			((PrintWriter) dataout.get(i.next())).flush();
 		}
 		out.flush();
 	}
@@ -82,18 +88,21 @@ public class GnuPlot extends EventLog {
 			String comment) {
 		// Node movement
 		if (type.equals("move")) {
-			PrintWriter dout = (PrintWriter)dataout.get(node);
-			if (dout==null) {
+			PrintWriter dout = (PrintWriter) dataout.get(node);
+			if (dout == null) {
 				try {
-					dout = new PrintWriter(new FileOutputStream(datafilename+"."+node,false));
+					dout = new PrintWriter(new FileOutputStream(datafilename
+							+ "." + node, false));
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
 				}
-				dataout.put(node,dout);
-				out.println("plot '"+datafilename+"."+node+"' using 1:2 with lines notitle");
-				if (skipfirstvalue) return;
+				dataout.put(node, dout);
+				out.println("plot '" + datafilename + "." + node
+						+ "' using 1:2 with lines notitle");
+				if (skipfirstvalue)
+					return;
 			}
-			dout.println(loc.getX()+"\t"+loc.getY());
+			dout.println(loc.getX() + "\t" + loc.getY());
 		}
 
 	}

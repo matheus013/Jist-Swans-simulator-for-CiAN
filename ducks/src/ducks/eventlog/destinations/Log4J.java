@@ -28,22 +28,24 @@ import ducks.eventlog.EventLog;
  * Output event data to Log4J
  * 
  * @author Stefan Schlott
- *
+ * 
  */
 public class Log4J extends EventLog {
-	protected static final Logger logger = Logger.getLogger(EventLog.class.getName());
+	protected static final Logger logger = Logger.getLogger(EventLog.class
+			.getName());
 
-	public void logEvent(int node, long time, Location loc, String type, String comment) {
+	public void logEvent(int node, long time, Location loc, String type,
+			String comment) {
 		String result = "";
-		if (node>=0)
+		if (node >= 0)
 			result = "Node " + node + " ";
-		if (time>=0)
+		if (time >= 0)
 			result += "@" + time + " ";
-		if (loc!=null)
+		if (loc != null)
 			result += " " + loc.getX() + "/" + loc.getY() + " ";
-		if (type!=null)
-			result += "["+type+"] ";
-		if (comment!=null)
+		if (type != null)
+			result += "[" + type + "] ";
+		if (comment != null)
 			result += comment;
 		logger.info(result);
 	}

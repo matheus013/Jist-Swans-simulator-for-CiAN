@@ -13,35 +13,32 @@ import jist.runtime.JistAPI;
 
 /**
  * Test trace facility, by throwing an exception.
- *
+ * 
  * @author Rimon Barr &lt;barr+jist@cs.cornell.edu&gt;
  * @version $Id: trace.java,v 1.3 2004-04-06 16:07:42 barr Exp $
  * @since JIST1.0
  */
 
-public class trace implements JistAPI.Entity
-{
-  /** an event. */
-  public void abort()
-  {
-    throw new RuntimeException("abort");
-  }
+public class trace implements JistAPI.Entity {
+	/** an event. */
+	public void abort() {
+		throw new RuntimeException("abort");
+	}
 
-  /** an event. */
-  public void foo()
-  {
-    abort();
-  }
+	/** an event. */
+	public void foo() {
+		abort();
+	}
 
-  /** 
-   * Simulation entry point.
-   *
-   * @param args command-line parameters
-   */
-  public static void main(String[] args)
-  {
-    trace t = new trace();
-    t.foo();
-  }
+	/**
+	 * Simulation entry point.
+	 * 
+	 * @param args
+	 *            command-line parameters
+	 */
+	public static void main(String[] args) {
+		trace t = new trace();
+		t.foo();
+	}
 
 } // class: trace

@@ -20,36 +20,36 @@ package vans.straw;
 
 import jist.swans.misc.Location;
 
+public final class StartPoint {
+	Location start;
 
-public final class StartPoint
-  {
-    Location start;
+	/**
+	 * @param start
+	 * @param finish
+	 */
+	public StartPoint(Location start) {
+		this.start = start;
 
-    /**
-     * @param start
-     * @param finish
-     */
-    public StartPoint(Location start) {
-        this.start = start;
+	}
 
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	public boolean equals(Object obj) {
+		// this will resolve paths on chaining
+		StartPoint other = (StartPoint) obj;
+		return (other.start.distance(start) == 0);
+	}
 
-
-    /* (non-Javadoc)
-    * @see java.lang.Object#equals(java.lang.Object)
-    */
-    public boolean equals(Object obj) {
-        // this will resolve paths on chaining
-        StartPoint other = (StartPoint) obj;
-        return (other.start.distance(start) == 0);
-    }
-
-
-    /* (non-Javadoc)
-    * @see java.lang.Object#hashCode()
-    */
-    public int hashCode() {
-        // this isn't great, but it should make the HashMap work decently
-        return (new Float(start.getX() + start.getY())).hashCode();
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
+	public int hashCode() {
+		// this isn't great, but it should make the HashMap work decently
+		return (new Float(start.getX() + start.getY())).hashCode();
+	}
 }

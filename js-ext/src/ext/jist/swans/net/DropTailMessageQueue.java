@@ -23,57 +23,58 @@ import java.util.Properties;
 import ext.util.ExtendedProperties;
 import ext.util.stats.StatsCollector;
 
-
 import jist.swans.net.MessageQueue.NoDropMessageQueue;
 import jist.swans.net.QueuedMessage;
 
 /**
  * DropTailMessageQueue is an extension to SWANS which does not come with a
- * message queue that allows dropping messages in case of overload. Instead,
- * the SWANS NoDropMessageQueue throws an exception halting the complete simulation
+ * message queue that allows dropping messages in case of overload. Instead, the
+ * SWANS NoDropMessageQueue throws an exception halting the complete simulation
  * which is not acceptable in many cases.
  * 
  * @author Elmar Schoch
- *
+ * 
  */
-public class DropTailMessageQueue extends NoDropMessageQueue implements StatsCollector {
+public class DropTailMessageQueue extends NoDropMessageQueue implements
+		StatsCollector {
 
 	/**
 	 * Count number of dropped messages
 	 */
-	private static long droppedMessages; 
-	
+	private static long droppedMessages;
+
 	public DropTailMessageQueue(byte priorities, byte capacity) {
 		super(priorities, capacity);
-		
+
 		droppedMessages = 0;
 	}
 
-	
 	/**
 	 * Insert message, and drop last message with lowest priority
 	 */
 	public void insert(QueuedMessage msg, int pri) {
-      
-		if(size==capacity) {
+
+		if (size == capacity) {
 			// queue is full -> remove latest message (= head) of lowest
 			// available prio
 			int loprio = 0;
-			while (loprio < heads.length && heads[loprio] == null) {loprio++; }
-			
+			while (loprio < heads.length && heads[loprio] == null) {
+				loprio++;
+			}
+
 			QueuedMessage latest = heads[loprio];
 			heads[loprio] = latest.next;
-			
+
 			droppedMessages++;
-			
+
 		} else {
 			size++;
 		}
-		
+
 		// insert new message
-		topPri = (byte)StrictMath.min(pri, topPri);
+		topPri = (byte) StrictMath.min(pri, topPri);
 		QueuedMessage tail = tails[pri];
-		if(tail==null) {
+		if (tail == null) {
 			heads[pri] = msg;
 			tails[pri] = msg;
 		} else {
@@ -81,25 +82,21 @@ public class DropTailMessageQueue extends NoDropMessageQueue implements StatsCol
 			tails[pri] = msg;
 		}
 	}
-	
-	
+
 	public static long getDroppedMessages() {
 		return droppedMessages;
 	}
 
-
-	
 	public ExtendedProperties getStats() {
 		ExtendedProperties stats = new ExtendedProperties();
 		stats.put("ducks.mac.ifqueue.drops", Long.toString(droppedMessages));
 		return stats;
 	}
 
-
 	public String[] getStatParams() {
 		String[] stats = new String[1];
 		stats[0] = "ducks.net.ifqueue.drops";
 		return stats;
 	}
-	
+
 }

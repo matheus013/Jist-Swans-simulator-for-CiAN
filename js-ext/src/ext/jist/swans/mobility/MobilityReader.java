@@ -25,41 +25,47 @@ import jist.swans.misc.Location.Location2D;
 
 /**
  * @author eschoch
- *
+ * 
  */
 public interface MobilityReader {
-	
+
 	/**
-	 * Load mobility from file
-	 * Note that the file needs to be accessible from the JVM on which the simulation
-	 * is currently running. In terms of DUCKS, this means, that every JiST server
-	 * needs its own copy of the file
+	 * Load mobility from file Note that the file needs to be accessible from
+	 * the JVM on which the simulation is currently running. In terms of DUCKS,
+	 * this means, that every JiST server needs its own copy of the file
 	 * 
-	 * @param filename The file to load
-	 * @throws Exception Exception in case of errors during loading or parsing
+	 * @param filename
+	 *            The file to load
+	 * @throws Exception
+	 *             Exception in case of errors during loading or parsing
 	 */
 	public void readFile(String filename) throws Exception;
 
 	/**
-	 * Returns a list of waypoints of a specific node. 
-	 * @param nodeID The node ID to get waypoints for
-	 * @return Either the list containing MobiliyReplay.Waypoint objects or null if the node ID was not found
+	 * Returns a list of waypoints of a specific node.
+	 * 
+	 * @param nodeID
+	 *            The node ID to get waypoints for
+	 * @return Either the list containing MobiliyReplay.Waypoint objects or null
+	 *         if the node ID was not found
 	 */
-	public List<MobilityReplay.Waypoint> getWaypoints(int nodeID); 
-	
+	public List<MobilityReplay.Waypoint> getWaypoints(int nodeID);
 
 	/**
-	 * Retrieves an array of 2 Location2D objects, which represent two corners of
-	 * the field: bottom left (at index 0) and top right (at index 1).
-	 * @return The array with 2 Location2D objects or null, if no waypoints are loaded
+	 * Retrieves an array of 2 Location2D objects, which represent two corners
+	 * of the field: bottom left (at index 0) and top right (at index 1).
+	 * 
+	 * @return The array with 2 Location2D objects or null, if no waypoints are
+	 *         loaded
 	 */
 	public Location2D[] getCorners();
-	
+
 	/**
-	 * Retrieve the number of nodes for which the mobility trace file contains waypoints.
+	 * Retrieve the number of nodes for which the mobility trace file contains
+	 * waypoints.
 	 * 
 	 * @return The number of nodes in the trace file
 	 */
 	public int getNodeNumber();
-	
+
 }

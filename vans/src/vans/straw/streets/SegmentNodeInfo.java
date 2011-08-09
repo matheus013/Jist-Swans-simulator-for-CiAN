@@ -36,40 +36,50 @@ import java.util.Vector;
 
 /**
  * @author David Choffnes &lt;drchoffnes@cs.northwestern.edu&gt;
- *
- *         The SegmentNodeInfo class contains information that the
- *         A* Search algorithm needs to find paths.
+ * 
+ *         The SegmentNodeInfo class contains information that the A* Search
+ *         algorithm needs to find paths.
  * 
  */
 public class SegmentNodeInfo {
 
-    /** Array of road segments in field */
-    public Vector segment;
-    /** Array of shapes of road segments in field */
-    public HashMap shapes;
-    /** quad tree representation of segments */
-    public SpatialStreets.HierGrid intersections;
-    /** map between street indeces and street names */
-    public HashMap streets;
-    /** A list of cached SegmentNodes; probably will not be used due to mutation of SN's */
-    public Vector segmentNodes;
-    public SegmentNode dest;
+	/** Array of road segments in field */
+	public Vector segment;
+	/** Array of shapes of road segments in field */
+	public HashMap shapes;
+	/** quad tree representation of segments */
+	public SpatialStreets.HierGrid intersections;
+	/** map between street indeces and street names */
+	public HashMap streets;
+	/**
+	 * A list of cached SegmentNodes; probably will not be used due to mutation
+	 * of SN's
+	 */
+	public Vector segmentNodes;
+	public SegmentNode dest;
 
-    /**
-     * SegmentNodeInfo constructor.
-     * @param segment       vector of RoadSegments
-     * @param shapes        HashMap of Shapes
-     * @param intersections QuadTree of intersections
-     * @param streets       HashMap of street names
-     * @param segmentNodes  Vector of SegmentNode objects
-     */
-    public SegmentNodeInfo(Vector segment, HashMap shapes,
-                           SpatialStreets.HierGrid intersections, HashMap streets, Vector segmentNodes) {
-        super();
-        this.segment = segment;
-        this.shapes = shapes;
-        this.intersections = intersections;
-        this.streets = streets;
-        this.segmentNodes = segmentNodes;
-    }
+	/**
+	 * SegmentNodeInfo constructor.
+	 * 
+	 * @param segment
+	 *            vector of RoadSegments
+	 * @param shapes
+	 *            HashMap of Shapes
+	 * @param intersections
+	 *            QuadTree of intersections
+	 * @param streets
+	 *            HashMap of street names
+	 * @param segmentNodes
+	 *            Vector of SegmentNode objects
+	 */
+	public SegmentNodeInfo(Vector segment, HashMap shapes,
+			SpatialStreets.HierGrid intersections, HashMap streets,
+			Vector segmentNodes) {
+		super();
+		this.segment = segment;
+		this.shapes = shapes;
+		this.intersections = intersections;
+		this.streets = streets;
+		this.segmentNodes = segmentNodes;
+	}
 }

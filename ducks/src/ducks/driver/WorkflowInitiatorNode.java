@@ -14,48 +14,56 @@ import ext.jist.swans.app.AppWorkflowInitiator;
 import ext.util.stats.DucksCompositionStats;
 
 public class WorkflowInitiatorNode extends GenericNode {
-    private static Logger log = Logger.getLogger(WorkflowInitiatorNode.class.getName());
+	private static Logger log = Logger.getLogger(WorkflowInitiatorNode.class
+			.getName());
 
-    public WorkflowInitiatorNode() {
-        super();
-    }
+	public WorkflowInitiatorNode() {
+		super();
+	}
 
-    protected void addApplication(Mapper protMap, Field field, Placement place) throws Exception {
-        this.app = null;
-        String appOpt = options.getStringProperty(SimParams.TRAFFIC_TYPE);
+	protected void addApplication(Mapper protMap, Field field, Placement place)
+			throws Exception {
+		this.app = null;
+		String appOpt = options.getStringProperty(SimParams.TRAFFIC_TYPE);
 
-        if (appOpt.equals(SimParams.TRAFFIC_TYPE_SERVICE)) {
-            int reqSize, reqRate, wTS, wTE, duration;
-            reqSize = options.getIntProperty(SimParams.COMPOSITION_LENGTH);
-            reqRate = options.getIntProperty(SimParams.TRAFFIC_SERV_RATE);
-            wTS = options.getIntProperty(SimParams.TRAFFIC_WAITSTART);
-            wTE = options.getIntProperty(SimParams.TRAFFIC_WAITEND);
-            duration = globalConfig.getIntProperty(SimParams.SIM_DURATION);
-            
-            DucksCompositionStats compoStats = null;
-            try {
-                // get composition stats, and automatically create and register, if necessary
-                compoStats = (DucksCompositionStats) stats.getStaticCollector(DucksCompositionStats.class, true);
-            } catch (Exception e) {
-                e.printStackTrace();                
-            }  
+		if (appOpt.equals(SimParams.TRAFFIC_TYPE_SERVICE)) {
+			int reqSize, reqRate, wTS, wTE, duration;
+			reqSize = options.getIntProperty(SimParams.COMPOSITION_LENGTH);
+			reqRate = options.getIntProperty(SimParams.TRAFFIC_SERV_RATE);
+			wTS = options.getIntProperty(SimParams.TRAFFIC_WAITSTART);
+			wTE = options.getIntProperty(SimParams.TRAFFIC_WAITEND);
+			duration = globalConfig.getIntProperty(SimParams.SIM_DURATION);
 
-            AppWorkflowBase ac = new AppWorkflowInitiator(this.id, compoStats, reqSize, reqRate, wTS, wTE, duration);
+			DucksCompositionStats compoStats = null;
+			try {
+				// get composition stats, and automatically create and register,
+				// if necessary
+				compoStats = (DucksCompositionStats) stats.getStaticCollector(
+						DucksCompositionStats.class, true);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 
-            // currently we do not use transport layer (UDP) instead we hand over from the network layer directly to application layer 
-            protMap.testMapToNext(Constants.NET_PROTOCOL_UDP);
-            net.setProtocolHandler(Constants.NET_PROTOCOL_UDP, (NetInterface.NetHandler) ac.getNetProxy());
+			AppWorkflowBase ac = new AppWorkflowInitiator(this.id, compoStats,
+					reqSize, reqRate, wTS, wTE, duration);
 
-            protMap.testMapToNext(AppGreetingBase.NET_PROTOCOL_NUMBER);
-            net.setProtocolHandler(AppGreetingBase.NET_PROTOCOL_NUMBER, (NetInterface.NetHandler) ac.getNetProxy());
+			// currently we do not use transport layer (UDP) instead we hand
+			// over from the network layer directly to application layer
+			protMap.testMapToNext(Constants.NET_PROTOCOL_UDP);
+			net.setProtocolHandler(Constants.NET_PROTOCOL_UDP,
+					(NetInterface.NetHandler) ac.getNetProxy());
 
-            this.app = ac;
-            this.appEntity = ac.getAppProxy();
-            ac.setNetEntity(this.netEntity);
-            this.appEntity.run();
+			protMap.testMapToNext(AppGreetingBase.NET_PROTOCOL_NUMBER);
+			net.setProtocolHandler(AppGreetingBase.NET_PROTOCOL_NUMBER,
+					(NetInterface.NetHandler) ac.getNetProxy());
 
-            log.debug("  Added composition initiator application module");
-        }
-    }
+			this.app = ac;
+			this.appEntity = ac.getAppProxy();
+			ac.setNetEntity(this.netEntity);
+			this.appEntity.run();
+
+			log.debug("  Added composition initiator application module");
+		}
+	}
 
 }

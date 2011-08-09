@@ -39,127 +39,162 @@ import jist.swans.misc.Location;
 /**
  * 
  * @author David Choffnes &lt;drchoffnes@cs.northwestern.edu&gt;
- *
- * The VisualizerInterface interface allows code to compile, but 
- * doesn't give you any of our visualization capability. We will 
- * release the actual Visualizer class when the time is right.
+ * 
+ *         The VisualizerInterface interface allows code to compile, but doesn't
+ *         give you any of our visualization capability. We will release the
+ *         actual Visualizer class when the time is right.
  */
 public interface VisualizerInterface {
 
-    /**
-     * Adds a node to the (visual) field.
-     * @param initX initial x position
-     * @param initY initial y position
-     * @param ip the node inditifier
-     */
-    public abstract void addNode(float initX, float initY, int ip);
+	/**
+	 * Adds a node to the (visual) field.
+	 * 
+	 * @param initX
+	 *            initial x position
+	 * @param initY
+	 *            initial y position
+	 * @param ip
+	 *            the node inditifier
+	 */
+	public abstract void addNode(float initX, float initY, int ip);
 
-    /**
-     * Updates a node's location.
-     * @param newX new x coordinate
-     * @param newY new y coordinate
-     * @param ip node identifier
-     */
-    public abstract void updateNodeLocation(float newX, float newY, int ip);
+	/**
+	 * Updates a node's location.
+	 * 
+	 * @param newX
+	 *            new x coordinate
+	 * @param newY
+	 *            new y coordinate
+	 * @param ip
+	 *            node identifier
+	 */
+	public abstract void updateNodeLocation(float newX, float newY, int ip);
 
-    /**
-     * Draws a cirlce around a node.
-     * @param ip the node to draw a cirlce around
-     */
-    public abstract void drawTransmitCircle(int ip);
+	/**
+	 * Draws a cirlce around a node.
+	 * 
+	 * @param ip
+	 *            the node to draw a cirlce around
+	 */
+	public abstract void drawTransmitCircle(int ip);
 
-    /**
-     * Hides the circle.
-     * @param ip the node to stop showing the cirlce for
-     */
-    public abstract void hideTransmitCircle(int ip);
+	/**
+	 * Hides the circle.
+	 * 
+	 * @param ip
+	 *            the node to stop showing the cirlce for
+	 */
+	public abstract void hideTransmitCircle(int ip);
 
-    /**
-     * Displaces the specified node by the specified amount
-     * @param step the amount to add to the current location
-     * @param ip the ip address of the node to move
-     */
-    public abstract void displaceNode(Location step, int ip);
+	/**
+	 * Displaces the specified node by the specified amount
+	 * 
+	 * @param step
+	 *            the amount to add to the current location
+	 * @param ip
+	 *            the ip address of the node to move
+	 */
+	public abstract void displaceNode(Location step, int ip);
 
-    /**
-     * Sets the node color to something new.
-     * 
-     * @param i the node to set
-     * @param c the color to set
-     */
-    public abstract void setNodeColor(int i, Color c);
+	/**
+	 * Sets the node color to something new.
+	 * 
+	 * @param i
+	 *            the node to set
+	 * @param c
+	 *            the color to set
+	 */
+	public abstract void setNodeColor(int i, Color c);
 
-    /**
-     * Sets the tooltip text for the specified node.
-     * @param ip
-     * @param text
-     */
-    public abstract void setToolTip(int ip, String text);
+	/**
+	 * Sets the tooltip text for the specified node.
+	 * 
+	 * @param ip
+	 * @param text
+	 */
+	public abstract void setToolTip(int ip, String text);
 
-    /**
-     * Sets the editor text for the specified node.
-     * @param ip the node indentifer
-     * @param text the text to set
-     */
-    public abstract void setRoutingPaneText(int ip, String text);
+	/**
+	 * Sets the editor text for the specified node.
+	 * 
+	 * @param ip
+	 *            the node indentifer
+	 * @param text
+	 *            the text to set
+	 */
+	public abstract void setRoutingPaneText(int ip, String text);
 
-    /**
-     * Sets the general text for the panel.
-     * @param text
-     */
-    public abstract void setGeneralPaneText(String text);
+	/**
+	 * Sets the general text for the panel.
+	 * 
+	 * @param text
+	 */
+	public abstract void setGeneralPaneText(String text);
 
-    /**
-     * Sets the max base distance that a message will propagate 
-     * (i.e., within 1 std dev).
-     * @param maxDistance
-     */
-    public abstract void setBaseTranmit(double maxDistance);
+	/**
+	 * Sets the max base distance that a message will propagate (i.e., within 1
+	 * std dev).
+	 * 
+	 * @param maxDistance
+	 */
+	public abstract void setBaseTranmit(double maxDistance);
 
-    /**
-     * Resets node colors to the default colors.
-     */
-    public abstract void resetColors();
+	/**
+	 * Resets node colors to the default colors.
+	 */
+	public abstract void resetColors();
 
-    /**
-     * Draws a circle of radius r at location loc.
-     * @param r radius of circle
-     * @param loc center of circle
-     */
-    public abstract void drawCircle(int r, Location loc);
+	/**
+	 * Draws a circle of radius r at location loc.
+	 * 
+	 * @param r
+	 *            radius of circle
+	 * @param loc
+	 *            center of circle
+	 */
+	public abstract void drawCircle(int r, Location loc);
 
-    /**
-     * Removes circle.
-     */
-    public abstract void removeCircle();
+	/**
+	 * Removes circle.
+	 */
+	public abstract void removeCircle();
 
-    /**
-     * Colors a RoadSegment.
-     * @param rs the road segment to color
-     * @param c the color to use
-     */
-    public abstract void colorSegment(RoadSegment rs, Color c);
+	/**
+	 * Colors a RoadSegment.
+	 * 
+	 * @param rs
+	 *            the road segment to color
+	 * @param c
+	 *            the color to use
+	 */
+	public abstract void colorSegment(RoadSegment rs, Color c);
 
-    /**
-     * Colors an array of road segments.
-     * 
-     * @param objects an array of RoadSegments
-     * @param colors an array of corresponding colors
-     */
-    public abstract void colorSegments(Object[] objects, Color colors[]);
+	/**
+	 * Colors an array of road segments.
+	 * 
+	 * @param objects
+	 *            an array of RoadSegments
+	 * @param colors
+	 *            an array of corresponding colors
+	 */
+	public abstract void colorSegments(Object[] objects, Color colors[]);
 
-    /**
-     * Sets the time for the visualization. Should not be called 
-     * by only method on a call stack that has already called 
-     * JistAPI.sleep().
-     * @param time the time, in nanoseconds.
-     */
-    public abstract void updateTime(long time);
-    
-    /**
-     * Draws an animated circle around the specified node
-     * @param ip the ip address of the node at center
-     * @param color the color of the cirlce drawn
-     */
-    public abstract void drawAnimatedTransmitCircle(int ip, Color color);
+	/**
+	 * Sets the time for the visualization. Should not be called by only method
+	 * on a call stack that has already called JistAPI.sleep().
+	 * 
+	 * @param time
+	 *            the time, in nanoseconds.
+	 */
+	public abstract void updateTime(long time);
+
+	/**
+	 * Draws an animated circle around the specified node
+	 * 
+	 * @param ip
+	 *            the ip address of the node at center
+	 * @param color
+	 *            the color of the cirlce drawn
+	 */
+	public abstract void drawAnimatedTransmitCircle(int ip, Color color);
 }

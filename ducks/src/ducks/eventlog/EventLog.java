@@ -32,32 +32,43 @@ import jist.swans.misc.Location;
 
 /**
  * 
- * Framework for logging runtime data (like node movements) to arbitrary destinations
- * (e.g. console, files, databases).
+ * Framework for logging runtime data (like node movements) to arbitrary
+ * destinations (e.g. console, files, databases).
  * <p/>
  * To enable debug output, put in your log4j.properties:
- * <pre>log4j.logger.ducks.eventlog=DEBUG</pre>
+ * 
+ * <pre>
+ * log4j.logger.ducks.eventlog = DEBUG
+ * </pre>
  * <p/>
  * To enable the eventlog framework, put in your simulation property file:
- * <pre>ducks.eventlog.dest=<i>destination classname</i>
- * ducks.eventlog.modules=<i>module classname[,module classname...]</i></pre>
+ * 
+ * <pre>
+ * ducks.eventlog.dest=<i>destination classname</i>
+ * ducks.eventlog.modules=<i>module classname[,module classname...]</i>
+ * </pre>
  * <p/>
  * eventlog will first look for a full qualified classname, then for a class in
  * ducks.eventlog.[destinations|modules].
  * <p/>
  * Additional parameters for the log destination may use the config key
- * <pre>ducks.eventlog.dest.<i>classname</i>[.*]</pre>
+ * 
+ * <pre>
+ * ducks.eventlog.dest.<i>classname</i>[.*]
+ * </pre>
+ * 
  * Log modules can use config keys accordingly.
  * 
  * @author Stefan Schlott
- *
+ * 
  */
 
 public abstract class EventLog implements DoNotRewrite {
 	protected static Vector<EventLog> eventlogs = new Vector<EventLog>();
-	protected static final Logger logger = Logger.getLogger(EventLog.class.getName());
+	protected static final Logger logger = Logger.getLogger(EventLog.class
+			.getName());
 	protected static Vector<EventLogModule> modules = new Vector<EventLogModule>();
-	
+
 	/**
 	 * Get event log destinations
 	 * 
@@ -66,49 +77,53 @@ public abstract class EventLog implements DoNotRewrite {
 	public static Iterator<EventLog> getEventLogs() {
 		return eventlogs.iterator();
 	}
-	
+
 	public static boolean hasEventLogs() {
-		return (eventlogs.size()>0);
+		return (eventlogs.size() > 0);
 	}
-	
+
 	/**
-	 * Replace placeholders in pattern string with values from config properties list.
-	 * Placeholders are written in curly braces, e.g. {ducks.general.nodes}.
+	 * Replace placeholders in pattern string with values from config properties
+	 * list. Placeholders are written in curly braces, e.g.
+	 * {ducks.general.nodes}.
 	 * 
-	 * @param config Property list with ducks instance configuration
-	 * @param pattern String containing placeholders {property.name}
+	 * @param config
+	 *            Property list with ducks instance configuration
+	 * @param pattern
+	 *            String containing placeholders {property.name}
 	 * @return Result of placeholder expansion
 	 */
 	public static String configStringReplacer(Properties config, String pattern) {
 		StringBuffer result = new StringBuffer(pattern);
-		
-		while (result.indexOf("{")>=0) {
-			int start=result.indexOf("{");
-			int end=result.indexOf("}");
-			
-			if (end<start) {
+
+		while (result.indexOf("{") >= 0) {
+			int start = result.indexOf("{");
+			int end = result.indexOf("}");
+
+			if (end < start) {
 				result.deleteCharAt(end);
 			} else {
-				String propName = result.substring(start+1,end);
+				String propName = result.substring(start + 1, end);
 				if (config.containsKey(propName))
-					result.replace(start,end+1,config.getProperty(propName)); else
-					result.replace(start,end+1,"0");
+					result.replace(start, end + 1, config.getProperty(propName));
+				else
+					result.replace(start, end + 1, "0");
 			}
 		}
-		
+
 		return result.toString();
 	}
-	
-	
+
 	/**
 	 * Add event log target.
 	 * 
 	 * @param logger
 	 */
 	public static void addEventLog(EventLog logger) {
-		if (logger!=null) eventlogs.add(logger);
+		if (logger != null)
+			eventlogs.add(logger);
 	}
-	
+
 	/**
 	 * Set event log target (and remove all existing ones)
 	 * 
@@ -119,104 +134,128 @@ public abstract class EventLog implements DoNotRewrite {
 		eventlogs.clear();
 		addEventLog(logger);
 	}
-	
+
 	/**
 	 * 
-	 * Find a destination class according to the naming rules given above.
-	 * The class will be instantiated using the default constructor (no parameters).
+	 * Find a destination class according to the naming rules given above. The
+	 * class will be instantiated using the default constructor (no parameters).
 	 * After that, the configure method is called.
 	 * 
-	 * @param classname Name of the class
-	 * @param config Simulation property file
+	 * @param classname
+	 *            Name of the class
+	 * @param config
+	 *            Simulation property file
 	 */
 	public static EventLog findEventLog(String classname, Properties config) {
 		EventLog el = null;
 		String prefix = null;
-		logger.debug("Trying to instantiate EventLog class "+classname);
+		logger.debug("Trying to instantiate EventLog class " + classname);
 		try {
-			el=(EventLog)Class.forName(classname).newInstance();
+			el = (EventLog) Class.forName(classname).newInstance();
 			prefix = classname;
 		} catch (Exception e1) {
 			try {
-				el=(EventLog)Class.forName("ducks.eventlog.destinations."+classname).newInstance();					
-				prefix = SimParams.EVENTLOG_DEST+"."+classname;
+				el = (EventLog) Class.forName(
+						"ducks.eventlog.destinations." + classname)
+						.newInstance();
+				prefix = SimParams.EVENTLOG_DEST + "." + classname;
 			} catch (Exception e2) {
-				logger.error("Unable to instantiate EventLog destination "+classname);
+				logger.error("Unable to instantiate EventLog destination "
+						+ classname);
 			} catch (Error err) {
-				logger.error("Unable to instantiate EventLog destination "+classname);
+				logger.error("Unable to instantiate EventLog destination "
+						+ classname);
 			}
 		}
-		if (el!=null) {
-			el.configure(config,prefix);
+		if (el != null) {
+			el.configure(config, prefix);
 			addEventLog(el);
-			logger.debug("Successfully instantiated EventLog destination "+classname);
+			logger.debug("Successfully instantiated EventLog destination "
+					+ classname);
 		}
 		return el;
 	}
-	
+
 	/**
 	 * Safe event logging. Writes log data if a logging instance is set.
 	 */
-	public static void log(int node, long time, Location loc, String type, String comment) {
+	public static void log(int node, long time, Location loc, String type,
+			String comment) {
 		Iterator<EventLog> it = eventlogs.iterator();
-		
-		while(it.hasNext())
-			it.next().logEvent(node,time,loc,type,comment);
+
+		while (it.hasNext())
+			it.next().logEvent(node, time, loc, type, comment);
 	}
 
 	public static void finalizeLoggers() {
 		Iterator<EventLog> it = eventlogs.iterator();
-		
-		while(it.hasNext())
+
+		while (it.hasNext())
 			it.next().finalize();
 	}
-	
-	
+
 	/**
-	 * Configure the logging instance (e.g. get database settings and open db connection, etc)
-	 * @param config Simulation configuration
-	 * @param configprefix Prefix for configuration parameters
+	 * Configure the logging instance (e.g. get database settings and open db
+	 * connection, etc)
+	 * 
+	 * @param config
+	 *            Simulation configuration
+	 * @param configprefix
+	 *            Prefix for configuration parameters
 	 */
-	public void configure(Properties config, String configprefix) {		
+	public void configure(Properties config, String configprefix) {
 	}
-	
+
 	public void finalize() {
 	}
-	
+
 	/**
-	 * Do actual logging. Mind that parameters may be null or <0, which means that they are
-	 * irrelevant for the log entry.
-	 * @param node Node number
-	 * @param time Simulation time
-	 * @param loc Position
-	 * @param type String describing the kind of log entry, e.g. "move", "transmit", etc.
-	 * @param comment For arbitrary comments
+	 * Do actual logging. Mind that parameters may be null or <0, which means
+	 * that they are irrelevant for the log entry.
+	 * 
+	 * @param node
+	 *            Node number
+	 * @param time
+	 *            Simulation time
+	 * @param loc
+	 *            Position
+	 * @param type
+	 *            String describing the kind of log entry, e.g. "move",
+	 *            "transmit", etc.
+	 * @param comment
+	 *            For arbitrary comments
 	 */
-	public abstract void logEvent(int node, long time, Location loc, String type, String comment);
+	public abstract void logEvent(int node, long time, Location loc,
+			String type, String comment);
 
 	/**
 	 * Load all log module classes according to the naming scheme given above.
 	 */
-	public static void loadModules(String[] modulename, Field field, Properties config) {
+	public static void loadModules(String[] modulename, Field field,
+			Properties config) {
 		int i;
-		
-		for (i=0; i<modulename.length; i++) {
+
+		for (i = 0; i < modulename.length; i++) {
 			EventLogModule m = null;
 			try {
-				m=(EventLogModule)Class.forName(modulename[i]).newInstance();
+				m = (EventLogModule) Class.forName(modulename[i]).newInstance();
 			} catch (Exception e1) {
 				try {
-					m=(EventLogModule)Class.forName("ducks.eventlog.modules."+modulename[i]).newInstance();					
+					m = (EventLogModule) Class.forName(
+							"ducks.eventlog.modules." + modulename[i])
+							.newInstance();
 				} catch (Exception e2) {
-					logger.error("Unable to instantiate EventLog module "+modulename[i]);
+					logger.error("Unable to instantiate EventLog module "
+							+ modulename[i]);
 				}
 			}
-			if (m!=null) {
-				String prefix = SimParams.EVENTLOG_MODULEPREFIX+modulename[i];
-				m.configure(field,config,prefix);
+			if (m != null) {
+				String prefix = SimParams.EVENTLOG_MODULEPREFIX + modulename[i];
+				m.configure(field, config, prefix);
 				modules.add(m);
 				m.enable();
-				logger.debug("Successfully instantiated EventLog module "+modulename[i]);
+				logger.debug("Successfully instantiated EventLog module "
+						+ modulename[i]);
 			}
 		}
 	}

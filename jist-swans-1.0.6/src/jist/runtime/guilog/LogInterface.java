@@ -18,20 +18,22 @@ import jist.runtime.Event;
  * @since SWANS1.0
  **/
 
-public interface LogInterface
-{
-  /**
-   * Adds an event to the GUI.
-   *
-   * @param id event id is added to the table
-   * @param parent id's parent event
-   */
-  void add(Event id, Event parent);
+public interface LogInterface {
+	/**
+	 * Adds an event to the GUI.
+	 * 
+	 * @param id
+	 *            event id is added to the table
+	 * @param parent
+	 *            id's parent event
+	 */
+	void add(Event id, Event parent);
 
-  /**
-   * Deletes an event from the GUI.
-   *
-   * @param id event that is deleted from the GUI.
-   */
-  void del(Event id);
+	/**
+	 * Deletes an event from the GUI.
+	 * 
+	 * @param id
+	 *            event that is deleted from the GUI.
+	 */
+	void del(Event id);
 }

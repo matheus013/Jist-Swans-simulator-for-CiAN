@@ -21,21 +21,22 @@ package ducks.misc;
 
 /**
  * Exception type used in the Ducks system.
+ * 
  * @author Elmar Schoch
  */
 public class DucksException extends Exception {
 
-    /**
+	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
 	public DucksException() {
-        super();
-    }
+		super();
+	}
 
-    public DucksException(String reason) {
-        super(reason);
-    }
-    
+	public DucksException(String reason) {
+		super(reason);
+	}
+
 }

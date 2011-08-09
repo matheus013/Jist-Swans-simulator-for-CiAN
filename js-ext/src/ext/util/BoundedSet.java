@@ -22,41 +22,43 @@ import java.util.HashSet;
 /**
  * A CacheMap is a bounded map data structure that silently drops put() requests
  * when the addition of a new element exceeds the maximum capacity of the map.
- *
- * @author 	Michael Feiri
+ * 
+ * @author Michael Feiri
  */
 public class BoundedSet extends HashSet {
-    
-    private static final float defaultLoadFactor = 0.75f; //same as HashMap
-    private int maxEntries;
-    
-    public BoundedSet(int capacity) {
-        super((int)(capacity/defaultLoadFactor)+1,defaultLoadFactor);
-        maxEntries=capacity;
-    }
-    public BoundedSet(int capacity, float loadFactor) {
-        super((int)(capacity/loadFactor)+1,loadFactor);
-        maxEntries=capacity;
-    }
-    public BoundedSet(Collection o) {
-        super(o);
-        maxEntries=o.size();
-    }
-    
-    public boolean add(Object o) {        
-        if (size() >= maxEntries) { 
-            return false;
-        } else {
-            return super.add(o);
-        }
-    }
-    
-    public int capacity() {
-        return maxEntries;
-    }
-    
-    public boolean isFull() {
-        return size() == maxEntries;
-    }
-    
+
+	private static final float defaultLoadFactor = 0.75f; // same as HashMap
+	private int maxEntries;
+
+	public BoundedSet(int capacity) {
+		super((int) (capacity / defaultLoadFactor) + 1, defaultLoadFactor);
+		maxEntries = capacity;
+	}
+
+	public BoundedSet(int capacity, float loadFactor) {
+		super((int) (capacity / loadFactor) + 1, loadFactor);
+		maxEntries = capacity;
+	}
+
+	public BoundedSet(Collection o) {
+		super(o);
+		maxEntries = o.size();
+	}
+
+	public boolean add(Object o) {
+		if (size() >= maxEntries) {
+			return false;
+		} else {
+			return super.add(o);
+		}
+	}
+
+	public int capacity() {
+		return maxEntries;
+	}
+
+	public boolean isFull() {
+		return size() == maxEntries;
+	}
+
 }

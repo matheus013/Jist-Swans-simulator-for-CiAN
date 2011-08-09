@@ -30,7 +30,7 @@ import ducks.eventlog.EventLogModule;
  * Register a movement listener and send movement data to logging system.
  * 
  * @author Stefan Schlott
- *
+ * 
  */
 public class Movement implements EventLogModule, MovementListenerInterface {
 	Field field;
@@ -48,6 +48,6 @@ public class Movement implements EventLogModule, MovementListenerInterface {
 	}
 
 	public void move(long time, Location loc, int node) {
-		EventLog.log(node,time,loc,"move",null);
+		EventLog.log(node, time, loc, "move", null);
 	}
 }

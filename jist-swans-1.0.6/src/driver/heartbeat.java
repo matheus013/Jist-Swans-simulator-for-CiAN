@@ -35,162 +35,184 @@ import jist.runtime.JistAPI;
 
 /**
  * SWANS demo/test: heartbeat application.
- *
+ * 
  * @author Rimon Barr &lt;barr+jist@cs.cornell.edu&gt;
  * @version $Id: heartbeat.java,v 1.16 2004-11-22 16:51:05 barr Exp $
  */
 
-public class heartbeat
-{
+public class heartbeat {
 
-  /** random waypoint pause time. */
-  public static final int PAUSE_TIME = 30;
-  /** random waypoint granularity. */
-  public static final int GRANULARITY = 10;
-  /** random waypoint minimum speed. */
-  public static final int MIN_SPEED = 2;
-  /** random waypoint maximum speed. */
-  public static final int MAX_SPEED = 10;
+	/** random waypoint pause time. */
+	public static final int PAUSE_TIME = 30;
+	/** random waypoint granularity. */
+	public static final int GRANULARITY = 10;
+	/** random waypoint minimum speed. */
+	public static final int MIN_SPEED = 2;
+	/** random waypoint maximum speed. */
+	public static final int MAX_SPEED = 10;
 
-  // Elmar Schoch added >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-  private static ArrayList<AppHeartbeat> appList = new ArrayList<AppHeartbeat>();
-  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// Elmar Schoch added >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+	private static ArrayList<AppHeartbeat> appList = new ArrayList<AppHeartbeat>();
 
-  /**
-   * Initialize simulation node.
-   *
-   * @param i node number
-   * @param field simulation field
-   * @param placement node placement model
-   * @param radioInfoShared shared radio information
-   * @param protMap shared protocol map
-   * @param plIn incoming packet loss model
-   * @param plOut outgoing packet loss model
-   */
-  public static void createNode(int i,
-      Field field, Placement placement,
-      RadioInfo.RadioInfoShared radioInfoShared, Mapper protMap,
-      PacketLoss plIn, PacketLoss plOut)
-  {
-    // create entities
-    RadioNoiseIndep radio = new RadioNoiseIndep(i, radioInfoShared);
-    MacDumb mac = new MacDumb(new MacAddress(i), radio.getRadioInfo());
-    //Mac802_11 mac = new Mac802_11(new MacAddress(i), radio.getRadioInfo());
-    NetIp net = new NetIp(new NetAddress(i), protMap, plIn, plOut);
-    AppHeartbeat app = new AppHeartbeat(i, true);
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-    // Elmar Schoch added >>>>>>>>>>>>>>>>>>>>>>>>>>>
-    heartbeat.appList.add(app);
-    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    
-    // hookup entities
-    field.addRadio(radio.getRadioInfo(), radio.getProxy(), placement.getNextLocation());
-    field.startMobility(radio.getRadioInfo().getUnique().getID());
-    radio.setFieldEntity(field.getProxy());
-    radio.setMacEntity(mac.getProxy());
-    mac.setRadioEntity(radio.getProxy());
-    byte intId = net.addInterface(mac.getProxy());
-    mac.setNetEntity(net.getProxy(), intId);
-    net.setProtocolHandler(Constants.NET_PROTOCOL_HEARTBEAT, app.getNetProxy());
-    app.setNetEntity(net.getProxy());
-    app.getAppProxy().run(null);
-  }
+	/**
+	 * Initialize simulation node.
+	 * 
+	 * @param i
+	 *            node number
+	 * @param field
+	 *            simulation field
+	 * @param placement
+	 *            node placement model
+	 * @param radioInfoShared
+	 *            shared radio information
+	 * @param protMap
+	 *            shared protocol map
+	 * @param plIn
+	 *            incoming packet loss model
+	 * @param plOut
+	 *            outgoing packet loss model
+	 */
+	public static void createNode(int i, Field field, Placement placement,
+			RadioInfo.RadioInfoShared radioInfoShared, Mapper protMap,
+			PacketLoss plIn, PacketLoss plOut) {
+		// create entities
+		RadioNoiseIndep radio = new RadioNoiseIndep(i, radioInfoShared);
+		MacDumb mac = new MacDumb(new MacAddress(i), radio.getRadioInfo());
+		// Mac802_11 mac = new Mac802_11(new MacAddress(i),
+		// radio.getRadioInfo());
+		NetIp net = new NetIp(new NetAddress(i), protMap, plIn, plOut);
+		AppHeartbeat app = new AppHeartbeat(i, true);
 
-  /**
-   * Initialize simulation field.
-   *
-   * @param nodes number of nodes
-   * @param length length of field
-   * @return simulation field
-   */
-  public static Field createSim(int nodes, int length)
-  {
-    Location.Location2D bounds = new Location.Location2D(length, length);
-    Placement placement = new Placement.Random(bounds);
-    Mobility mobility = new Mobility.RandomWaypoint(bounds, PAUSE_TIME, GRANULARITY, MAX_SPEED, MIN_SPEED);
-    Spatial spatial = new Spatial.HierGrid(bounds, 5);
-    Fading fading = new Fading.None();
-    PathLoss pathloss = new PathLoss.FreeSpace();
-    Field field = new Field(spatial, fading, pathloss, mobility, Constants.PROPAGATION_LIMIT_DEFAULT);
+		// Elmar Schoch added >>>>>>>>>>>>>>>>>>>>>>>>>>>
+		heartbeat.appList.add(app);
+		// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-    RadioInfo.RadioInfoShared radioInfoShared = RadioInfo.createShared(
-        Constants.FREQUENCY_DEFAULT, Constants.BANDWIDTH_DEFAULT,
-        Constants.TRANSMIT_DEFAULT, Constants.GAIN_DEFAULT,
-        Util.fromDB(Constants.SENSITIVITY_DEFAULT), Util.fromDB(Constants.THRESHOLD_DEFAULT),
-        Constants.TEMPERATURE_DEFAULT, Constants.TEMPERATURE_FACTOR_DEFAULT, Constants.AMBIENT_NOISE_DEFAULT);
+		// hookup entities
+		field.addRadio(radio.getRadioInfo(), radio.getProxy(),
+				placement.getNextLocation());
+		field.startMobility(radio.getRadioInfo().getUnique().getID());
+		radio.setFieldEntity(field.getProxy());
+		radio.setMacEntity(mac.getProxy());
+		mac.setRadioEntity(radio.getProxy());
+		byte intId = net.addInterface(mac.getProxy());
+		mac.setNetEntity(net.getProxy(), intId);
+		net.setProtocolHandler(Constants.NET_PROTOCOL_HEARTBEAT,
+				app.getNetProxy());
+		app.setNetEntity(net.getProxy());
+		app.getAppProxy().run(null);
+	}
 
-    Mapper protMap = new Mapper(Constants.NET_PROTOCOL_MAX);
-    protMap.mapToNext(Constants.NET_PROTOCOL_HEARTBEAT);
-    PacketLoss pl = new PacketLoss.Zero();
+	/**
+	 * Initialize simulation field.
+	 * 
+	 * @param nodes
+	 *            number of nodes
+	 * @param length
+	 *            length of field
+	 * @return simulation field
+	 */
+	public static Field createSim(int nodes, int length) {
+		Location.Location2D bounds = new Location.Location2D(length, length);
+		Placement placement = new Placement.Random(bounds);
+		Mobility mobility = new Mobility.RandomWaypoint(bounds, PAUSE_TIME,
+				GRANULARITY, MAX_SPEED, MIN_SPEED);
+		Spatial spatial = new Spatial.HierGrid(bounds, 5);
+		Fading fading = new Fading.None();
+		PathLoss pathloss = new PathLoss.FreeSpace();
+		Field field = new Field(spatial, fading, pathloss, mobility,
+				Constants.PROPAGATION_LIMIT_DEFAULT);
 
-    for(int i=0; i<nodes; i++)
-    {
-      createNode(i, field, placement, radioInfoShared, protMap, pl, pl);
-    }
+		RadioInfo.RadioInfoShared radioInfoShared = RadioInfo.createShared(
+				Constants.FREQUENCY_DEFAULT, Constants.BANDWIDTH_DEFAULT,
+				Constants.TRANSMIT_DEFAULT, Constants.GAIN_DEFAULT,
+				Util.fromDB(Constants.SENSITIVITY_DEFAULT),
+				Util.fromDB(Constants.THRESHOLD_DEFAULT),
+				Constants.TEMPERATURE_DEFAULT,
+				Constants.TEMPERATURE_FACTOR_DEFAULT,
+				Constants.AMBIENT_NOISE_DEFAULT);
 
-    return field;
-  }
+		Mapper protMap = new Mapper(Constants.NET_PROTOCOL_MAX);
+		protMap.mapToNext(Constants.NET_PROTOCOL_HEARTBEAT);
+		PacketLoss pl = new PacketLoss.Zero();
 
-  /**
-   * Benchmark entry point: heartbeat test.
-   *
-   * @param args command-line parameters
-   */
-  public static void main(String[] args)
-  {
-    if(args.length<3)
-    {
-      System.out.println("syntax: swans driver.heartbeat <nodes> <length> <time>");
-      System.out.println("    eg: swans driver.heartbeat 5 100 5");
-      return;
-    }
+		for (int i = 0; i < nodes; i++) {
+			createNode(i, field, placement, radioInfoShared, protMap, pl, pl);
+		}
 
-    int nodes = Integer.parseInt(args[0]);
-    int length = Integer.parseInt(args[1]);
-    int time = Integer.parseInt(args[2]);
-    float density = nodes / (float)(length/1000.0 * length/1000.0);
+		return field;
+	}
 
-    System.out.println("nodes   = "+nodes);
-    System.out.println("size    = "+length+" x "+length);
-    System.out.println("time    = "+time+" seconds");
-    System.out.print("Creating simulation nodes... ");
-    Field f = createSim(nodes, length);
-    System.out.println("done.");
+	/**
+	 * Benchmark entry point: heartbeat test.
+	 * 
+	 * @param args
+	 *            command-line parameters
+	 */
+	public static void main(String[] args) {
+		if (args.length < 3) {
+			System.out
+					.println("syntax: swans driver.heartbeat <nodes> <length> <time>");
+			System.out.println("    eg: swans driver.heartbeat 5 100 5");
+			return;
+		}
 
-    System.out.println("Average density = "+f.computeDensity()*1000*1000+"/km^2");
-    System.out.println("Average sensing = "+f.computeAvgConnectivity(true));
-    System.out.println("Average receive = "+f.computeAvgConnectivity(false));
-    JistAPI.endAt(time*Constants.SECOND);
-    
-    // Elmar Schoch added >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    JistAPI.runAt(new Runnable()
-    {
-      public void run()
-      {
-        System.out.println("Evaluation");
-        int i = 0;
-        float avgMinSum = 0;
-        float avgMaxSum = 0;
-        float avgSum = 0;
-        for(AppHeartbeat app : appList) {
-        	float[] stats = app.hbs.getNeighborCountStats(5*Constants.SECOND, 60*Constants.SECOND, 500*Constants.MILLI_SECOND);
-        	float[] statTime = app.hbs.getNeighborTimeStats(60*Constants.SECOND);
-        	avgMinSum += stats[0];
-        	avgMaxSum += stats[1];
-        	avgSum += stats[2];
-        	System.out.println("Node "+i+":");
-        	System.out.println(" - Neighbor Count:  Min: "+stats[0]+"  Max: "+stats[1]+"  Avg: "+stats[2]);
-        	System.out.println(" - Neighbor Time:   Min: "+statTime[0]+"  Max: "+statTime[1]+"  Avg: "+statTime[2]);
-        	//app.hbs.displayNeighborTrace();
-        	i++;
-        }
-        System.out.println("Min average: "+(avgMinSum / (float) appList.size()));
-        System.out.println("Max average: "+(avgMaxSum / (float) appList.size()));
-        System.out.println("Total average: "+(avgSum / (float) appList.size()));
-      }
-    }, JistAPI.END);
-    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-  }
+		int nodes = Integer.parseInt(args[0]);
+		int length = Integer.parseInt(args[1]);
+		int time = Integer.parseInt(args[2]);
+		float density = nodes / (float) (length / 1000.0 * length / 1000.0);
+
+		System.out.println("nodes   = " + nodes);
+		System.out.println("size    = " + length + " x " + length);
+		System.out.println("time    = " + time + " seconds");
+		System.out.print("Creating simulation nodes... ");
+		Field f = createSim(nodes, length);
+		System.out.println("done.");
+
+		System.out.println("Average density = " + f.computeDensity() * 1000
+				* 1000 + "/km^2");
+		System.out.println("Average sensing = "
+				+ f.computeAvgConnectivity(true));
+		System.out.println("Average receive = "
+				+ f.computeAvgConnectivity(false));
+		JistAPI.endAt(time * Constants.SECOND);
+
+		// Elmar Schoch added >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+		JistAPI.runAt(new Runnable() {
+			public void run() {
+				System.out.println("Evaluation");
+				int i = 0;
+				float avgMinSum = 0;
+				float avgMaxSum = 0;
+				float avgSum = 0;
+				for (AppHeartbeat app : appList) {
+					float[] stats = app.hbs.getNeighborCountStats(
+							5 * Constants.SECOND, 60 * Constants.SECOND,
+							500 * Constants.MILLI_SECOND);
+					float[] statTime = app.hbs
+							.getNeighborTimeStats(60 * Constants.SECOND);
+					avgMinSum += stats[0];
+					avgMaxSum += stats[1];
+					avgSum += stats[2];
+					System.out.println("Node " + i + ":");
+					System.out.println(" - Neighbor Count:  Min: " + stats[0]
+							+ "  Max: " + stats[1] + "  Avg: " + stats[2]);
+					System.out.println(" - Neighbor Time:   Min: "
+							+ statTime[0] + "  Max: " + statTime[1] + "  Avg: "
+							+ statTime[2]);
+					// app.hbs.displayNeighborTrace();
+					i++;
+				}
+				System.out.println("Min average: "
+						+ (avgMinSum / (float) appList.size()));
+				System.out.println("Max average: "
+						+ (avgMaxSum / (float) appList.size()));
+				System.out.println("Total average: "
+						+ (avgSum / (float) appList.size()));
+			}
+		}, JistAPI.END);
+		// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	}
 
 }
-

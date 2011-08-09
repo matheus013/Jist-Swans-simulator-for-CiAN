@@ -25,24 +25,24 @@ import ext.util.ExtendedProperties;
  * the database result handling delivered by the DUCKS framework.
  * 
  * Note that this mechanism is only useful for collecting aggregated values at
- * the end of a simulation. To trace events during runtime of a simulation,
- * use the Eventlog mechanisms. 
+ * the end of a simulation. To trace events during runtime of a simulation, use
+ * the Eventlog mechanisms.
  * 
  * @author Elmar Schoch
- *
+ * 
  */
 public interface StatsCollector {
-	
+
 	/**
-	 * Must return a properties object that contains result parameters
-	 * in the format defined by DUCKS (i.e. properties format)
-	 * Also note, that the result parameters reflect the database
-	 * structure (see DBManager for details).
+	 * Must return a properties object that contains result parameters in the
+	 * format defined by DUCKS (i.e. properties format) Also note, that the
+	 * result parameters reflect the database structure (see DBManager for
+	 * details).
 	 * 
 	 * @return
 	 */
 	public ExtendedProperties getStats();
-	
+
 	/**
 	 * Must return an array of result parameter strings that will be contained
 	 * when "getStats()" is called.

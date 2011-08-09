@@ -21,56 +21,58 @@ package ext.util;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
-
 public class ReflectionUtils {
 
-// Reflection utility methods ...................................
-	
+	// Reflection utility methods ...................................
+
 	public static Class getClass(String className) throws Exception {
 		Class result = null;
 		try {
-	        result = Class.forName(className);
-        } catch (Exception e) {
-	        throw new Exception(e.getMessage());
-        }
-        return result;
+			result = Class.forName(className);
+		} catch (Exception e) {
+			throw new Exception(e.getMessage());
+		}
+		return result;
 	}
-	
+
 	public static Object createObject(String className) throws Exception {
 		Object result = null;
 		try {
 			result = Class.forName(className).newInstance();
 		} catch (Exception e) {
-			throw new Exception("Class "+className+" could not be instantiated!");
+			throw new Exception("Class " + className
+					+ " could not be instantiated!");
 		}
 		return result;
 	}
-	
-	public static Object createObject(String className, Class[] paramTypes, 
+
+	public static Object createObject(String className, Class[] paramTypes,
 			Object[] params) throws Exception {
 		Object result = null;
 		try {
 			Class cls = Class.forName(className);
-    		Constructor con = cls.getConstructor(paramTypes);
-    		result = con.newInstance(params);
+			Constructor con = cls.getConstructor(paramTypes);
+			result = con.newInstance(params);
 		} catch (Exception e) {
-			throw new Exception("Class "+className+" could not be instantiated!");
+			throw new Exception("Class " + className
+					+ " could not be instantiated!");
 		}
 		return result;
 	}
-	
-	public static Object invokeMethod(String className, String method, Class[] paramTypes, 
-			Object obj, Object[] args) throws Exception {
-    	
+
+	public static Object invokeMethod(String className, String method,
+			Class[] paramTypes, Object obj, Object[] args) throws Exception {
+
 		Object result = null;
 		try {
-    		Class cls = Class.forName(className);
-    		Method m = cls.getMethod(method, paramTypes );
-	    	result = m.invoke(obj, args);
-    	} catch (Exception e) {
-    		throw new Exception("Method invoke failed: Class: "+className+" Method: "+method);
-    	}
-    	return result;
+			Class cls = Class.forName(className);
+			Method m = cls.getMethod(method, paramTypes);
+			result = m.invoke(obj, args);
+		} catch (Exception e) {
+			throw new Exception("Method invoke failed: Class: " + className
+					+ " Method: " + method);
+		}
+		return result;
 	}
 
 }

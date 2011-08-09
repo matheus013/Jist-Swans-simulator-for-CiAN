@@ -26,28 +26,31 @@ import ext.jist.swans.mobility.MobilityReplay.Waypoint;
 import jist.swans.field.Mobility.MobilityInfo;
 
 public class MobilityReplayMobilityInfo implements MobilityInfo {
-	
+
 	// base data
 	List<Waypoint> waypoints;
-	
+
 	// concurrent data
 	Waypoint lastWaypoint = null;
 	Waypoint nextWaypoint = null;
-		
+
 	int steps;
 	int remainingSteps;
 	long stepTime;
-	
+
 	/**
 	 * Returns waypoint next to the current time, or null, if no further
 	 * waypoint is available
-	 * @param curTime Current JiST time (in nanoseconds which is the official JiST time)
+	 * 
+	 * @param curTime
+	 *            Current JiST time (in nanoseconds which is the official JiST
+	 *            time)
 	 * @return Next waypoint
 	 */
 	public Waypoint getNextWaypoint(long curTime) {
 		long minTime = Long.MAX_VALUE;
 		Waypoint wp = null;
-		for( Waypoint w: waypoints) {
+		for (Waypoint w : waypoints) {
 			if (w.time >= curTime && w.time < minTime) {
 				minTime = w.time;
 				wp = w;
@@ -58,7 +61,7 @@ public class MobilityReplayMobilityInfo implements MobilityInfo {
 		}
 		return wp;
 	}
-	
+
 	public Waypoint getNextWaypoint() {
 		Waypoint wp = null;
 		if (waypoints.size() > 0) {
@@ -67,5 +70,5 @@ public class MobilityReplayMobilityInfo implements MobilityInfo {
 		}
 		return wp;
 	}
-	
+
 }

@@ -25,13 +25,16 @@ import ext.util.ExtendedProperties;
 
 public interface SimulationMultiplexer {
 
-	// namespaces in the config file that are excluded during multiplexing of parameters
+	// namespaces in the config file that are excluded during multiplexing of
+	// parameters
 	// Note that this may be different from the parameters excluded from
-	// saving. In particular, do not exclude any parameters that are required by the
+	// saving. In particular, do not exclude any parameters that are required by
+	// the
 	// driver !
-	public static final String[] CFG_EXCLUDE_PARAMS = new String[] { "ducks.config", "ducks.servers", 
-        "ducks.stats" };
-	
-	public List<ExtendedProperties> getSimulations(ExtendedProperties config) throws DucksException;
+	public static final String[] CFG_EXCLUDE_PARAMS = new String[] {
+			"ducks.config", "ducks.servers", "ducks.stats" };
+
+	public List<ExtendedProperties> getSimulations(ExtendedProperties config)
+			throws DucksException;
 
 }

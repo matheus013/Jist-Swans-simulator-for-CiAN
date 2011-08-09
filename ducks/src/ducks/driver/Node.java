@@ -26,23 +26,24 @@ import vans.straw.VisualizerInterface;
 import ext.util.ExtendedProperties;
 
 /**
- * The Node interface is required for classes that implement a node in the
- * ad hoc network, at least if they shall be used within the DUCKS generic
- * driver model.
- * Note that this is not necessarily required if the next higher level class 
- * (here: GenericNodes) is implemented differently
- *  
+ * The Node interface is required for classes that implement a node in the ad
+ * hoc network, at least if they shall be used within the DUCKS generic driver
+ * model. Note that this is not necessarily required if the next higher level
+ * class (here: GenericNodes) is implemented differently
+ * 
  * @author Elmar Schoch
- *
+ * 
  */
 public interface Node extends DucksDriverModule {
 
 	public void setIdentifier(int id);
-	
+
 	public void setScene(Scene scene);
+
 	public void setGlobalConfig(ExtendedProperties config);
-	
-	public void setCommonObjects(Placement place, RadioInfo.RadioInfoShared radioInfo, 
-			Mapper protMap, PacketLoss inLoss, PacketLoss outLoss, VisualizerInterface v);
-	
+
+	public void setCommonObjects(Placement place,
+			RadioInfo.RadioInfoShared radioInfo, Mapper protMap,
+			PacketLoss inLoss, PacketLoss outLoss, VisualizerInterface v);
+
 }
