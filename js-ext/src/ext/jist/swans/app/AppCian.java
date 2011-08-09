@@ -4,7 +4,6 @@ import jist.runtime.JistAPI;
 import jist.runtime.JistAPI.Continuation;
 import jist.swans.Constants;
 import jist.swans.app.AppInterface;
-import jist.swans.mac.MacAddress;
 import jist.swans.misc.Message;
 import jist.swans.net.NetAddress;
 import jist.swans.net.NetInterface;
@@ -15,9 +14,10 @@ import jist.swans.trans.TransTcp;
 import jist.swans.trans.TransTcp.TcpMessage;
 import jist.swans.trans.TransUdp;
 import jist.swans.trans.TransUdp.UdpMessage;
+import system.CiAN;
 import ext.util.stats.DucksCompositionStats;
 
-public abstract class AppCianBase implements AppInterface, AppInterface.TcpApp,
+public class AppCian implements AppInterface, AppInterface.TcpApp,
 		AppInterface.UdpApp, SocketHandler {
 
 	// network entity.
@@ -35,9 +35,13 @@ public abstract class AppCianBase implements AppInterface, AppInterface.TcpApp,
 	// composition stats accumulator
 	protected DucksCompositionStats compositionStats;
 
-	public AppCianBase(int nodeId, DucksCompositionStats compositionStats) {
+	protected String[] args;
+
+	public AppCian(int nodeId, DucksCompositionStats compositionStats,
+			String[] args) {
 		this.nodeId = nodeId;
 		this.compositionStats = compositionStats;
+		this.args = args;
 		// init self reference
 		this.self = JistAPI.proxyMany(this, new Class[] { AppInterface.class,
 				AppInterface.TcpApp.class, AppInterface.UdpApp.class });
@@ -63,14 +67,18 @@ public abstract class AppCianBase implements AppInterface, AppInterface.TcpApp,
 	public void receive(Message msg, NetAddress src, int srcPort)
 			throws Continuation {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	public void run() {
-		run(null);
+		run(this.args);
 	}
 
-	public abstract void run(String[] args);
+	public void run(String[] args) {
+		compositionStats.incrementNumReq();
+
+		CiAN.main(args);
+	}
 
 	/**
 	 * Set network entity.
@@ -87,11 +95,11 @@ public abstract class AppCianBase implements AppInterface, AppInterface.TcpApp,
 	public AppInterface getAppProxy() {
 		return (AppInterface) self;
 	}
-	
+
 	public AppInterface.TcpApp getTcpAppProxy() {
 		return (AppInterface.TcpApp) self;
 	}
-	
+
 	public AppInterface.UdpApp getUdpAppProxy() {
 		return (AppInterface.UdpApp) self;
 	}
