@@ -2,6 +2,7 @@ package ext.jist.swans.app;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLClassLoader;
 
@@ -55,6 +56,10 @@ public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.
 
     public int getNodeId() {
         return nodeId;
+    }
+    
+    public InetAddress getInetAddress() {
+        return this.netEntity.getAddress().getIP();
     }
 
     public void send(Message msg, NetAddress addr) throws Exception {
