@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" output="vans/classes" path="vans/src"/>
-	<classpathentry kind="src" output="CiAN/classes" path="CiAN/src/java"/>
 	<classpathentry kind="src" output="js-ext/classes" path="js-ext/src"/>
 	<classpathentry kind="src" output="jist-swans-1.0.6/classes" path="jist-swans-1.0.6/src"/>
 	<classpathentry kind="src" output="ducks/classes" path="ducks/src"/>

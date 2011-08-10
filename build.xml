@@ -4,8 +4,6 @@
 	<property name="classes.dir" value="classes" />
 	<property name="src.dir" value="src" />
 	<property name="libs.dir" value="libs" />
-	<property name="cian.src.dir" value="src/java" />
-	<property name="cian.libs.dir" value="lib" />
 
 	
 	<!-- Available modules -->
@@ -13,7 +11,6 @@
 	<property name="js-ext.dir" value="js-ext"/>
 	<property name="ducks.dir" value="ducks" />
 	<property name="vans.dir" value="vans" />
-	<property name="cian.dir" value="CiAN" />
 
 	<path id="project.classpath">
     	<dirset dir="${basedir}">
@@ -21,20 +18,11 @@
     	</dirset>
     	<fileset dir="${basedir}">
     		<include name="*/${libs.dir}/*.jar"/>
-    		<include name="${cian.dir}/${cian.libs.dir}/*.jar"/>
     	</fileset>
     </path>
 	
-	<target name="build.cian">
-		<mkdir dir="${cian.dir}/${classes.dir}"/>
-		<javac destdir="${cian.dir}/${classes.dir}" source="1.5">
-			<src path="${cian.dir}/${cian.src.dir}" />
-		   	<classpath refid="project.classpath"/>
-		</javac>
-	</target>
-	
 	<!-- Compilation targets ......................................... -->
-    <target name="build.init" depends="build.cian">
+    <target name="build.init">
     	
     </target>
 	
