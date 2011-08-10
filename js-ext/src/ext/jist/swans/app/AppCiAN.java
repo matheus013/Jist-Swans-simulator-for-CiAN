@@ -135,10 +135,18 @@ public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.
             // node to be isolated from the others.
             // IMPORTANT: it is vital that CiAN.jar is NOT in the classpath!
             try {
+                // We need a new ClassLoader for each node we are creating
                 ClassLoader loader = new URLClassLoader(new URL[] { new File("CiAN/CiAN.jar").toURI().toURL() });
+
+                // Loading CiAN class this way ensures us that each node is
+                // isolated from each other
                 Class<?> c = loader.loadClass("CiAN");
+
+                // Add a dependency to this node's application into CiAN
                 Method extToolSetter = c.getDeclaredMethod("setExternalTool", Object.class);
                 extToolSetter.invoke(null, parent);
+
+                // Finally we can start CiAN
                 Method main = c.getDeclaredMethod("main", this.args.getClass());
                 main.invoke(null, (Object[]) this.args);
             } catch (Exception e) {

@@ -9,6 +9,7 @@ public class CiANHost3Node extends CiANBaseNode
 
     @Override
     protected String[] getCiANArguments() {
-        return new String[] { "Host 3", "standard", "-p", "properties3.ini", "-c", "simplehost3.hcfg" };
+        return new String[] { "Host 3", "standard", "-p", "CiAN/src/examples/simpleSimu/properties3.ini", "-c",
+                "CiAN/src/examples/simpleSimu/simplehost3.hcfg" };
     }
 }
