@@ -14,9 +14,12 @@
 
 	<path id="project.classpath">
     	<dirset dir="${basedir}">
+    		<!-- CAREFUL: CiAN must NOT have classes generated in CiAN/classes -->
+    		<!-- You should only use the JAR BUT not include it in the classpath! -->
     		<include name="*/${classes.dir}"/>
     	</dirset>
     	<fileset dir="${basedir}">
+    		<!-- Also includes CiAN libs -->
     		<include name="*/${libs.dir}/*.jar"/>
     	</fileset>
     </path>
