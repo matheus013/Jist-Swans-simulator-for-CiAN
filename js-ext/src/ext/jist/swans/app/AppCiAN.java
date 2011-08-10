@@ -1,5 +1,10 @@
 package ext.jist.swans.app;
 
+import java.io.File;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
+
 import jist.runtime.JistAPI;
 import jist.runtime.JistAPI.Continuation;
 import jist.swans.Constants;
@@ -14,10 +19,9 @@ import jist.swans.trans.TransTcp;
 import jist.swans.trans.TransTcp.TcpMessage;
 import jist.swans.trans.TransUdp;
 import jist.swans.trans.TransUdp.UdpMessage;
-import system.CiAN;
 import ext.util.stats.DucksCompositionStats;
 
-public class AppCian implements AppInterface, AppInterface.TcpApp, AppInterface.UdpApp, SocketHandler
+public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.UdpApp, SocketHandler
 {
 
     // network entity.
@@ -37,7 +41,7 @@ public class AppCian implements AppInterface, AppInterface.TcpApp, AppInterface.
 
     protected String[]              args;
 
-    public AppCian(int nodeId, DucksCompositionStats compositionStats, String[] args) {
+    public AppCiAN(int nodeId, DucksCompositionStats compositionStats, String[] args) {
         this.nodeId = nodeId;
         this.compositionStats = compositionStats;
         this.args = args;
@@ -47,6 +51,10 @@ public class AppCian implements AppInterface, AppInterface.TcpApp, AppInterface.
 
         this.transTCP = new TransTcp();
         this.transUDP = new TransUdp();
+    }
+
+    public int getNodeId() {
+        return nodeId;
     }
 
     public void send(Message msg, NetAddress addr) throws Exception {
@@ -74,7 +82,8 @@ public class AppCian implements AppInterface, AppInterface.TcpApp, AppInterface.
     public void run(String[] args) {
         compositionStats.incrementNumReq();
 
-        new CiANThread(args).start();
+        // Starting a new CiAN application isolated from the others
+        new CiANThread(this, args).start();
     }
 
     /**
@@ -112,22 +121,30 @@ public class AppCian implements AppInterface, AppInterface.TcpApp, AppInterface.
     class CiANThread extends Thread
     {
         private String[] args;
+        private AppCiAN  parent;
 
-        public CiANThread(String[] args) {
-            super("CiaNThread for node " + nodeId);
+        public CiANThread(AppCiAN parent, String[] args) {
+            super("CiANThread for node " + parent.getNodeId());
             this.args = args;
-            setContextClassLoader(new CiANClassLoader());
+            this.parent = parent;
         }
 
         @Override
         public void run() {
-            CiAN.main(this.args);
+            // Unfortunately we have to do this little hack in order for every
+            // node to be isolated from the others.
+            // IMPORTANT: it is vital that CiAN.jar is NOT in the classpath!
+            try {
+                ClassLoader loader = new URLClassLoader(new URL[] { new File("CiAN.jar").toURI().toURL() });
+                Class<?> c = loader.loadClass("CiAN");
+                Method extToolSetter = c.getDeclaredMethod("setExternalTool", Object.class);
+                extToolSetter.invoke(null, parent);
+                Method main = c.getDeclaredMethod("main", this.args.getClass());
+                main.invoke(null, (Object[]) this.args);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-    }
-
-    class CiANClassLoader extends ClassLoader
-    {
-
     }
 
 }

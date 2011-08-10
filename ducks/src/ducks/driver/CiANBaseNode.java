@@ -7,15 +7,15 @@ import jist.swans.misc.Mapper;
 
 import org.apache.log4j.Logger;
 
-import ext.jist.swans.app.AppCian;
+import ext.jist.swans.app.AppCiAN;
 import ext.util.stats.DucksCompositionStats;
 
-public abstract class CianBaseNode extends GenericNode
+public abstract class CiANBaseNode extends GenericNode
 {
 
-    protected static Logger log = Logger.getLogger(CianBaseNode.class.getName());
+    protected static Logger log = Logger.getLogger(CiANBaseNode.class.getName());
 
-    public CianBaseNode() {
+    public CiANBaseNode() {
         super();
     }
 
@@ -33,7 +33,7 @@ public abstract class CianBaseNode extends GenericNode
                 e.printStackTrace();
             }
 
-            AppCian ac = new AppCian(this.id, compoStats, getCianArguments());
+            AppCiAN ac = new AppCiAN(this.id, compoStats, getCiANArguments());
 
             protMap.testMapToNext(Constants.NET_PROTOCOL_UDP);
             net.setProtocolHandler(Constants.NET_PROTOCOL_UDP, ac.getUdpEntity());
@@ -50,6 +50,6 @@ public abstract class CianBaseNode extends GenericNode
         }
     }
 
-    protected abstract String[] getCianArguments();
+    protected abstract String[] getCiANArguments();
 
 }

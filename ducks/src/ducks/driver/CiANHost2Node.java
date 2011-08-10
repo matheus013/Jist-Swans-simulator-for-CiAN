@@ -1,14 +1,14 @@
 package ducks.driver;
 
-public class CianHost2Node extends CianBaseNode
+public class CiANHost2Node extends CiANBaseNode
 {
 
-    public CianHost2Node() {
+    public CiANHost2Node() {
         super();
     }
 
     @Override
-    protected String[] getCianArguments() {
+    protected String[] getCiANArguments() {
         return new String[] { "Host 2", "standard", "-p", "properties2.ini", "-c", "simplehost2.hcfg" };
     }
 
