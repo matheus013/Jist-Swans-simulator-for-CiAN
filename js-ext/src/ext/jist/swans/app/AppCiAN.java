@@ -61,6 +61,10 @@ public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.
     public InetAddress getInetAddress() {
         return this.netEntity.getAddress().getIP();
     }
+    
+    public InetAddress getMulticastAddress() {
+        return NetAddress.ANY.getIP();
+    }
 
     public void send(Message msg, NetAddress addr) throws Exception {
         if (msg instanceof TcpMessage) {
