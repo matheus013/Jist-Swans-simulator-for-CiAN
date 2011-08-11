@@ -5,42 +5,46 @@ import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import jist.runtime.JistAPI;
 import jist.runtime.JistAPI.Continuation;
 import jist.swans.Constants;
 import jist.swans.app.AppInterface;
 import jist.swans.misc.Message;
+import jist.swans.misc.MessageBytes;
 import jist.swans.net.NetAddress;
 import jist.swans.net.NetInterface;
 import jist.swans.trans.TransInterface.SocketHandler;
 import jist.swans.trans.TransInterface.TransTcpInterface;
 import jist.swans.trans.TransInterface.TransUdpInterface;
 import jist.swans.trans.TransTcp;
-import jist.swans.trans.TransTcp.TcpMessage;
 import jist.swans.trans.TransUdp;
 import jist.swans.trans.TransUdp.UdpMessage;
 import ext.util.stats.DucksCompositionStats;
 
 public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.UdpApp, SocketHandler
 {
-
     // network entity.
-    protected NetInterface          netEntity;
+    private NetInterface              netEntity;
 
-    protected TransTcp              transTCP;
+    private TransTcp                  transTCP;
 
-    protected TransUdp              transUDP;
+    private TransUdp                  transUDP;
 
     // self-referencing proxy entity.
-    protected Object                self;
+    private Object                    self;
 
-    protected int                   nodeId;
+    private int                       nodeId;
 
     // composition stats accumulator
-    protected DucksCompositionStats compositionStats;
+    private DucksCompositionStats     compositionStats;
 
-    protected String[]              args;
+    private String[]                  args;
+
+    private BlockingQueue<UdpMessage> UDPMessageQueue;
+    private int                       multicastPort;
 
     public AppCiAN(int nodeId, DucksCompositionStats compositionStats, String[] args) {
         this.nodeId = nodeId;
@@ -52,36 +56,65 @@ public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.
 
         this.transTCP = new TransTcp();
         this.transUDP = new TransUdp();
+
+        this.UDPMessageQueue = new LinkedBlockingQueue<UdpMessage>();
     }
 
     public int getNodeId() {
         return nodeId;
     }
-    
+
     public InetAddress getInetAddress() {
         return this.netEntity.getAddress().getIP();
     }
-    
-    public InetAddress getMulticastAddress() {
-        return NetAddress.ANY.getIP();
+
+    public void addUDPHandler(int port) {
+        transUDP.addSocketHandler(port, this);
+        this.multicastPort = port;
     }
 
-    public void send(Message msg, NetAddress addr) throws Exception {
-        if (msg instanceof TcpMessage) {
-            TcpMessage tcpMsg = (TcpMessage) msg;
-            transTCP.send(tcpMsg, addr, tcpMsg.getDstPort(), tcpMsg.getSrcPort(), Constants.NET_PRIORITY_NORMAL);
-        } else if (msg instanceof UdpMessage) {
-            UdpMessage udpMsg = (UdpMessage) msg;
-            transUDP.send(udpMsg.getPayload(), addr, udpMsg.getDstPort(), udpMsg.getSrcPort(),
-                    Constants.NET_PRIORITY_NORMAL);
-        } else {
-            throw new Exception("Invalid message type");
-        }
+    public void removeUDPHandler(int port) {
+        transUDP.delSocketHandler(port);
+        this.multicastPort = 0;
     }
 
+    public void sendMulticastPacket(byte[] packet) {
+        transUDP.send(new MessageBytes(packet), NetAddress.ANY, multicastPort, multicastPort,
+                Constants.NET_PRIORITY_NORMAL);
+    }
+
+    /**
+     * Handler for new UDP packets
+     * 
+     * @see receiveUDPPacket()
+     */
     public void receive(Message msg, NetAddress src, int srcPort) throws Continuation {
-        // TODO Auto-generated method stub
+        UdpMessage uMsg;
+        if (msg instanceof UdpMessage) {
+            uMsg = (UdpMessage) msg;
+        } else {
+            // We can safely say it is a UDP message coming from the correct
+            // port since we only use UDP for beaconning (multicast)
+            uMsg = new UdpMessage(srcPort, multicastPort, msg);
+        }
+        UDPMessageQueue.add(uMsg);
+    }
 
+    /**
+     * Blocks until a new UDP packet arrives and retrieves it
+     * 
+     * @return the payload of the UDP packet
+     */
+    public byte[] receiveUDPPacket() {
+        byte[] packet = new byte[1500];
+        try {
+            UdpMessage msg = UDPMessageQueue.take();
+            msg.getPayload().getBytes(packet, 0);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return packet;
     }
 
     public void run() {
