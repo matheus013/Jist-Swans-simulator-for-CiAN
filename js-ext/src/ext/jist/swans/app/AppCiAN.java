@@ -222,13 +222,9 @@ public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.
          * Sends a multicast packet to all hosts in range
          * 
          * @param packet
-         * @throws Exception
          */
-        public void sendMulticastPacket(byte[] packet) throws Exception {
-            if (0 == app.multicastPort) {
-                throw new Exception("Cannot send multicast packet without first opening a handler");
-            }
-            app.transUdp.send(new MessageBytes(packet), NetAddress.ANY, app.multicastPort, app.multicastPort,
+        public void sendMulticastPacket(byte[] packet, int port) {
+            app.transUdp.send(new MessageBytes(packet), NetAddress.ANY, port, port,
                     Constants.NET_PRIORITY_NORMAL);
         }
 
