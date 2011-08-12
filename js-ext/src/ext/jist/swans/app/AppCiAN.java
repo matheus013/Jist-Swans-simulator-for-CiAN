@@ -16,6 +16,8 @@ import jist.swans.misc.Message;
 import jist.swans.misc.MessageBytes;
 import jist.swans.net.NetAddress;
 import jist.swans.net.NetInterface;
+import jist.swans.trans.TcpServerSocket;
+import jist.swans.trans.TcpSocket;
 import jist.swans.trans.TransInterface.SocketHandler;
 import jist.swans.trans.TransInterface.TransTcpInterface;
 import jist.swans.trans.TransInterface.TransUdpInterface;
@@ -34,9 +36,9 @@ public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.
     // network entity.
     protected NetInterface              netEntity;
 
-    protected TransTcp                  transTCP;
+    protected TransTcp                  transTcp;
 
-    protected TransUdp                  transUDP;
+    protected TransUdp                  transUdp;
 
     // self-referencing proxy entity.
     protected Object                    self;
@@ -61,8 +63,8 @@ public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.
         this.self = JistAPI.proxyMany(this, new Class[] { AppInterface.class, AppInterface.TcpApp.class,
                 AppInterface.UdpApp.class });
 
-        this.transTCP = new TransTcp();
-        this.transUDP = new TransUdp();
+        this.transTcp = new TransTcp();
+        this.transUdp = new TransUdp();
 
         this.UDPMessageQueue = new LinkedBlockingQueue<UdpMessage>();
         this.multicastPort = 0;
@@ -75,7 +77,7 @@ public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.
     /**
      * Handler for new UDP packets.
      * 
-     * @see CiANAdapter#receiveUDPPacket()
+     * @see CiANAdapter#receiveUdpPacket()
      */
     public void receive(Message msg, NetAddress src, int srcPort) throws Continuation {
         UdpMessage uMsg;
@@ -109,8 +111,8 @@ public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.
      */
     public void setNetEntity(NetInterface netEntity) {
         this.netEntity = netEntity;
-        this.transTCP.setNetEntity(netEntity);
-        this.transUDP.setNetEntity(netEntity);
+        this.transTcp.setNetEntity(netEntity);
+        this.transUdp.setNetEntity(netEntity);
     }
 
     public AppInterface getAppProxy() {
@@ -126,11 +128,11 @@ public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.
     }
 
     public TransTcpInterface getTcpEntity() throws Continuation {
-        return transTCP.getProxy();
+        return transTcp.getProxy();
     }
 
     public TransUdpInterface getUdpEntity() throws Continuation {
-        return transUDP.getProxy();
+        return transUdp.getProxy();
     }
 
     /**
@@ -200,8 +202,8 @@ public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.
          * 
          * @param port
          */
-        public void addUDPHandler(int port) {
-            app.transUDP.addSocketHandler(port, app);
+        public void addUdpHandler(int port) {
+            app.transUdp.addSocketHandler(port, app);
             app.multicastPort = port;
         }
 
@@ -211,8 +213,8 @@ public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.
          * 
          * @param port
          */
-        public void removeUDPHandler(int port) {
-            app.transUDP.delSocketHandler(port);
+        public void removeUdpHandler(int port) {
+            app.transUdp.delSocketHandler(port);
             app.multicastPort = 0;
         }
 
@@ -226,7 +228,7 @@ public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.
             if (0 == app.multicastPort) {
                 throw new Exception("Cannot send multicast packet without first opening a handler");
             }
-            app.transUDP.send(new MessageBytes(packet), NetAddress.ANY, app.multicastPort, app.multicastPort,
+            app.transUdp.send(new MessageBytes(packet), NetAddress.ANY, app.multicastPort, app.multicastPort,
                     Constants.NET_PRIORITY_NORMAL);
         }
 
@@ -237,7 +239,7 @@ public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.
          * @return the payload of the UDP packet
          * @throws InterruptedException
          */
-        public byte[] receiveUDPPacket() throws InterruptedException {
+        public byte[] receiveUdpPacket() throws InterruptedException {
             byte[] packet = null;
             UdpMessage msg = app.UDPMessageQueue.take();
             if (msg.getPayload() instanceof MessageBytes) {
@@ -248,6 +250,33 @@ public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.
             }
 
             return packet;
+        }
+
+        /**
+         * @param ipAddress
+         * @param remotePort
+         * @return jist.swans.trans.TcpSocket connected to ipAddress:remotePort
+         *         and casted to Object
+         */
+        public Object createTcpSocket(String ipAddress, int remotePort) {
+            TcpSocket socket = new TcpSocket(ipAddress, remotePort);
+            socket.setTcpEntity(app.getTcpEntity());
+            socket._jistPostInit();
+
+            return socket;
+        }
+
+        /**
+         * @param port
+         * @return jist.swans.trans.TcpServerSocket listening on port and casted
+         *         to Object
+         */
+        public Object createTcpServerSocket(int port) {
+            TcpServerSocket serverSocket = new TcpServerSocket(port);
+            serverSocket.setTcpEntity(app.getTcpEntity());
+            serverSocket._jistPostInit();
+
+            return serverSocket;
         }
     }
 }
