@@ -252,9 +252,8 @@ public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.
          * @param ipAddress
          * @param remotePort
          * @return jist.swans.trans.TcpSocket connected to ipAddress:remotePort
-         *         and casted to Object
          */
-        public Object createTcpSocket(String ipAddress, int remotePort) {
+        public TcpSocket createTcpSocket(String ipAddress, int remotePort) {
             TcpSocket socket = new TcpSocket(ipAddress, remotePort);
             socket.setTcpEntity(app.getTcpEntity());
             socket._jistPostInit();
@@ -264,10 +263,9 @@ public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.
 
         /**
          * @param port
-         * @return jist.swans.trans.TcpServerSocket listening on port and casted
-         *         to Object
+         * @return jist.swans.trans.TcpServerSocket listening on port
          */
-        public Object createTcpServerSocket(int port) {
+        public TcpServerSocket createTcpServerSocket(int port) {
             TcpServerSocket serverSocket = new TcpServerSocket(port);
             serverSocket.setTcpEntity(app.getTcpEntity());
             serverSocket._jistPostInit();
