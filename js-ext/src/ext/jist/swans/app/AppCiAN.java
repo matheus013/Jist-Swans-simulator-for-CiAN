@@ -24,27 +24,34 @@ import jist.swans.trans.TransUdp;
 import jist.swans.trans.TransUdp.UdpMessage;
 import ext.util.stats.DucksCompositionStats;
 
+/**
+ * Application for every node running CiAN
+ * 
+ * @author Jordan Alliot
+ */
 public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.UdpApp, SocketHandler
 {
     // network entity.
-    private NetInterface              netEntity;
+    protected NetInterface              netEntity;
 
-    private TransTcp                  transTCP;
+    protected TransTcp                  transTCP;
 
-    private TransUdp                  transUDP;
+    protected TransUdp                  transUDP;
 
     // self-referencing proxy entity.
-    private Object                    self;
+    protected Object                    self;
 
-    private int                       nodeId;
+    protected int                       nodeId;
 
     // composition stats accumulator
-    private DucksCompositionStats     compositionStats;
+    protected DucksCompositionStats     compositionStats;
 
-    private String[]                  args;
+    protected String[]                  args;
 
-    private BlockingQueue<UdpMessage> UDPMessageQueue;
-    private int                       multicastPort;
+    protected CiANAdapter               adapter;
+
+    protected BlockingQueue<UdpMessage> UDPMessageQueue;
+    protected int                       multicastPort;
 
     public AppCiAN(int nodeId, DucksCompositionStats compositionStats, String[] args) {
         this.nodeId = nodeId;
@@ -58,35 +65,17 @@ public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.
         this.transUDP = new TransUdp();
 
         this.UDPMessageQueue = new LinkedBlockingQueue<UdpMessage>();
+        this.multicastPort = 0;
     }
 
     public int getNodeId() {
         return nodeId;
     }
 
-    public InetAddress getInetAddress() {
-        return this.netEntity.getAddress().getIP();
-    }
-
-    public void addUDPHandler(int port) {
-        transUDP.addSocketHandler(port, this);
-        this.multicastPort = port;
-    }
-
-    public void removeUDPHandler(int port) {
-        transUDP.delSocketHandler(port);
-        this.multicastPort = 0;
-    }
-
-    public void sendMulticastPacket(byte[] packet) {
-        transUDP.send(new MessageBytes(packet), NetAddress.ANY, multicastPort, multicastPort,
-                Constants.NET_PRIORITY_NORMAL);
-    }
-
     /**
-     * Handler for new UDP packets
+     * Handler for new UDP packets.
      * 
-     * @see receiveUDPPacket()
+     * @see CiANAdapter#receiveUDPPacket()
      */
     public void receive(Message msg, NetAddress src, int srcPort) throws Continuation {
         UdpMessage uMsg;
@@ -100,23 +89,6 @@ public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.
         UDPMessageQueue.add(uMsg);
     }
 
-    /**
-     * Blocks until a new UDP packet arrives and retrieves it
-     * 
-     * @return the payload of the UDP packet
-     */
-    public byte[] receiveUDPPacket() {
-        byte[] packet = new byte[1500];
-        try {
-            UdpMessage msg = UDPMessageQueue.take();
-            msg.getPayload().getBytes(packet, 0);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        return packet;
-    }
-
     public void run() {
         run(this.args);
     }
@@ -125,7 +97,8 @@ public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.
         compositionStats.incrementNumReq();
 
         // Starting a new CiAN application isolated from the others
-        new CiANThread(this, args).start();
+        adapter = new CiANAdapter(this);
+        new CiANThread(adapter, args).start();
     }
 
     /**
@@ -160,15 +133,20 @@ public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.
         return transUDP.getProxy();
     }
 
+    /**
+     * Thread running CiAN isolated thanks to a new ClassLoader
+     * 
+     * @author Jordan Alliot
+     */
     class CiANThread extends Thread
     {
-        private String[] args;
-        private AppCiAN  parent;
+        private String[]    args;
+        private CiANAdapter adapter;
 
-        public CiANThread(AppCiAN parent, String[] args) {
-            super("CiANThread for node " + parent.getNodeId());
+        public CiANThread(CiANAdapter adapter, String[] args) {
+            super("CiANThread for node " + getNodeId());
             this.args = args;
-            this.parent = parent;
+            this.adapter = adapter;
         }
 
         @Override
@@ -178,7 +156,7 @@ public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.
             // IMPORTANT: it is vital that CiAN.jar is NOT in the classpath!
             try {
                 // We need a new ClassLoader for each node we are creating
-                ClassLoader loader = new URLClassLoader(new URL[] { new File("CiAN/CiAN.jar").toURI().toURL() });
+                ClassLoader loader = new URLClassLoader(new URL[] { new File("CiAN/CiAN.jar").toURI().toURL() }, null);
 
                 // Loading CiAN class this way ensures us that each node is
                 // isolated from each other
@@ -186,15 +164,90 @@ public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.
 
                 // Add a dependency to this node's application into CiAN
                 Method extToolSetter = c.getDeclaredMethod("setExternalTool", Object.class);
-                extToolSetter.invoke(null, parent);
+                extToolSetter.invoke(null, adapter);
 
                 // Finally we can start CiAN
-                Method main = c.getDeclaredMethod("main", this.args.getClass());
-                main.invoke(null, (Object[]) this.args);
+                Method main = c.getDeclaredMethod("main", new Class[] { this.args.getClass() });
+                main.invoke(null, new Object[] { this.args });
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
+    /**
+     * Class of public methods to be used by CiAN
+     * 
+     * @author Jordan Alliot
+     */
+    public class CiANAdapter
+    {
+        public AppCiAN app;
+
+        public CiANAdapter(AppCiAN app) {
+            this.app = app;
+        }
+
+        /**
+         * @return the InetAddress of this node in Swans
+         */
+        public InetAddress getInetAddress() {
+            return app.netEntity.getAddress().getIP();
+        }
+
+        /**
+         * Opens a new handler for UDP communications on this port
+         * 
+         * @param port
+         */
+        public void addUDPHandler(int port) {
+            app.transUDP.addSocketHandler(port, app);
+            app.multicastPort = port;
+        }
+
+        /**
+         * Removes a previously opened handler for UDP communications on this
+         * port
+         * 
+         * @param port
+         */
+        public void removeUDPHandler(int port) {
+            app.transUDP.delSocketHandler(port);
+            app.multicastPort = 0;
+        }
+
+        /**
+         * Sends a multicast packet to all hosts in range
+         * 
+         * @param packet
+         * @throws Exception
+         */
+        public void sendMulticastPacket(byte[] packet) throws Exception {
+            if (0 == app.multicastPort) {
+                throw new Exception("Cannot send multicast packet without first opening a handler");
+            }
+            app.transUDP.send(new MessageBytes(packet), NetAddress.ANY, app.multicastPort, app.multicastPort,
+                    Constants.NET_PRIORITY_NORMAL);
+        }
+
+        /**
+         * Blocks until a new UDP packet arrives and retrieves it.
+         * CiAN should call this method to receive a UDP packet.
+         * 
+         * @return the payload of the UDP packet
+         * @throws InterruptedException
+         */
+        public byte[] receiveUDPPacket() throws InterruptedException {
+            byte[] packet = null;
+            UdpMessage msg = app.UDPMessageQueue.take();
+            if (msg.getPayload() instanceof MessageBytes) {
+                packet = ((MessageBytes) msg.getPayload()).getBytes();
+            } else {
+                packet = new byte[msg.getPayload().getSize()];
+                msg.getPayload().getBytes(packet, 0);
+            }
+
+            return packet;
+        }
+    }
 }
