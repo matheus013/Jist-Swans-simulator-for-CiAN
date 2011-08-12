@@ -158,9 +158,9 @@ public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.
             // IMPORTANT: it is vital that CiAN.jar is NOT in the classpath!
             try {
                 // We need a new ClassLoader for each node we are creating
-                // Working directory is $(basedir)/ducks so we need to go up to $(basedir)
-                ClassLoader loader = new URLClassLoader(new URL[] { new File("../CiAN/CiAN.jar").toURI().toURL() },
-                        null);
+                // Working directory is $(basedir)/ducks so we need to go up to
+                // $(basedir)
+                ClassLoader loader = new URLClassLoader(new URL[] { new File("../CiAN/CiAN.jar").toURI().toURL() });
 
                 // Loading CiAN class this way ensures us that each node is
                 // isolated from each other
