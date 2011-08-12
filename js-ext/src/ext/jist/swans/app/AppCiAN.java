@@ -2,7 +2,6 @@ package ext.jist.swans.app;
 
 import java.io.File;
 import java.lang.reflect.Method;
-import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.concurrent.BlockingQueue;
@@ -10,14 +9,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import jist.runtime.JistAPI;
 import jist.runtime.JistAPI.Continuation;
-import jist.swans.Constants;
 import jist.swans.app.AppInterface;
 import jist.swans.misc.Message;
-import jist.swans.misc.MessageBytes;
 import jist.swans.net.NetAddress;
 import jist.swans.net.NetInterface;
-import jist.swans.trans.TcpServerSocket;
-import jist.swans.trans.TcpSocket;
 import jist.swans.trans.TransInterface.SocketHandler;
 import jist.swans.trans.TransInterface.TransTcpInterface;
 import jist.swans.trans.TransInterface.TransUdpInterface;
@@ -103,6 +98,10 @@ public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.
         new CiANThread(adapter, args).start();
     }
 
+    public NetInterface getNetEntity() {
+        return netEntity;
+    }
+
     /**
      * Set network entity.
      * 
@@ -133,6 +132,18 @@ public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.
 
     public TransUdpInterface getUdpEntity() throws Continuation {
         return transUdp.getProxy();
+    }
+
+    public BlockingQueue<UdpMessage> getUdpMessageQueue() {
+        return udpMessageQueue;
+    }
+
+    public int getMulticastPort() {
+        return multicastPort;
+    }
+
+    public void setMulticastPort(int multicastPort) {
+        this.multicastPort = multicastPort;
     }
 
     /**
@@ -176,102 +187,6 @@ public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
-    }
-
-    /**
-     * Class of public methods to be used by CiAN
-     * 
-     * @author Jordan Alliot
-     */
-    public class CiANAdapter
-    {
-        public AppCiAN app;
-
-        public CiANAdapter(AppCiAN app) {
-            this.app = app;
-        }
-
-        /**
-         * @return the InetAddress of this node in Swans
-         */
-        public InetAddress getInetAddress() {
-            return app.netEntity.getAddress().getIP();
-        }
-
-        /**
-         * Opens a new handler for UDP communications on this port
-         * 
-         * @param port
-         */
-        public void addUdpHandler(int port) {
-            app.transUdp.addSocketHandler(port, app);
-            app.multicastPort = port;
-        }
-
-        /**
-         * Removes a previously opened handler for UDP communications on this
-         * port
-         * 
-         * @param port
-         */
-        public void removeUdpHandler(int port) {
-            app.transUdp.delSocketHandler(port);
-            app.multicastPort = 0;
-        }
-
-        /**
-         * Sends a multicast packet to all hosts in range
-         * 
-         * @param packet
-         */
-        public void sendMulticastPacket(byte[] packet, int port) {
-            app.transUdp.send(new MessageBytes(packet), NetAddress.ANY, port, port, Constants.NET_PRIORITY_NORMAL);
-        }
-
-        /**
-         * Blocks until a new UDP packet arrives and retrieves it.
-         * CiAN should call this method to receive a UDP packet.
-         * 
-         * @return the payload of the UDP packet
-         * @throws InterruptedException
-         */
-        public byte[] receiveUdpPacket() throws InterruptedException {
-            byte[] packet = null;
-            UdpMessage msg = app.udpMessageQueue.take();
-            if (msg.getPayload() instanceof MessageBytes) {
-                packet = ((MessageBytes) msg.getPayload()).getBytes();
-            } else {
-                packet = new byte[msg.getPayload().getSize()];
-                msg.getPayload().getBytes(packet, 0);
-            }
-
-            return packet;
-        }
-
-        /**
-         * @param ipAddress
-         * @param remotePort
-         * @return jist.swans.trans.TcpSocket connected to ipAddress:remotePort
-         */
-        public TcpSocket createTcpSocket(String ipAddress, int remotePort) {
-            TcpSocket socket = new TcpSocket(ipAddress, remotePort);
-            socket.setTcpEntity(app.getTcpEntity());
-            socket._jistPostInit();
-
-            return socket;
-        }
-
-        /**
-         * @param port
-         * @return jist.swans.trans.TcpServerSocket listening on port
-         */
-        public TcpServerSocket createTcpServerSocket(int port) {
-            TcpServerSocket serverSocket = new TcpServerSocket(port);
-            serverSocket.setTcpEntity(app.getTcpEntity());
-            serverSocket._jistPostInit();
-
-            return serverSocket;
         }
     }
 }
