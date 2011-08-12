@@ -158,7 +158,8 @@ public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.
             // IMPORTANT: it is vital that CiAN.jar is NOT in the classpath!
             try {
                 // We need a new ClassLoader for each node we are creating
-                ClassLoader loader = new URLClassLoader(new URL[] { new File("CiAN/CiAN.jar").toURI().toURL() }, null);
+                ClassLoader loader = new URLClassLoader(new URL[] { new File("../CiAN/CiAN.jar").toURI().toURL() },
+                        null);
 
                 // Loading CiAN class this way ensures us that each node is
                 // isolated from each other
@@ -224,8 +225,7 @@ public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.
          * @param packet
          */
         public void sendMulticastPacket(byte[] packet, int port) {
-            app.transUdp.send(new MessageBytes(packet), NetAddress.ANY, port, port,
-                    Constants.NET_PRIORITY_NORMAL);
+            app.transUdp.send(new MessageBytes(packet), NetAddress.ANY, port, port, Constants.NET_PRIORITY_NORMAL);
         }
 
         /**
