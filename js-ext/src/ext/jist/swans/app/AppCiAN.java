@@ -52,7 +52,7 @@ public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.
 
     protected CiANAdapter               adapter;
 
-    protected BlockingQueue<UdpMessage> UDPMessageQueue;
+    protected BlockingQueue<UdpMessage> udpMessageQueue;
     protected int                       multicastPort;
 
     public AppCiAN(int nodeId, DucksCompositionStats compositionStats, String[] args) {
@@ -66,7 +66,7 @@ public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.
         this.transTcp = new TransTcp();
         this.transUdp = new TransUdp();
 
-        this.UDPMessageQueue = new LinkedBlockingQueue<UdpMessage>();
+        this.udpMessageQueue = new LinkedBlockingQueue<UdpMessage>();
         this.multicastPort = 0;
     }
 
@@ -88,7 +88,7 @@ public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.
             // port since we only use UDP for beaconning (multicast)
             uMsg = new UdpMessage(srcPort, multicastPort, msg);
         }
-        UDPMessageQueue.add(uMsg);
+        udpMessageQueue.add(uMsg);
     }
 
     public void run() {
@@ -237,7 +237,7 @@ public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.
          */
         public byte[] receiveUdpPacket() throws InterruptedException {
             byte[] packet = null;
-            UdpMessage msg = app.UDPMessageQueue.take();
+            UdpMessage msg = app.udpMessageQueue.take();
             if (msg.getPayload() instanceof MessageBytes) {
                 packet = ((MessageBytes) msg.getPayload()).getBytes();
             } else {
