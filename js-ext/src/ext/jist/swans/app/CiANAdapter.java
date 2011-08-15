@@ -17,6 +17,11 @@ public class CiANAdapter
         this.app = app;
     }
 
+    @Override
+    public String toString() {
+        return "CiANAdapter for node " + app.getNodeId() + " (addr = " + getInetAddress() + ")";
+    }
+
     /**
      * @return the InetAddress of this node in Swans
      */

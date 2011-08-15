@@ -1,7 +1,6 @@
 package ext.jist.swans.app;
 
 import java.io.File;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.concurrent.BlockingQueue;
@@ -171,19 +170,22 @@ public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.
                 // We need a new ClassLoader for each node we are creating
                 // Working directory is $(basedir)/ducks so we need to go up to
                 // $(basedir)
-                ClassLoader loader = new URLClassLoader(new URL[] { new File("../CiAN/CiAN.jar").toURI().toURL() });
+                File cianJar = new File("../CiAN/CiAN.jar");
+                if (!cianJar.isFile() || !cianJar.canRead()) {
+                    throw new Exception("Cannot find CiAN.jar in " + cianJar.getCanonicalPath());
+                }
+                ClassLoader loader = new URLClassLoader(new URL[] { cianJar.toURI().toURL() });
 
                 // Loading CiAN class this way ensures us that each node is
                 // isolated from each other
-                Class<?> c = loader.loadClass("system.CiAN");
+                Class<?> cianClass = loader.loadClass("system.CiAN");
 
                 // Add a dependency to this node's application into CiAN
-                Method extToolSetter = c.getDeclaredMethod("setExternalTool", Object.class);
-                extToolSetter.invoke(null, adapter);
+                cianClass.getDeclaredMethod("setExternalTool", Object.class).invoke(null, adapter);
 
                 // Finally we can start CiAN
-                Method main = c.getDeclaredMethod("main", new Class[] { this.args.getClass() });
-                main.invoke(null, new Object[] { this.args });
+                cianClass.getDeclaredMethod("main", new Class[] { this.args.getClass() }).invoke(null,
+                        new Object[] { this.args });
             } catch (Exception e) {
                 e.printStackTrace();
             }
