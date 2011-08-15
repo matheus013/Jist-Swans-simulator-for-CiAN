@@ -90,11 +90,37 @@ public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.
     }
 
     public void run(String[] args) {
-        compositionStats.incrementNumReq();
-
         // Starting a new CiAN application isolated from the others
         adapter = new CiANAdapter(this);
-        new CiANThread(adapter, args).start();
+
+        // Unfortunately we have to do this little hack in order for every
+        // node to be isolated from the others.
+        // IMPORTANT: it is vital that CiAN.jar is NOT in the classpath!
+        try {
+            // We need a new ClassLoader for each node we are creating
+            // Working directory is $(basedir)/ducks so we need to go up to
+            // $(basedir)
+            File cianJar = new File("../CiAN/CiAN.jar");
+            if (!cianJar.isFile() || !cianJar.canRead()) {
+                throw new Exception("Cannot find CiAN.jar in " + cianJar.getCanonicalPath());
+            }
+            ClassLoader loader = new URLClassLoader(new URL[] { cianJar.toURI().toURL() });
+
+            // Loading CiAN class this way ensures us that each node is
+            // isolated from each other
+            Class<?> cianClass = loader.loadClass("system.CiAN");
+
+            // Add a dependency to this node's application into CiAN
+            cianClass.getDeclaredMethod("setExternalTool", Object.class).invoke(null, adapter);
+
+            // Finally we can start CiAN
+            cianClass.getDeclaredMethod("main", new Class[] { args.getClass() }).invoke(null,
+                    new Object[] { args });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        compositionStats.incrementNumReq();
     }
 
     public NetInterface getNetEntity() {
@@ -143,52 +169,5 @@ public class AppCiAN implements AppInterface, AppInterface.TcpApp, AppInterface.
 
     public void setMulticastPort(int multicastPort) {
         this.multicastPort = multicastPort;
-    }
-
-    /**
-     * Thread running CiAN isolated thanks to a new ClassLoader
-     * 
-     * @author Jordan Alliot
-     */
-    class CiANThread extends Thread
-    {
-        private String[]    args;
-        private CiANAdapter adapter;
-
-        public CiANThread(CiANAdapter adapter, String[] args) {
-            super("CiANThread for node " + getNodeId());
-            this.args = args;
-            this.adapter = adapter;
-        }
-
-        @Override
-        public void run() {
-            // Unfortunately we have to do this little hack in order for every
-            // node to be isolated from the others.
-            // IMPORTANT: it is vital that CiAN.jar is NOT in the classpath!
-            try {
-                // We need a new ClassLoader for each node we are creating
-                // Working directory is $(basedir)/ducks so we need to go up to
-                // $(basedir)
-                File cianJar = new File("../CiAN/CiAN.jar");
-                if (!cianJar.isFile() || !cianJar.canRead()) {
-                    throw new Exception("Cannot find CiAN.jar in " + cianJar.getCanonicalPath());
-                }
-                ClassLoader loader = new URLClassLoader(new URL[] { cianJar.toURI().toURL() });
-
-                // Loading CiAN class this way ensures us that each node is
-                // isolated from each other
-                Class<?> cianClass = loader.loadClass("system.CiAN");
-
-                // Add a dependency to this node's application into CiAN
-                cianClass.getDeclaredMethod("setExternalTool", Object.class).invoke(null, adapter);
-
-                // Finally we can start CiAN
-                cianClass.getDeclaredMethod("main", new Class[] { this.args.getClass() }).invoke(null,
-                        new Object[] { this.args });
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
     }
 }
