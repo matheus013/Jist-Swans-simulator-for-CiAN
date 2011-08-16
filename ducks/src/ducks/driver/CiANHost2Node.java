@@ -8,9 +8,10 @@ public class CiANHost2Node extends CiANBaseNode
     }
 
     @Override
-    protected String[] getCiANArguments() {
+    public String[] getCiANArguments() {
         return new String[] { "Host 2", "standard", "-p", "../CiAN/src/examples/simpleSimu/properties2.ini", "-c",
-                "../CiAN/src/examples/simpleSimu/simplehost2.hcfg" };
+                "../CiAN/src/examples/simpleSimu/simplehost2.hcfg", "-a",
+                netEntity.getAddress().getIP().getHostAddress() };
     }
 
 }
