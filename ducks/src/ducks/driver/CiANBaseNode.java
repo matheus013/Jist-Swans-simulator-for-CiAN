@@ -35,7 +35,7 @@ public abstract class CiANBaseNode extends GenericNode
         net.setProtocolHandler(Constants.NET_PROTOCOL_UDP, udp.getProxy());
         udp.setNetEntity(net.getProxy());
 
-        AppJava app = new AppJava("system.cian");
+        AppJava app = new AppJava("system.CiAN");
 
         app.setTcpEntity(tcp.getProxy());
         app.setUdpEntity(udp.getProxy());
