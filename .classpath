@@ -12,5 +12,10 @@
 	<classpathentry kind="lib" path="ducks/libs/mysql-connector-java-3.0.17-ga-bin.jar"/>
 	<classpathentry kind="lib" path="jist-swans-1.0.6/libs/bcel-5.2.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.5.0_22"/>
+	<classpathentry kind="lib" path="CiAN/libs/jgraph.jar"/>
+	<classpathentry kind="lib" path="CiAN/libs/jgrapht-jdk1.5.jar"/>
+	<classpathentry kind="lib" path="CiAN/libs/ksoap2-j2se-full-2.1.2.jar"/>
+	<classpathentry kind="lib" path="CiAN/libs/sliver-j2se.jar"/>
+	<classpathentry kind="lib" path="CiAN/CiAN.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
