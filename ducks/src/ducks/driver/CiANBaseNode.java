@@ -1,5 +1,6 @@
 package ducks.driver;
 
+import jist.runtime.JistAPI;
 import jist.swans.Constants;
 import jist.swans.app.AppJava;
 import jist.swans.field.Field;
@@ -12,17 +13,18 @@ import org.apache.log4j.Logger;
 
 public abstract class CiANBaseNode extends GenericNode
 {
-    protected static Logger log;
+    private static Logger log = Logger.getLogger(CiANBaseNode.class.getName());
 
-    protected TransTcp      tcp;
-    protected TransUdp      udp;
-
-    protected String[]      args;
+    private TransTcp      tcp;
+    private TransUdp      udp;
 
     public CiANBaseNode() {
         super();
     }
 
+    protected abstract void runApplication();
+
+    @Override
     protected void addApplication(Mapper protMap, Field field, Placement place) throws Exception {
         this.app = null;
 
@@ -44,7 +46,8 @@ public abstract class CiANBaseNode extends GenericNode
 
         this.app = app;
         this.appEntity = app.getProxy();
-        this.appEntity.run(args);
+
+        runApplication();
 
         log.debug("  Added composition initiator application module");
     }
