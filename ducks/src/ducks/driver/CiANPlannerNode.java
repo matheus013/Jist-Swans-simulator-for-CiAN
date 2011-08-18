@@ -10,13 +10,8 @@ public class CiANPlannerNode extends CiANBaseNode
 
     public CiANPlannerNode() {
         super();
-    }
-
-    @Override
-    protected void runApplication() {
-        String[] args = new String[] { "Host 1", "planner", "-p", "../CiAN/src/examples/simpleSimu/properties1.ini",
-                "-c", "../CiAN/src/examples/simpleSimu/simplehost1.hcfg", "-w",
+        args = new String[] { "Host 1", "planner", "-p", "../CiAN/src/examples/simpleSimu/properties1.ini", "-c",
+                "../CiAN/src/examples/simpleSimu/simplehost1.hcfg", "-w",
                 "../CiAN/src/examples/simpleSimu/simple.cian", "-a", "localhost" };
-        this.appEntity.run(args);
     }
 }

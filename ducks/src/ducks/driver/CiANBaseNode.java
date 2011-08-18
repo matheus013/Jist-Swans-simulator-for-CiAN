@@ -18,11 +18,11 @@ public abstract class CiANBaseNode extends GenericNode
     private TransTcp      tcp;
     private TransUdp      udp;
 
+    protected String[]    args;
+
     public CiANBaseNode() {
         super();
     }
-
-    protected abstract void runApplication();
 
     @Override
     protected void addApplication(Mapper protMap, Field field, Placement place) throws Exception {
@@ -47,7 +47,7 @@ public abstract class CiANBaseNode extends GenericNode
         this.app = app;
         this.appEntity = app.getProxy();
 
-        runApplication();
+        this.appEntity.run(args);
 
         log.debug("  Added composition initiator application module");
     }
