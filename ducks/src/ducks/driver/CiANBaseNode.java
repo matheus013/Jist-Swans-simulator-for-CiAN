@@ -12,10 +12,12 @@ import org.apache.log4j.Logger;
 
 public abstract class CiANBaseNode extends GenericNode
 {
-    protected static Logger log = Logger.getLogger(CiANBaseNode.class.getName());
+    protected static Logger log;
 
     protected TransTcp      tcp;
     protected TransUdp      udp;
+
+    protected String[]      args;
 
     public CiANBaseNode() {
         super();
@@ -42,16 +44,9 @@ public abstract class CiANBaseNode extends GenericNode
 
         this.app = app;
         this.appEntity = app.getProxy();
-        this.appEntity.run(getCiANArguments());
+        this.appEntity.run(args);
 
         log.debug("  Added composition initiator application module");
     }
-
-    /**
-     * @return array of arguments to pass to CiAN.
-     *         Besides the standard arguments, we should also pass the local
-     *         InetAddress with the added -a option
-     */
-    public abstract String[] getCiANArguments();
 
 }
