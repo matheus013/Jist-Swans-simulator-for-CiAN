@@ -106,38 +106,40 @@ class CiANWorkflow
 {
     public final static char         SYMBOL_DESTINATION = '\r';
     public final static String       STRING_DESTINATION = "dst";
-    public final static int          INITIAL_WF_VERSION = 1;
+    //    public final static int          INITIAL_WF_VERSION = 1;
 
     private int                      initiatorId;
     private String                   id;
-    private int                      version;                   // currently not
-                                                                 // used, but later
-                                                                 // when wf is
-                                                                 // transformed
+    //    private int                      version;                   // currently not
+    //                                                                 // used, but later
+    //                                                                 // when wf is
+    //                                                                 // transformed
     private char[]                   services;
     private int[]                    inputs;
     private List<List<CiANProvider>> providers;
-    private long                     arrival;
-    private int                      nextIndexToExecute;
+
+    //    private long                     arrival;
+    //    private int                      nextIndexToExecute;
 
     public CiANWorkflow(int nodeId, int msgId, int reqSize) {
         this.id = (new Integer(nodeId)).toString() + "-" + (new Integer(msgId)).toString();
-        this.version = INITIAL_WF_VERSION;
+        this.initiatorId = nodeId;
+        //        this.version = INITIAL_WF_VERSION;
         this.services = createServices(reqSize);
         this.inputs = createInputs(services.length);
         this.providers = createProviders(services.length);
-        this.nextIndexToExecute = 0;
+        //        this.nextIndexToExecute = 0;
     }
 
-    public CiANWorkflow(String id, int version, char[] services, int[] inputs, int nextIndexToExecute, long arrival) {
+    public CiANWorkflow(String id, char[] services, int[] inputs, CiANProvider[] providers) {
         this.initiatorId = Integer.parseInt(id.split("-")[0]);
         this.id = id;
-        this.version = version;
+        //        this.version = version;
         this.services = services;
         this.inputs = inputs;
-        this.nextIndexToExecute = nextIndexToExecute;
-        this.providers = createProviders(services.length);
-        this.arrival = arrival;
+        //        this.nextIndexToExecute = nextIndexToExecute;
+        this.providers = createProviders(providers);
+        //        this.arrival = arrival;
     }
 
     private char[] createServices(int size) {
@@ -173,11 +175,20 @@ class CiANWorkflow
 
         for (int i = 0; i < size; i++) {
             List<CiANProvider> tmp = new ArrayList<CiANProvider>();
-            // tmp.add(new NetAddress(new byte[] { 0, 0, 0, (byte) initiatorId
-            // }))
-            CiANProvider p = new CiANProvider(initiatorId, 0);
             if (i == size - 1)
-                tmp.add(p);
+                tmp.add(new CiANProvider(initiatorId, 0));
+            providers.add(tmp);
+        }
+
+        return providers;
+    }
+
+    private List<List<CiANProvider>> createProviders(CiANProvider[] _providers) {
+        List<List<CiANProvider>> providers = new ArrayList<List<CiANProvider>>();
+
+        for (CiANProvider provider : _providers) {
+            List<CiANProvider> tmp = new ArrayList<CiANProvider>();
+            tmp.add(provider);
             providers.add(tmp);
         }
 
@@ -188,9 +199,9 @@ class CiANWorkflow
         return id;
     }
 
-    public int getVersion() {
-        return version;
-    }
+    //    public int getVersion() {
+    //        return version;
+    //    }
 
     public char[] getServices() {
         return services;
@@ -202,22 +213,6 @@ class CiANWorkflow
 
     public List<List<CiANProvider>> getProviders() {
         return providers;
-    }
-
-    public int getNextIndexToExecute() {
-        return nextIndexToExecute;
-    }
-
-    public void advanceIndexToExecute() {
-        nextIndexToExecute = nextIndexToExecute + 1;
-    }
-
-    public void advanceIndexToExecute(char service) {
-        nextIndexToExecute = getIndexForService(service);
-    }
-
-    public long getArrival() {
-        return arrival;
     }
 
     public void updateProviderFor(char service, CiANProvider provider) {
@@ -251,7 +246,7 @@ class CiANWorkflow
         inputs[index] = input;
     }
 
-    private int getIndexForService(char service) {
+    public int getIndexForService(char service) {
         for (int i = 0; i < services.length; i++) {
             if (services[i] == service)
                 return i;
@@ -308,6 +303,16 @@ class CiANWorkflow
         }
     }
 
+    public boolean areAllServicesProvided() {
+        for (List<CiANProvider> l : providers) {
+            if (l.isEmpty()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public boolean isPartOfProviderList(char service, int providerId) {
         List<CiANProvider> providers = getProvidersFor(getIndexForService(service));
         Iterator<CiANProvider> it = providers.iterator();
@@ -324,10 +329,10 @@ class CiANWorkflow
 
 class CiANProvider
 {
-    int    nodeId;
-    double connectivity;
+    int nodeId;
+    int connectivity;
 
-    public CiANProvider(int nodeId, double connectivity) {
+    public CiANProvider(int nodeId, int connectivity) {
         this.nodeId = nodeId;
         this.connectivity = connectivity;
     }
@@ -336,8 +341,12 @@ class CiANProvider
         return nodeId;
     }
 
-    public double getConnectivity() {
+    public int getConnectivity() {
         return connectivity;
+    }
+
+    public NetAddress getAddress() {
+        return new NetAddress(new byte[] { 0, 0, 0, (byte) nodeId });
     }
 }
 
@@ -353,28 +362,24 @@ abstract class CiANWorkflowMessage implements Message
         return id;
     }
 
-    public abstract void getBytes(byte[] msg, int offset);
+    public void getBytes(byte[] msg, int offset) {
+        throw new RuntimeException("not implemented");
+    }
 
     public abstract int getSize();
 }
 
 class CiANWorkflowRequest extends CiANWorkflowMessage
 {
-    private int    version;
-    private char[] services;
-    private int[]  inputs;
-    private int    nextIndexToExecute;
+    private char[]         services;
+    private int[]          inputs;
+    private CiANProvider[] providers;
 
-    public CiANWorkflowRequest(String id, int version, char[] services, int[] inputs, int nextIndexToExecute) {
+    public CiANWorkflowRequest(String id, char[] services, int[] inputs, CiANProvider[] providers) {
         super(id);
-        this.version = version;
         this.services = services;
         this.inputs = inputs;
-        this.nextIndexToExecute = nextIndexToExecute;
-    }
-
-    public int getVersion() {
-        return version;
+        this.providers = providers;
     }
 
     public char[] getServicesCopy() {
@@ -389,55 +394,14 @@ class CiANWorkflowRequest extends CiANWorkflowMessage
         return copy;
     }
 
-    public int getNextIndexToExecute() {
-        return nextIndexToExecute;
-    }
-
-    public void getBytes(byte[] msg, int offset) {
-        throw new RuntimeException("not implemented");
+    public CiANProvider[] getProvidersCopy() {
+        CiANProvider[] copy = new CiANProvider[providers.length];
+        System.arraycopy(providers, 0, copy, 0, providers.length);
+        return copy;
     }
 
     public int getSize() {
-        return Sizeof.inst(id.toCharArray()) + Sizeof.inst(version) + Sizeof.inst(services) + Sizeof.inst(inputs)
-                + Sizeof.inst(nextIndexToExecute);
-    }
-}
-
-class CiANServiceAd extends CiANWorkflowMessage
-{
-    private char   service;
-    private int    advertiser;
-    private double connectivity;
-
-    public CiANServiceAd(String id, int advertiser, char service, double connectivity) {
-        super(id);
-        this.advertiser = advertiser;
-        this.service = service;
-        this.connectivity = connectivity;
-    }
-
-    public char getService() {
-        return service;
-    }
-
-    public int getAdvertiser() {
-        return advertiser;
-    }
-
-    public double getConnectivity() {
-        return connectivity;
-    }
-
-    @Override
-    public void getBytes(byte[] msg, int offset) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public int getSize() {
-        return Sizeof.inst(id.toCharArray()) + Sizeof.inst(advertiser) + Sizeof.inst(service)
-                + Sizeof.inst(connectivity);
+        return Sizeof.inst(id.toCharArray()) + Sizeof.inst(services) + Sizeof.inst(inputs) + Sizeof.inst(providers);
     }
 }
 
@@ -445,13 +409,11 @@ class CiANToken extends CiANWorkflowMessage
 {
     private char service;
     private int  input;
-    private int  provider;
 
-    public CiANToken(String id, char nextService, int input, int provider) {
+    public CiANToken(String id, char nextService, int input) {
         super(id);
         this.service = nextService;
         this.input = input;
-        this.provider = provider;
     }
 
     public char getService() {
@@ -462,183 +424,70 @@ class CiANToken extends CiANWorkflowMessage
         return input;
     }
 
-    public int getProvider() {
-        return provider;
-    }
-
-    @Override
-    public void getBytes(byte[] msg, int offset) {
-        // TODO Auto-generated method stub
-
-    }
-
     @Override
     public int getSize() {
-        return Sizeof.inst(id.toCharArray()) + Sizeof.inst(service) + Sizeof.inst(input) + Sizeof.inst(provider);
+        return Sizeof.inst(id.toCharArray()) + Sizeof.inst(service) + Sizeof.inst(input);
     }
 }
 
-abstract class CiANServiceMessage implements Message
+class CiANDiscoveryRequest extends CiANWorkflowMessage
 {
-    protected String id;
+    private int    ttl;
+    private char[] services;
 
-    public CiANServiceMessage(int nodeId, int msgId) {
-        this.id = (new Integer(nodeId)).toString() + "-" + (new Integer(msgId)).toString();
-    }
-
-    public CiANServiceMessage(String id) {
-        this.id = id;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public abstract void getBytes(byte[] msg, int offset);
-
-    public abstract int getSize();
-}
-
-class CiANDiscoveryRequest extends CiANServiceMessage
-{
-    private char   serviceName;
-    private String compositionRequestId;
-
-    public CiANDiscoveryRequest(int nodeId, int msgId, char serviceName) {
-        super(nodeId, msgId);
-        this.serviceName = serviceName;
-        this.compositionRequestId = this.getId();
-    }
-
-    public CiANDiscoveryRequest(int nodeId, int msgId, char serviceName, String compositionRequestId) {
-        super(nodeId, msgId);
-        this.serviceName = serviceName;
-        this.compositionRequestId = compositionRequestId;
-    }
-
-    public char getServiceName() {
-        return serviceName;
-    }
-
-    public String getCompositionRequestId() {
-        return compositionRequestId;
-    }
-
-    public void getBytes(byte[] msg, int offset) {
-        throw new RuntimeException("not implemented");
-    }
-
-    public int getSize() {
-        return Sizeof.inst(id.toCharArray()) + Sizeof.inst(serviceName);
-    }
-}
-
-class CiANDiscoveryResponse extends CiANServiceMessage
-{
-    private String service;
-
-    public CiANDiscoveryResponse(String id, String service) {
-        super(id);
-        this.service = service;
-    }
-
-    public String getService() {
-        return service;
-    }
-
-    public void getBytes(byte[] msg, int offset) {
-        throw new RuntimeException("not implemented");
-    }
-
-    public int getSize() {
-        return Sizeof.inst(id.toCharArray()) + Sizeof.inst(service);
-    }
-}
-
-class CiANCompositionMessage extends CiANServiceMessage
-{
-    public final static char   SYMBOL_DESTINATION = '\r';
-    public final static String STRING_DESTINATION = "dst";
-    private char[]             services;
-    private int[]              providers;
-    private int[]              input;
-    private int                lastModifiedBy;
-
-    public CiANCompositionMessage(String id, char[] services, int[] providers, int[] input, int lastModifiedBy) {
+    public CiANDiscoveryRequest(String id, char[] services, int ttl) {
         super(id);
         this.services = services;
-        this.providers = providers;
-        this.input = input;
-        this.lastModifiedBy = lastModifiedBy;
+        this.ttl = ttl > 0 ? ttl : 1;
     }
 
-    public int[] getProvidersCopy() {
-        int[] copy = new int[providers.length];
-        System.arraycopy(providers, 0, copy, 0, providers.length);
-        return copy;
+    public boolean isExpired() {
+        return 0 == --ttl;
     }
 
-    public char[] getServicesCopy() {
-        char[] copy = new char[services.length];
-        System.arraycopy(services, 0, copy, 0, services.length);
-        return copy;
+    public int getTtl() {
+        return ttl;
     }
 
-    public int[] getInputCopy() {
-        int[] copy = new int[input.length];
-        System.arraycopy(input, 0, copy, 0, input.length);
-        return copy;
-    }
-
-    public int getLastModifiedBy() {
-        return lastModifiedBy;
-    }
-
-    public int getIndexNextEmptyProvider() {
-        for (int i = 0; i < providers.length; i++) {
-            if (providers[i] == -1)
-                return i;
-        }
-        return -1;
-    }
-
-    public int getIndexNextInput() {
-        for (int i = 0; i < input.length; i++) {
-            if (input[i] == -1)
-                return i - 1;
-        }
-        return -1;
-    }
-
-    public String getServiceAt(int index) {
-        if (index == services.length - 1)
-            return STRING_DESTINATION;
-        try {
-            char s = services[index];
-            return Character.toString(s);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            System.err.println("index = " + index);
-            throw e;
-        }
-    }
-
-    public int getIndexLastService() {
-        return services.length - 2;
-    }
-
-    public int getDestinationId() {
-        return providers[providers.length - 1];
-    }
-
-    public int getDestinationInput() {
-        return input[providers.length - 1];
-    }
-
-    public void getBytes(byte[] msg, int offset) {
-        throw new RuntimeException("not implemented");
+    public char[] getServices() {
+        return services;
     }
 
     public int getSize() {
-        return Sizeof.inst(id.toCharArray()) + Sizeof.inst(services) + Sizeof.inst(providers) + Sizeof.inst(input);
+        return Sizeof.inst(id) + Sizeof.inst(ttl) + Sizeof.inst(services);
+    }
+
+    public NetAddress getInitiatorAddress() {
+        return new NetAddress(new byte[] { 0, 0, 0, (byte) Integer.parseInt(id.split("-")[0]) });
+    }
+}
+
+class CiANDiscoveryResponse extends CiANWorkflowMessage
+{
+    private int    senderId;
+    private char[] services;
+    private int    finalTtl;
+
+    public CiANDiscoveryResponse(String id, int senderId, char[] services, int finalTtl) {
+        super(id);
+        this.senderId = senderId;
+        this.services = services;
+        this.finalTtl = finalTtl;
+    }
+
+    public int getSenderId() {
+        return senderId;
+    }
+
+    public char[] getServices() {
+        return services;
+    }
+
+    public int getDistance(int initialTtl) {
+        return initialTtl - finalTtl;
+    }
+
+    public int getSize() {
+        return Sizeof.inst(id) + Sizeof.inst(senderId) + Sizeof.inst(services) + Sizeof.inst(finalTtl);
     }
 }

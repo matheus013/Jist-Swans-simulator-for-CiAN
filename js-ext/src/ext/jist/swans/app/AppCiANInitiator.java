@@ -10,6 +10,7 @@ import jist.swans.Constants;
 import jist.swans.mac.MacAddress;
 import jist.swans.misc.Message;
 import jist.swans.net.NetAddress;
+import ducks.driver.SimParams;
 import ext.util.stats.DucksCompositionStats;
 
 public class AppCiANInitiator extends AppCiANBase
@@ -17,6 +18,8 @@ public class AppCiANInitiator extends AppCiANBase
     private static final int              STATE_SEARCHING      = 0;
     private static final int              STATE_AWAITING_TIMER = 1;
     private static final int              STATE_OBSERVING      = 2;
+
+    private static final int              defaultTtl           = 64;
 
     private int                           state;
     private HashMap<String, CiANWorkflow> pendingWf;
@@ -27,8 +30,11 @@ public class AppCiANInitiator extends AppCiANBase
     private int                           waitTimeEnd;
     private int                           duration;
 
+    private String                        compoRestrict;
+    private int                           responsesReceived;
+
     public AppCiANInitiator(int nodeId, DucksCompositionStats stats, int reqSize, int reqRate, int waitTimeStart,
-            int waitTimeEnd, int duration) {
+            int waitTimeEnd, int duration, String compoRestrict) {
         super(nodeId, stats);
         this.state = STATE_SEARCHING;
         this.pendingWf = new HashMap<String, CiANWorkflow>();
@@ -38,6 +44,10 @@ public class AppCiANInitiator extends AppCiANBase
         this.waitTimeStart = waitTimeStart;
         this.waitTimeEnd = waitTimeEnd;
         this.duration = duration;
+
+        // If set to true, we ask for different providers for each service
+        this.compoRestrict = compoRestrict;
+        this.responsesReceived = 0;
     }
 
     @Override
@@ -70,43 +80,40 @@ public class AppCiANInitiator extends AppCiANBase
         }
 
         // handle workflow message
-        if (msg instanceof CiANWorkflowRequest) {
-            handleWorkflowRequest((CiANWorkflowRequest) msg, src);
-        } else if (msg instanceof CiANServiceAd) {
-            handleServiceAd((CiANServiceAd) msg, src);
-        } else if (msg instanceof CiANToken) {
+        if (msg instanceof CiANToken) {
             handleToken((CiANToken) msg, src);
+        } else if (msg instanceof CiANDiscoveryResponse) {
+            handleDiscoveryResponse((CiANDiscoveryResponse) msg, src);
         } else {
             return;
         }
     }
 
-    protected void handleWorkflowRequest(CiANWorkflowRequest req, NetAddress src) {
-        CiANWorkflow localWf = pendingWf.get(req.getId());
-        if (localWf == null)
+    protected void handleDiscoveryResponse(CiANDiscoveryResponse response, NetAddress src) {
+        CiANWorkflow wf = pendingWf.get(response.getId());
+        if (null == wf)
             return;
 
         switch (state) {
-            case STATE_OBSERVING:
-                if (localWf.getVersion() > req.getVersion())
-                    return;
-                // TODO What for? Need to be put back to pendingWf
-                localWf = new CiANWorkflow(req.getId(), req.getVersion(), req.getServicesCopy(), req.getInputCopy(),
-                        req.getNextIndexToExecute(), JistAPI.getTime());
-                break;
-            default:
-                break;
-        }
-
-    }
-
-    protected void handleServiceAd(CiANServiceAd ad, NetAddress src) {
-        CiANWorkflow wf = pendingWf.get(ad.getId());
-        switch (state) {
             case STATE_SEARCHING:
-                state = STATE_AWAITING_TIMER;
+            case STATE_AWAITING_TIMER:
+                // We have a new potential provider
+                ++responsesReceived;
+                CiANProvider p = new CiANProvider(response.getSenderId(), response.getDistance(defaultTtl));
+                char[] services = wf.getServices();
+                for (char service : services) {
+                    if (!wf.isPartOfProviderList(service, p.getNodeId())) {
+                        wf.updateProviderFor(service, p);
+                    }
+                }
+
+                // If all services have a provider we're good to go planning
+                if (wf.areAllServicesProvided()
+                        && (!compoRestrict.equals(SimParams.COMPOSITION_RESTRICTION_NO_REPEAT) || responsesReceived >= reqSize)) {
+                    state = STATE_AWAITING_TIMER;
+                }
+                break;
             default:
-                wf.updateProviderFor(ad.getService(), new CiANProvider(ad.getAdvertiser(), ad.getConnectivity()));
                 break;
         }
     }
@@ -119,13 +126,13 @@ public class AppCiANInitiator extends AppCiANBase
                 int in = t.getInput();
                 wf.updateInputFor(service, in);
                 if (wf.isLastService(service)) {
-                    compositionStats.incrementInvokeSuccess(CiANCompositionMessage.STRING_DESTINATION);
-                    compositionStats.registerForwardToExecEndTime(CiANCompositionMessage.STRING_DESTINATION,
-                            wf.getId(), JistAPI.getTime());
-                    compositionStats.setLastServiceExecuted(CiANCompositionMessage.STRING_DESTINATION);
-                    compositionStats.setiKnowsLastServiceExecuted(CiANCompositionMessage.STRING_DESTINATION);
-                    compositionStats.setiKnowsLastServiceBound(CiANCompositionMessage.STRING_DESTINATION);
-                } else {
+                    compositionStats.incrementInvokeSuccess(CiANWorkflow.STRING_DESTINATION);
+                    compositionStats.registerForwardToExecEndTime(CiANWorkflow.STRING_DESTINATION, wf.getId(),
+                            JistAPI.getTime());
+                    compositionStats.setLastServiceExecuted(CiANWorkflow.STRING_DESTINATION);
+                    compositionStats.setiKnowsLastServiceExecuted(CiANWorkflow.STRING_DESTINATION);
+                    compositionStats.setiKnowsLastServiceBound(CiANWorkflow.STRING_DESTINATION);
+                } else { // should not happen
                     compositionStats.setiKnowsLastServiceExecuted(String.valueOf((char) (service - 1)));
                     compositionStats.setiKnowsLastServiceBound(String.valueOf(service));
                 }
@@ -184,28 +191,33 @@ public class AppCiANInitiator extends AppCiANBase
     }
 
     private void search(CiANWorkflow wf) {
-        CiANWorkflowRequest wfreq = new CiANWorkflowRequest(wf.getId(), wf.getVersion(), wf.getServices(),
-                wf.getInputs(), wf.getNextIndexToExecute());
-        send(wfreq);
+        CiANDiscoveryRequest req = new CiANDiscoveryRequest(wf.getId(), wf.getServices(), defaultTtl);
+        send(req);
         scheduleTimeoutFor(wf.getId(), JistAPI.getTime() + TIMEOUT_SEND_SERVICE_AD + TIMEOUT_COOL_OFF);
     }
 
     private void handOff(CiANWorkflow wf) {
-        int index = wf.getNextIndexToExecute();
-        List<CiANProvider> providers = wf.getProvidersFor(index);
-        if (providers.size() > 0) {
-            char service = wf.getServiceForIndex(index);
-            CiANToken t = new CiANToken(wf.getId(), service, wf.getInputForService(service), providers.get(0)
-                    .getNodeId());
-            send(t);
-            compositionStats.addServiceProvider(wf.getId(), new Integer(providers.get(0).getNodeId()).toString());
+        // Allocation
+        CiANProvider[] providers = new CiANProvider[wf.getServices().length];
+        for (int i = 0; i < providers.length; ++i) {
+            // Little hack to have different providers for each service...
+            // TODO improve this...
+            List<CiANProvider> _providers = wf.getProvidersFor(i);
+            int size = _providers.size();
+            providers[i] = _providers.get(i % size);
+        }
+
+        // Disbursement
+        CiANWorkflowRequest wfReq = new CiANWorkflowRequest(wf.getId(), wf.getServices(), wf.getInputs(), providers);
+        for (int i = 0; i < providers.length; ++i) {
+            CiANProvider provider = providers[i];
+            char service = wf.getServiceForIndex(i);
+
+            compositionStats.addServiceProvider(wf.getId(), "" + provider.getNodeId());
             compositionStats.incrementSearchSuccess(String.valueOf(service));
             compositionStats.setLastServiceBound(String.valueOf(service));
             compositionStats.setiKnowsLastServiceBound(String.valueOf(service));
-        } else {
-            state = STATE_SEARCHING;
-            search(wf);
+            send(wfReq, provider.getAddress());
         }
     }
-
 }

@@ -54,7 +54,7 @@ public class CiANProviderNode extends GenericNode
 
             }
 
-            AppCiANBase ac = new AppCiANProvider(this.id, compoStats, mode, repository, compRestrict);
+            AppCiANBase ac = new AppCiANProvider(this.id, compoStats, mode, compRestrict, repository);
 
             // Currently we do not use transport layer instead we hand
             // over from the network layer directly to application layer

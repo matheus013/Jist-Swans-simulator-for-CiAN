@@ -30,6 +30,7 @@ public class CiANInitiatorNode extends GenericNode
             wTS = options.getIntProperty(SimParams.TRAFFIC_WAITSTART);
             wTE = options.getIntProperty(SimParams.TRAFFIC_WAITEND);
             duration = globalConfig.getIntProperty(SimParams.SIM_DURATION);
+            String compRestrict = options.getStringProperty(SimParams.COMPOSITION_RESTRICTION);
 
             DucksCompositionStats compoStats = null;
             try {
@@ -40,7 +41,7 @@ public class CiANInitiatorNode extends GenericNode
                 e.printStackTrace();
             }
 
-            AppCiANBase ac = new AppCiANInitiator(this.id, compoStats, reqSize, reqRate, wTS, wTE, duration);
+            AppCiANBase ac = new AppCiANInitiator(this.id, compoStats, reqSize, reqRate, wTS, wTE, duration, compRestrict);
 
             // Currently we do not use transport layer instead we hand
             // over from the network layer directly to application layer
