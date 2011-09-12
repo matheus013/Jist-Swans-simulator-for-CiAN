@@ -106,40 +106,27 @@ class CiANWorkflow
 {
     public final static char         SYMBOL_DESTINATION = '\r';
     public final static String       STRING_DESTINATION = "dst";
-    //    public final static int          INITIAL_WF_VERSION = 1;
 
     private int                      initiatorId;
     private String                   id;
-    //    private int                      version;                   // currently not
-    //                                                                 // used, but later
-    //                                                                 // when wf is
-    //                                                                 // transformed
     private char[]                   services;
     private int[]                    inputs;
     private List<List<CiANProvider>> providers;
 
-    //    private long                     arrival;
-    //    private int                      nextIndexToExecute;
-
     public CiANWorkflow(int nodeId, int msgId, int reqSize) {
         this.id = (new Integer(nodeId)).toString() + "-" + (new Integer(msgId)).toString();
         this.initiatorId = nodeId;
-        //        this.version = INITIAL_WF_VERSION;
         this.services = createServices(reqSize);
         this.inputs = createInputs(services.length);
         this.providers = createProviders(services.length);
-        //        this.nextIndexToExecute = 0;
     }
 
     public CiANWorkflow(String id, char[] services, int[] inputs, CiANProvider[] providers) {
         this.initiatorId = Integer.parseInt(id.split("-")[0]);
         this.id = id;
-        //        this.version = version;
         this.services = services;
         this.inputs = inputs;
-        //        this.nextIndexToExecute = nextIndexToExecute;
         this.providers = createProviders(providers);
-        //        this.arrival = arrival;
     }
 
     private char[] createServices(int size) {
@@ -198,10 +185,6 @@ class CiANWorkflow
     public String getId() {
         return id;
     }
-
-    //    public int getVersion() {
-    //        return version;
-    //    }
 
     public char[] getServices() {
         return services;
