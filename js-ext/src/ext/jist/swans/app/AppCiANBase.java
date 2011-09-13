@@ -416,12 +416,22 @@ class CiANToken extends CiANWorkflowMessage
 class CiANDiscoveryRequest extends CiANWorkflowMessage
 {
     private int    ttl;
+    private int    version;
     private char[] services;
 
     public CiANDiscoveryRequest(String id, char[] services, int ttl) {
         super(id);
         this.services = services;
         this.ttl = ttl > 0 ? ttl : 1;
+        this.version = 0;
+    }
+    
+    public int getVersion() {
+        return version;
+    }
+    
+    public void incrementVersion() {
+        ++version;
     }
 
     public boolean isExpired() {

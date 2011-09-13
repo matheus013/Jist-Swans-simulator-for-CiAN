@@ -69,9 +69,10 @@ public class AppCiANProvider extends AppCiANBase
     protected void handleDiscoveryRequest(CiANDiscoveryRequest msg, NetAddress src) {
         switch (state) {
             case STATE_LISTENING:
-                if (!responsesSent.contains(msg.getId()) && !msg.isExpired()) {
+                String id = msg.getId() + "@" + msg.getVersion();
+                if (!responsesSent.contains(id) && !msg.isExpired()) {
                     // First forward it to neighbours
-                    responsesSent.add(msg.getId());
+                    responsesSent.add(id);
                     send(msg);
 
                     // And finally send a response to the initiator

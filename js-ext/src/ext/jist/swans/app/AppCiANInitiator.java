@@ -33,6 +33,8 @@ public class AppCiANInitiator extends AppCiANBase
     private String                        compoRestrict;
     private int                           responsesReceived;
 
+    private CiANDiscoveryRequest          request;
+
     public AppCiANInitiator(int nodeId, DucksCompositionStats stats, int reqSize, int reqRate, int waitTimeStart,
             int waitTimeEnd, int duration, String compoRestrict) {
         super(nodeId, stats);
@@ -152,6 +154,7 @@ public class AppCiANInitiator extends AppCiANBase
                 if (JistAPI.getTime() <= ((this.duration - this.waitTimeEnd) * Constants.SECOND) - reqSize
                         * (TIMEOUT_SEND_SERVICE_AD + TIMEOUT_COOL_OFF)) {
                     JistAPI.sleep(SLEEP_BEFORE_RETRY);
+                    request.incrementVersion();
                     search(wf);
                 }
                 break;
@@ -183,6 +186,7 @@ public class AppCiANInitiator extends AppCiANBase
     private CiANWorkflow createWorkflow() {
         CiANWorkflow wf = new CiANWorkflow(nodeId, msgId, reqSize);
         pendingWf.put(wf.getId(), wf);
+        request = new CiANDiscoveryRequest(wf.getId(), wf.getServices(), defaultTtl);
         msgId++;
         compositionStats.setLastService(Character.toString(wf.getLastRealService()));
         compositionStats.registerBindStartTime("A", wf.getId(), JistAPI.getTime());
@@ -191,8 +195,7 @@ public class AppCiANInitiator extends AppCiANBase
     }
 
     private void search(CiANWorkflow wf) {
-        CiANDiscoveryRequest req = new CiANDiscoveryRequest(wf.getId(), wf.getServices(), defaultTtl);
-        send(req);
+        send(request);
         scheduleTimeoutFor(wf.getId(), JistAPI.getTime() + TIMEOUT_SEND_SERVICE_AD + TIMEOUT_COOL_OFF);
     }
 
@@ -206,7 +209,7 @@ public class AppCiANInitiator extends AppCiANBase
             int size = _providers.size();
             providers[i] = _providers.get(i % size);
         }
-        
+
         // Last service must always get back to the initiator
         providers[providers.length - 1] = new CiANProvider(nodeId, 0);
 
