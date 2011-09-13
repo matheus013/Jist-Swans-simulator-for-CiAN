@@ -199,13 +199,16 @@ public class AppCiANInitiator extends AppCiANBase
     private void handOff(CiANWorkflow wf) {
         // Allocation
         CiANProvider[] providers = new CiANProvider[wf.getServices().length];
-        for (int i = 0; i < providers.length; ++i) {
+        for (int i = 0; i < providers.length - 1; ++i) {
             // Little hack to have different providers for each service...
             // TODO improve this...
             List<CiANProvider> _providers = wf.getProvidersFor(i);
             int size = _providers.size();
             providers[i] = _providers.get(i % size);
         }
+        
+        // Last service must always get back to the initiator
+        providers[providers.length - 1] = new CiANProvider(nodeId, 0);
 
         // Disbursement
         CiANWorkflowRequest wfReq = new CiANWorkflowRequest(wf.getId(), wf.getServices(), wf.getInputs(), providers);
