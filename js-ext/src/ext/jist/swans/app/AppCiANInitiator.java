@@ -102,7 +102,7 @@ public class AppCiANInitiator extends AppCiANBase
                 CiANProvider p = new CiANProvider(response.getSenderId(), response.getDistance(defaultTtl));
                 char[] services = wf.getServices();
                 for (char service : services) {
-                    if (!wf.isPartOfProviderList(service, p.getNodeId())) {
+                    if (!wf.isLastService(service) && !wf.isPartOfProviderList(service, p.getNodeId())) {
                         wf.updateProviderFor(service, p);
                     }
                 }
