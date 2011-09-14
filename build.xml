@@ -98,10 +98,10 @@
 	<target name="run.ducks.driver" depends="clean.cache">
 		<java classname="jist.runtime.Main" dir="${basedir}/${ducks.dir}" failonerror="true" fork="yes">
 			<jvmarg value="-Xmx1G" />
-			<!-- enable for debugging		-->	
+			<!-- enable for debugging		
 				<jvmarg value="-Xdebug" />
 				<jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5432" />
-				 
+				 -->
 			<!--<jvmarg value="-server" />-->
 			<arg value="ducks.driver.Main" />
 			<arg value="-f" />

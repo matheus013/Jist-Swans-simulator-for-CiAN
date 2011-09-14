@@ -106,10 +106,14 @@ public class AppCiANInitiator extends AppCiANBase
                 for (char service : services) {
                     if (!wf.isLastService(service) && !wf.isPartOfProviderList(service, p.getNodeId())) {
                         wf.updateProviderFor(service, p);
+                        compositionStats.incrementSearchSuccess(String.valueOf(service));
                     }
                 }
 
                 // If all services have a provider we're good to go planning
+                // TODO this is really a hack that should be better implemented
+                //      If no-repeat, we must actually check that each service is assigned to
+                //      a different provider
                 if (wf.areAllServicesProvided()
                         && (!compoRestrict.equals(SimParams.COMPOSITION_RESTRICTION_NO_REPEAT) || responsesReceived >= reqSize)) {
                     state = STATE_AWAITING_TIMER;
@@ -133,10 +137,9 @@ public class AppCiANInitiator extends AppCiANBase
                             JistAPI.getTime());
                     compositionStats.setLastServiceExecuted(CiANWorkflow.STRING_DESTINATION);
                     compositionStats.setiKnowsLastServiceExecuted(CiANWorkflow.STRING_DESTINATION);
-                    compositionStats.setiKnowsLastServiceBound(CiANWorkflow.STRING_DESTINATION);
                 } else { // should not happen
                     compositionStats.setiKnowsLastServiceExecuted(String.valueOf((char) (service - 1)));
-                    compositionStats.setiKnowsLastServiceBound(String.valueOf(service));
+                    compositionStats.registerForwardToExecEndTime(String.valueOf(service), wf.getId(), JistAPI.getTime());
                 }
                 break;
             default:
@@ -189,7 +192,9 @@ public class AppCiANInitiator extends AppCiANBase
         request = new CiANDiscoveryRequest(wf.getId(), wf.getServices(), defaultTtl);
         msgId++;
         compositionStats.setLastService(Character.toString(wf.getLastRealService()));
-        compositionStats.registerBindStartTime("A", wf.getId(), JistAPI.getTime());
+        for (char service : wf.getServices()) {
+            compositionStats.registerBindStartTime(wf.isLastService(service) ? CiANWorkflow.STRING_DESTINATION : String.valueOf(service), wf.getId(), JistAPI.getTime());
+        }
 
         return wf;
     }
@@ -204,7 +209,7 @@ public class AppCiANInitiator extends AppCiANBase
         CiANProvider[] providers = new CiANProvider[wf.getServices().length];
         for (int i = 0; i < providers.length - 1; ++i) {
             // Little hack to have different providers for each service...
-            // TODO improve this...
+            // TODO improve this... and must be a proper check if compoRestrict = true
             List<CiANProvider> _providers = wf.getProvidersFor(i);
             int size = _providers.size();
             providers[i] = _providers.get(i % size);
@@ -212,18 +217,20 @@ public class AppCiANInitiator extends AppCiANBase
 
         // Last service must always get back to the initiator
         providers[providers.length - 1] = new CiANProvider(nodeId, 0);
+        compositionStats.registerBindEndTime(CiANWorkflow.STRING_DESTINATION, wf.getId(), JistAPI.getTime());
 
         // Disbursement
         CiANWorkflowRequest wfReq = new CiANWorkflowRequest(wf.getId(), wf.getServices(), wf.getInputs(), providers);
-        for (int i = 0; i < providers.length; ++i) {
+        for (int i = 0; i < providers.length - 1; ++i) {
             CiANProvider provider = providers[i];
             char service = wf.getServiceForIndex(i);
 
+            compositionStats.registerBindEndTime(String.valueOf(wf.getServiceForIndex(i)), wf.getId(), JistAPI.getTime());
             compositionStats.addServiceProvider(wf.getId(), "" + provider.getNodeId());
-            compositionStats.incrementSearchSuccess(String.valueOf(service));
             compositionStats.setLastServiceBound(String.valueOf(service));
             compositionStats.setiKnowsLastServiceBound(String.valueOf(service));
             send(wfReq, provider.getAddress());
         }
+        compositionStats.registerForwardToExecStartTime(String.valueOf(wf.getServiceForIndex(0)), wf.getId(), JistAPI.getTime());
     }
 }

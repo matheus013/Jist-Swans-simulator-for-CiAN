@@ -20,22 +20,18 @@ public class AppCiANProvider extends AppCiANBase
 
     private int                           state;
     private HashMap<String, CiANWorkflow> pendingWf;
-    private String                        compoRestrict;
-    private boolean                       alligible;
     private HashMap<Character, Integer>   repository;
 
     private List<Message>                 completedMessages;
     private List<String>                  responsesSent;
 
-    public AppCiANProvider(int nodeId, DucksCompositionStats stats, String mode, String compoRestrict,
+    public AppCiANProvider(int nodeId, DucksCompositionStats stats, String mode,
             HashMap<Character, Integer> repository) {
         super(nodeId, stats);
         this.state = STATE_LISTENING;
         this.pendingWf = new HashMap<String, CiANWorkflow>();
-        this.compoRestrict = compoRestrict;
         this.completedMessages = new ArrayList<Message>();
         this.responsesSent = new ArrayList<String>();
-        this.alligible = true;
         this.repository = repository;
     }
 
@@ -93,8 +89,6 @@ public class AppCiANProvider extends AppCiANBase
 
         switch (state) {
             case STATE_LISTENING:
-                if (!alligible)
-                    return;
                 wf = new CiANWorkflow(reqId, req.getServicesCopy(), req.getInputCopy(), req.getProvidersCopy());
                 pendingWf.put(wf.getId(), wf);
 
@@ -138,10 +132,6 @@ public class AppCiANProvider extends AppCiANBase
     private void execute(CiANWorkflow wf, int index) {
         String wfId = wf.getId();
 
-        if (compoRestrict.equals(SimParams.COMPOSITION_RESTRICTION_NO_REPEAT)) {
-            alligible = false;
-        }
-
         char service = wf.getServiceForIndex(index);
         int in = wf.getInputForService(service);
         if (in == -2) {
@@ -152,6 +142,7 @@ public class AppCiANProvider extends AppCiANBase
         in = serviceImpl(in, repository.get(service));
         compositionStats.incrementInvokeSuccess(String.valueOf(service));
         compositionStats.setLastServiceExecuted(String.valueOf(service));
+        compositionStats.registerForwardToExecEndTime(String.valueOf(service), wf.getId(), JistAPI.getTime());
         char nextService = wf.getSuccessorService(service);
         wf.updateInputFor(nextService, in);
         handOff(wfId, nextService, in, wf.getProvidersFor(index + 1).get(0), wf.isLastService(nextService));
@@ -171,15 +162,7 @@ public class AppCiANProvider extends AppCiANBase
     private void handOff(String wfId, char service, int in, CiANProvider provider, boolean isLast) {
         CiANToken t = new CiANToken(wfId, service, in);
         send(t, provider.getAddress());
-        if (!isLast) {
-            compositionStats.addServiceProvider(wfId, new Integer(provider.getNodeId()).toString());
-            compositionStats.setLastServiceBound(String.valueOf(service));
-        } else {
-            compositionStats.setLastServiceBound(CiANWorkflow.STRING_DESTINATION);
-            // needed only to use DuckStats as is and to have dst entry
-            // registered, otherwise end time is not stored
-            compositionStats.registerForwardToExecStartTime(CiANWorkflow.STRING_DESTINATION, wfId, JistAPI.getTime());
-        }
+        compositionStats.registerForwardToExecStartTime(isLast ? CiANWorkflow.STRING_DESTINATION : String.valueOf(service), wfId, JistAPI.getTime());
     }
 
     private int serviceImpl(int in, int waitTime) {

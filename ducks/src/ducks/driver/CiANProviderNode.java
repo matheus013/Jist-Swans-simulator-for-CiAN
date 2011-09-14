@@ -29,7 +29,6 @@ public class CiANProviderNode extends GenericNode
             HashMap<Character, Integer> repository = new HashMap<Character, Integer>();
             String mode = options.getStringProperty(SimParams.COMPOSITION_TYPE);
             int reqSize = options.getIntProperty(SimParams.COMPOSITION_LENGTH);
-            String compRestrict = options.getStringProperty(SimParams.COMPOSITION_RESTRICTION);
 
             // init provider-specific service repository
             char service = 'A';
@@ -54,7 +53,7 @@ public class CiANProviderNode extends GenericNode
 
             }
 
-            AppCiANBase ac = new AppCiANProvider(this.id, compoStats, mode, compRestrict, repository);
+            AppCiANBase ac = new AppCiANProvider(this.id, compoStats, mode, repository);
 
             // Currently we do not use transport layer instead we hand
             // over from the network layer directly to application layer
