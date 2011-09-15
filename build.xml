@@ -105,7 +105,7 @@
 			<!--<jvmarg value="-server" />-->
 			<arg value="ducks.driver.Main" />
 			<arg value="-f" />
-			<arg value="resources/cian-workflow-study.properties" />
+			<arg value="resources/cian-workflow-test.properties" />
 			<arg value="-d" />
 			<arg value="resources/log4j.properties" />
 			<classpath refid="project.classpath" />

@@ -140,11 +140,11 @@ public class AppCiANProvider extends AppCiANBase
             cleanup(wfId);
             return;
         }
+        compositionStats.registerForwardToExecEndTime(String.valueOf(service), wf.getId(), JistAPI.getTime());
 
         in = serviceImpl(in, repository.get(service));
         compositionStats.incrementInvokeSuccess(String.valueOf(service));
         compositionStats.setLastServiceExecuted(String.valueOf(service));
-        compositionStats.registerForwardToExecEndTime(String.valueOf(service), wf.getId(), JistAPI.getTime());
         char nextService = wf.getSuccessorService(service);
         wf.updateInputFor(nextService, in);
         
@@ -165,9 +165,9 @@ public class AppCiANProvider extends AppCiANBase
 
     private void handOff(String wfId, char service, int in, CiANProvider provider, boolean isLast) {
         CiANToken t = new CiANToken(wfId, service, in);
-        send(t, provider.getAddress());
         compositionStats.registerForwardToExecStartTime(
                 isLast ? CiANWorkflow.STRING_DESTINATION : String.valueOf(service), wfId, JistAPI.getTime());
+        send(t, provider.getAddress());
     }
 
     private int serviceImpl(int in, int waitTime) {

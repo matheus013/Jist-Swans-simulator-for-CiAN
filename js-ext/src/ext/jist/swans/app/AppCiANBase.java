@@ -117,7 +117,7 @@ class CiANWorkflow
 
     /*
      * TODO createServices only creates a linear workflow for now but it can
-     * easily be changed to a sequential workflow.
+     * easily be changed to a parallel workflow.
      * Please note though that there is no workflow validation like in CiAN
      * so you must be careful and provide a valid workflow.
      * 

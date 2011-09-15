@@ -225,6 +225,7 @@ public class AppCiANInitiator extends AppCiANBase
 
         // Disbursement
         CiANWorkflowRequest wfReq = new CiANWorkflowRequest(wf.getId(), wf.getServices(), wf.getInputs(), providers);
+        compositionStats.registerForwardToExecStartTime(String.valueOf(wf.getServiceForIndex(0)), wf.getId(), JistAPI.getTime());
         for (int i = 0; i < providers.length - 1; ++i) {
             CiANProvider provider = providers[i];
             char service = wf.getServiceForIndex(i);
@@ -235,6 +236,5 @@ public class AppCiANInitiator extends AppCiANBase
             compositionStats.setiKnowsLastServiceBound(String.valueOf(service));
             send(wfReq, provider.getAddress());
         }
-        compositionStats.registerForwardToExecStartTime(String.valueOf(wf.getServiceForIndex(0)), wf.getId(), JistAPI.getTime());
     }
 }
