@@ -9,7 +9,6 @@ import jist.swans.Constants;
 import jist.swans.mac.MacAddress;
 import jist.swans.misc.Message;
 import jist.swans.net.NetAddress;
-import ducks.driver.SimParams;
 import ext.util.stats.DucksCompositionStats;
 
 public class AppCiANProvider extends AppCiANBase
@@ -149,7 +148,7 @@ public class AppCiANProvider extends AppCiANBase
         compositionStats.setLastServiceExecuted(String.valueOf(service));
         char nextService = wf.getSuccessorService(service);
         wf.updateInputFor(nextService, in);
-        
+
         // TODO handoff to every successors and not rely on (index + 1) anymore
         handOff(wfId, nextService, in, wf.getProvidersFor(index + 1).get(0), wf.isLastService(nextService));
 
