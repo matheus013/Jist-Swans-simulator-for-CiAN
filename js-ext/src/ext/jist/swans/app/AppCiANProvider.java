@@ -124,6 +124,8 @@ public class AppCiANProvider extends AppCiANBase
         switch (state) {
             case STATE_OBSERVING:
                 // TODO Do not execute until we are sure we received ALL tokens for all predecessors of this service
+                //      That might involve changing the behaviour of the token to not contain next service but current service
+                //      so that the successor can look in its predecessors list to see if it received a token for each one.
                 execute(wf, index);
                 break;
             default:
