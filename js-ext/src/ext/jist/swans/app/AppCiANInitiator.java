@@ -116,6 +116,10 @@ public class AppCiANInitiator extends AppCiANBase
                 //      a different provider
                 if (wf.areAllServicesProvided()
                         && (!compoRestrict.equals(SimParams.COMPOSITION_RESTRICTION_NO_REPEAT) || responsesReceived >= reqSize)) {
+                    // TODO Actually in CiAN there is no such timer
+                    //      We start the allocation process as soon as we know enough providers to
+                    //      complete the workflow. We can't do that here "as-is" because for now every providers
+                    //      provides everything.
                     state = STATE_AWAITING_TIMER;
                 }
                 break;

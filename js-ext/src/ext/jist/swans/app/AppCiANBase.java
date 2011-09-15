@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.sun.java_cup.internal.lalr_item;
+
 import jist.runtime.JistAPI;
 import jist.swans.Constants;
 import jist.swans.app.AppInterface;
@@ -113,6 +115,22 @@ class CiANWorkflow
     private int[]                    inputs;
     private List<List<CiANProvider>> providers;
 
+    /*
+     * TODO createServices only creates a linear workflow for now but it can
+     * easily be changed to a sequential workflow.
+     * Please note though that there is no workflow validation like in CiAN
+     * so you must be careful and provide a valid workflow.
+     * 
+     * The predecessors and successors lists are not used at the moment.
+     * They should be sent inside the workflow request and providers should not
+     * send anymore directly to provider for (service + 1) but for every
+     * providers in the list of successors. Same goes when they receive a token,
+     * they have to wait for tokens for every predecessors for a given service
+     * before actually executing it.
+     */
+    private List<List<Character>>    predecessors;
+    private List<List<Character>>    successors;
+
     public CiANWorkflow(int nodeId, int msgId, int reqSize) {
         this.id = (new Integer(nodeId)).toString() + "-" + (new Integer(msgId)).toString();
         this.initiatorId = nodeId;
@@ -133,13 +151,28 @@ class CiANWorkflow
         char[] services = new char[size + 1];
         char service = 'A';
         int index = 0;
+        predecessors = new ArrayList<List<Character>>(size);
+        successors = new ArrayList<List<Character>>(size);
 
         while (index < size) {
             services[index] = service;
+            List<Character> _predecessors = new ArrayList<Character>();
+            if (0 != index)
+                _predecessors.add((char) (service - 1));
+            List<Character> _successors = new ArrayList<Character>();
+            _successors.add((size - 1 == index) ? SYMBOL_DESTINATION : (char) (service + 1));
+            predecessors.add(_predecessors);
+            successors.add(_successors);
+
             index++;
             service++;
         }
         services[size] = SYMBOL_DESTINATION;
+        List<Character> _predecessors = new ArrayList<Character>();
+        _predecessors.add(services[size - 1]);
+        predecessors.add(_predecessors);
+        successors.add(new ArrayList<Character>());
+
         // compositionStats.setLastService(Character.toString(services[size-1]));
         return services;
     }
@@ -256,6 +289,22 @@ class CiANWorkflow
         return s;
     }
 
+    public List<Character> getPredecessorsForService(char service) {
+        return predecessors.get(getIndexForService(service));
+    }
+
+    public List<Character> getSuccessorsForService(char service) {
+        return successors.get(getIndexForService(service));
+    }
+
+    public List<List<Character>> getPredecessors() {
+        return predecessors;
+    }
+
+    public List<List<Character>> getSuccessors() {
+        return successors;
+    }
+
     public char getSuccessorService(char service) {
         char s = '\0';
         int index = getIndexForService(service);
@@ -352,6 +401,9 @@ abstract class CiANWorkflowMessage implements Message
     public abstract int getSize();
 }
 
+/*
+ * TODO Should also store services predecessors and successors
+ */
 class CiANWorkflowRequest extends CiANWorkflowMessage
 {
     private char[]         services;
@@ -425,11 +477,11 @@ class CiANDiscoveryRequest extends CiANWorkflowMessage
         this.ttl = ttl > 0 ? ttl : 1;
         this.version = 0;
     }
-    
+
     public int getVersion() {
         return version;
     }
-    
+
     public void incrementVersion() {
         ++version;
     }

@@ -25,8 +25,7 @@ public class AppCiANProvider extends AppCiANBase
     private List<Message>                 completedMessages;
     private List<String>                  responsesSent;
 
-    public AppCiANProvider(int nodeId, DucksCompositionStats stats, String mode,
-            HashMap<Character, Integer> repository) {
+    public AppCiANProvider(int nodeId, DucksCompositionStats stats, String mode, HashMap<Character, Integer> repository) {
         super(nodeId, stats);
         this.state = STATE_LISTENING;
         this.pendingWf = new HashMap<String, CiANWorkflow>();
@@ -73,6 +72,8 @@ public class AppCiANProvider extends AppCiANBase
 
                     // And finally send a response to the initiator
                     // To simplify, we announce that we can handle every service
+                    // TODO To be closer to CiAN implementation, we should respond to only some (or even one service)
+                    //      chosen arbitrarily. That would allow maybe the initiator to remove its AWAITING_TIMER state.
                     CiANDiscoveryResponse response = new CiANDiscoveryResponse(msg.getId(), nodeId, msg.getServices(),
                             msg.getTtl());
                     send(response, msg.getInitiatorAddress());
@@ -122,6 +123,7 @@ public class AppCiANProvider extends AppCiANBase
 
         switch (state) {
             case STATE_OBSERVING:
+                // TODO Do not execute until we are sure we received ALL tokens for all predecessors of this service
                 execute(wf, index);
                 break;
             default:
@@ -145,6 +147,8 @@ public class AppCiANProvider extends AppCiANBase
         compositionStats.registerForwardToExecEndTime(String.valueOf(service), wf.getId(), JistAPI.getTime());
         char nextService = wf.getSuccessorService(service);
         wf.updateInputFor(nextService, in);
+        
+        // TODO handoff to every successors and not rely on (index + 1) anymore
         handOff(wfId, nextService, in, wf.getProvidersFor(index + 1).get(0), wf.isLastService(nextService));
 
         // If we must wait for another service to execute
@@ -162,7 +166,8 @@ public class AppCiANProvider extends AppCiANBase
     private void handOff(String wfId, char service, int in, CiANProvider provider, boolean isLast) {
         CiANToken t = new CiANToken(wfId, service, in);
         send(t, provider.getAddress());
-        compositionStats.registerForwardToExecStartTime(isLast ? CiANWorkflow.STRING_DESTINATION : String.valueOf(service), wfId, JistAPI.getTime());
+        compositionStats.registerForwardToExecStartTime(
+                isLast ? CiANWorkflow.STRING_DESTINATION : String.valueOf(service), wfId, JistAPI.getTime());
     }
 
     private int serviceImpl(int in, int waitTime) {
